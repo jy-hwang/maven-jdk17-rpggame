@@ -13,12 +13,13 @@ import util.InputValidator;
  */
 public class Game {
   private static final Logger logger = LoggerFactory.getLogger(Game.class);
-
+  private static final double GAME_VERSION = 1.3;
   // 게임 상태
   private GameCharacter player;
   private QuestManager questManager;
   private GameDataService.GameState gameState;
   private boolean gameRunning;
+  private boolean inGameLoop;
   private long gameStartTime;
   private int currentSaveSlot;
 
@@ -31,13 +32,14 @@ public class Game {
 
   public Game() {
     this.gameRunning = true;
+    this.inGameLoop = false;
     this.questManager = new QuestManager();
     this.gameState = new GameDataService.GameState();
     this.gameStartTime = System.currentTimeMillis();
     this.currentSaveSlot = 0;
 
     initializeControllers();
-    logger.info("게임 인스턴스 생성 완료 (v1.2 - Controller 분리)");
+    logger.info("게임 인스턴스 생성 완료 (v"+GAME_VERSION+"- 상점판매기능 추가)");
   }
 
   /**
@@ -64,24 +66,31 @@ public class Game {
    */
   public void start() {
     try {
-      logger.info("게임 시작 (v1.2)");
+      logger.info("게임 시작 (v"+GAME_VERSION+")");
       showWelcomeMessage();
 
-      // 플레이어 초기화
-      if (!initializePlayer()) {
-        logger.info("플레이어 초기화 실패로 게임 종료");
-        return;
-      }
+      // 메인 메뉴 루프
+      while (gameRunning) {
+        showMainMenu();
+        int choice = InputValidator.getIntInput("선택: ", 1, 3);
 
-      // 메인 게임 루프
-      gameLoop();
+        switch (choice) {
+          case 1:
+            startNewGame();
+            break;
+          case 2:
+            loadGame();
+            break;
+          case 3:
+            exitGame();
+            break;
+        }
+      }
 
     } catch (Exception e) {
       logger.error("게임 실행 중 오류 발생", e);
       System.out.println("게임 실행 중 오류가 발생했습니다. 게임을 종료합니다.");
     } finally {
-      // 플레이 시간 업데이트
-      updatePlayTime();
       logger.info("게임 종료");
     }
   }
@@ -91,44 +100,60 @@ public class Game {
    */
   private void showWelcomeMessage() {
     System.out.println("====================================");
-    System.out.println("   🎮 RPG 게임 v1.2 🎮   ");
+    System.out.println("   🎮 RPG 게임 v"+GAME_VERSION+" 🎮   ");
     System.out.println("====================================");
     System.out.println("새로운 기능:");
     System.out.println("• 📦 다중 저장 슬롯 시스템 (5개)");
     System.out.println("• 🏗️ 개선된 아키텍처 (Controller 분리)");
     System.out.println("• 🌟 향상된 탐험 시스템");
-    System.out.println("• 🛍️ 확장된 상점 시스템");
+    System.out.println("• 🛍️ 확장된 상점 시스템(구매 / 판매)");
     System.out.println("• 📋 고도화된 퀘스트 관리");
     System.out.println("====================================");
   }
 
   /**
-   * 플레이어를 초기화합니다.
+   * 메인 메뉴를 표시합니다.
    */
-  private boolean initializePlayer() {
-    try {
-      int choice = InputValidator.getIntInput("1. 새 게임\n2. 게임 불러오기\n선택: ", 1, 2);
+  private void showMainMenu() {
+    System.out.println("\n=== 🎮 메인 메뉴 ===");
+    System.out.println("1. 🆕 새로하기");
+    System.out.println("2. 📁 불러오기");
+    System.out.println("3. 🚪 종료하기");
+    System.out.println("==================");
 
-      if (choice == 1) {
-        return createNewCharacter();
-      } else {
-        return loadExistingCharacter();
-      }
+    // 저장된 게임이 있는지 확인해서 표시
+    showSaveFileInfo();
+  }
 
-    } catch (Exception e) {
-      logger.error("플레이어 초기화 중 오류", e);
-      System.out.println("플레이어 초기화 중 오류가 발생했습니다.");
-      return false;
+  /**
+   * 저장 파일 정보를 표시합니다.
+   */
+  private void showSaveFileInfo() {
+    var saveSlots = GameDataService.getAllSaveSlots();
+    long occupiedSlots = saveSlots.stream().filter(GameDataService.SaveSlotInfo::isOccupied).count();
+
+    if (occupiedSlots > 0) {
+      System.out.println("💾 저장된 게임: " + occupiedSlots + "개");
+    } else {
+      System.out.println("💾 저장된 게임이 없습니다.");
     }
   }
 
   /**
-   * 새 캐릭터를 생성합니다.
+   * 새 게임을 시작합니다.
    */
-  private boolean createNewCharacter() {
+  private void startNewGame() {
     try {
       String name = InputValidator.getStringInput("캐릭터 이름을 입력하세요: ", 1, 20);
       player = new GameCharacter(name);
+
+      // 게임 상태 초기화
+      gameState = new GameDataService.GameState();
+      gameStartTime = System.currentTimeMillis();
+      currentSaveSlot = 0;
+
+      // 컨트롤러들에 새로운 게임 상태 적용
+      updateControllersWithNewGameState();
 
       System.out.println("🎉 새로운 모험가 " + name + "님, 환영합니다!");
       player.displayStats();
@@ -137,68 +162,74 @@ public class Game {
       System.out.println("\n💡 퀘스트 메뉴에서 첫 번째 퀘스트를 수락해보세요!");
 
       logger.info("새 캐릭터 생성: {}", name);
-      return true;
+
+      // 인게임 루프 시작
+      startGameLoop();
 
     } catch (Exception e) {
-      logger.error("새 캐릭터 생성 실패", e);
-      System.out.println("캐릭터 생성 중 오류가 발생했습니다.");
-      return false;
+      logger.error("새 게임 시작 실패", e);
+      System.out.println("새 게임 시작 중 오류가 발생했습니다.");
+      InputValidator.waitForAnyKey("계속하려면 Enter를 누르세요...");
     }
   }
 
+
   /**
-   * 기존 캐릭터를 불러옵니다.
+   * 게임을 불러옵니다.
    */
-  private boolean loadExistingCharacter() {
+  private void loadGame() {
     try {
       // 저장 슬롯 목록 표시
       GameDataService.displaySaveSlots();
 
       int slotNumber = InputValidator.getIntInput("불러올 슬롯 번호 (0: 취소): ", 0, GameDataService.getMaxSaveSlots());
 
-      if (slotNumber == 0) {
-        return createNewCharacter(); // 취소하면 새 게임으로
-      }
+      if (slotNumber == 0)
+        return;
 
       GameDataService.SaveData saveData = GameDataService.loadGame(slotNumber);
 
       if (saveData == null) {
         System.out.println("슬롯 " + slotNumber + "에 저장된 게임이 없습니다.");
-        boolean createNew = InputValidator.getConfirmation("새 게임을 시작하시겠습니까?");
-        if (createNew) {
-          return createNewCharacter();
-        } else {
-          return false;
-        }
-      } else {
-        player = saveData.getCharacter();
-        gameState = saveData.getGameState();
-        currentSaveSlot = slotNumber;
-
-        // 컨트롤러들에 새로운 gameState 적용
-        updateControllersWithNewGameState();
-
-        System.out.println("🎮 슬롯 " + slotNumber + "에서 게임을 불러왔습니다!");
-        System.out.println("어서오세요, " + player.getName() + "님!");
-        player.displayStats();
-        gameState.displayGameStats();
-
-        logger.info("슬롯 {} 기존 캐릭터 로드: {}", slotNumber, player.getName());
-        return true;
+        InputValidator.waitForAnyKey("계속하려면 Enter를 누르세요...");
+        return;
       }
+
+      player = saveData.getCharacter();
+      gameState = saveData.getGameState();
+      currentSaveSlot = slotNumber;
+      gameStartTime = System.currentTimeMillis(); // 플레이 시간을 새로 시작
+
+      // 컨트롤러들에 새로운 gameState 적용
+      updateControllersWithNewGameState();
+
+      System.out.println("🎮 슬롯 " + slotNumber + "에서 게임을 불러왔습니다!");
+      System.out.println("어서오세요, " + player.getName() + "님!");
+      player.displayStats();
+      gameState.displayGameStats();
+
+      logger.info("슬롯 {} 기존 캐릭터 로드: {}", slotNumber, player.getName());
+
+      // 인게임 루프 시작
+      startGameLoop();
 
     } catch (GameDataService.GameDataException e) {
       logger.error("게임 로드 실패", e);
       System.out.println("게임 로드 실패: " + e.getMessage());
-
-      boolean createNew = InputValidator.getConfirmation("새 게임을 시작하시겠습니까?");
-      if (createNew) {
-        return createNewCharacter();
-      } else {
-        return false;
-      }
+      InputValidator.waitForAnyKey("계속하려면 Enter를 누르세요...");
     }
   }
+
+  /**
+   * 게임을 종료합니다.
+   */
+  private void exitGame() {
+    if (InputValidator.getConfirmation("정말로 게임을 종료하시겠습니까?")) {
+      System.out.println("🎮 게임을 종료합니다. 안녕히 가세요!");
+      gameRunning = false;
+    }
+  }
+
 
   /**
    * 새로운 게임 상태로 컨트롤러들을 업데이트합니다.
@@ -212,10 +243,12 @@ public class Game {
   /**
    * 메인 게임 루프를 실행합니다.
    */
-  private void gameLoop() {
-    while (gameRunning && player.isAlive()) {
+  private void startGameLoop() {
+    inGameLoop = true;
+
+    while (inGameLoop && player.isAlive()) {
       try {
-        showMainMenu();
+        showInGameMenu();
         int choice = InputValidator.getIntInput("선택: ", 1, 10);
 
         switch (choice) {
@@ -244,9 +277,7 @@ public class Game {
             manageSaveSlots();
             break;
           case 9:
-            if (confirmExit()) {
-              gameRunning = false;
-            }
+            returnToMainMenu();
             break;
           case 10:
             showHelp();
@@ -255,7 +286,7 @@ public class Game {
             System.out.println("잘못된 선택입니다.");
         }
 
-        if (gameRunning && choice != 2 && choice != 10) {
+        if (inGameLoop && choice != 2 && choice != 10) {
           InputValidator.waitForAnyKey("\n계속하려면 Enter를 누르세요...");
         }
 
@@ -267,15 +298,16 @@ public class Game {
 
     if (!player.isAlive()) {
       handleGameOver();
-    } else {
-      System.out.println("게임을 종료합니다. 안녕히 가세요!");
     }
+
+    // 인게임 루프 종료 후 메인 메뉴로 복귀
+    inGameLoop = false;
   }
 
   /**
    * 메인 메뉴를 표시합니다.
    */
-  private void showMainMenu() {
+  private void showInGameMenu() {
     System.out.println("\n=== 메인 메뉴 ===");
     System.out.println("1. 🗡️ 탐험하기");
     System.out.println("2. 📊 상태 확인");
@@ -304,6 +336,22 @@ public class Game {
     if (inventoryUsage > 0.8) {
       System.out.println("💼 인벤토리가 거의 가득 찼습니다! (" + String.format("%.0f%%", inventoryUsage * 100) + ")");
     }
+  }
+
+  /**
+   * 메인 메뉴로 돌아갑니다.
+   */
+  private void returnToMainMenu() {
+    boolean shouldSave = InputValidator.getConfirmation("게임을 저장하고 메인 메뉴로 돌아가시겠습니까?");
+
+    if (shouldSave) {
+      saveGame();
+    }
+    
+    //updatePlayTime(); // 플레이 시간 업데이트
+    inGameLoop = false;
+    System.out.println("🏠 메인 메뉴로 돌아갑니다.");
+  
   }
 
   /**
