@@ -2,6 +2,7 @@ package controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import model.GameCharacter;
@@ -21,6 +22,7 @@ public class ShopController {
 
   private final List<ShopItem> shopItems;
   private final InventoryController inventoryController;
+  private final Random random;
 
   // 상점 아이템 가격 상수
   private static final int HEALTH_POTION_PRICE = 20;
@@ -29,9 +31,15 @@ public class ShopController {
   private static final int LEATHER_ARMOR_PRICE = 80;
   private static final int MAGIC_RING_PRICE = 150;
 
+  // 이벤트 관련 상수
+  private static final int EVENT_CHANCE = 15; // 15% 확률로 이벤트 발생
+  private boolean currentEventActive = false;
+  private ShopEvent currentEvent = null;
+
   public ShopController(InventoryController inventoryController) {
     this.inventoryController = inventoryController;
     this.shopItems = new ArrayList<>();
+    this.random = new Random();
     initializeShopItems();
     logger.debug("ShopController 초기화 완료");
   }
@@ -41,8 +49,7 @@ public class ShopController {
    */
   private void initializeShopItems() {
     // 소비 아이템
-    shopItems
-        .add(new ShopItem(new GameConsumable("체력 물약", "HP를 50 회복합니다", HEALTH_POTION_PRICE, GameItem.ItemRarity.COMMON, 50, 0, 0, true), HEALTH_POTION_PRICE, 999, ShopItemCategory.CONSUMABLE));
+    shopItems.add(new ShopItem(new GameConsumable("체력 물약", "HP를 50 회복합니다", HEALTH_POTION_PRICE, GameItem.ItemRarity.COMMON, 50, 0, 0, true), HEALTH_POTION_PRICE, 999, ShopItemCategory.CONSUMABLE));
 
     shopItems.add(new ShopItem(new GameConsumable("마나 물약", "MP를 30 회복합니다", MANA_POTION_PRICE, GameItem.ItemRarity.COMMON, 0, 30, 0, true), MANA_POTION_PRICE, 999, ShopItemCategory.CONSUMABLE));
 
@@ -72,6 +79,10 @@ public class ShopController {
    * @param player 플레이어 캐릭터
    */
   public void openShop(GameCharacter player) {
+
+    // 상점 진입 시 랜덤 이벤트 체크
+    checkForRandomEvent();
+
     while (true) {
       displayShopMenuMain(player);
 
@@ -94,17 +105,87 @@ public class ShopController {
   }
 
   /**
+   * 랜덤 상점 이벤트를 체크합니다.
+   */
+  private void checkForRandomEvent() {
+    if (random.nextInt(100) < EVENT_CHANCE) {
+      triggerRandomEvent();
+    }
+  }
+
+  /**
+   * 랜덤 이벤트를 발생시킵니다.
+   */
+  private void triggerRandomEvent() {
+    ShopEvent[] events = ShopEvent.values();
+    currentEvent = events[random.nextInt(events.length)];
+    currentEventActive = true;
+
+    displayEventNotification();
+    logger.info("상점 이벤트 발생: {}", currentEvent);
+  }
+
+  /**
+   * 이벤트 알림을 표시합니다.
+   */
+  private void displayEventNotification() {
+    System.out.println("\n" + "🎉".repeat(20));
+    System.out.println("✨ 특별 이벤트 발생! ✨");
+
+    switch (currentEvent) {
+      case DISCOUNT_SALE -> {
+        System.out.println("🏷️ 할인 세일!");
+        System.out.println("💥 모든 아이템 20% 할인!");
+      }
+      case BONUS_SELL -> {
+        System.out.println("💰 고가 매입 이벤트!");
+        System.out.println("📈 판매 시 30% 보너스!");
+      }
+      case FREE_POTION -> {
+        System.out.println("🎁 무료 증정 이벤트!");
+        System.out.println("🧪 체력 물약 1개 무료 증정!");
+      }
+      case RARE_ITEMS -> {
+        System.out.println("⭐ 희귀 아이템 입고!");
+        System.out.println("🔥 특별한 아이템들이 입고되었습니다!");
+      }
+    }
+
+    System.out.println("🎉".repeat(20));
+    InputValidator.waitForAnyKey("계속하려면 Enter를 누르세요...");
+  }
+
+  /**
    * 상점 메인 메뉴를 표시합니다.
    */
   private void displayShopMenuMain(GameCharacter player) {
     System.out.println("\n🏪 === 마을 상점 ===");
     System.out.println("💰 보유 골드: " + player.getGold());
+
+    // 이벤트가 활성화되어 있으면 표시
+    if (currentEventActive && currentEvent != null) {
+      displayActiveEventInfo();
+    }
+
     System.out.println();
     System.out.println("1. 🛒 아이템 사기");
     System.out.println("2. 💰 아이템 팔기");
     System.out.println("3. 📊 판매 시세 확인");
     System.out.println("4. 🚪 상점 나가기");
     System.out.println("====================");
+  }
+
+  /**
+   * 활성화된 이벤트 정보를 표시합니다.
+   */
+  private void displayActiveEventInfo() {
+    System.out.println("\n🎉 현재 진행 중인 이벤트:");
+    switch (currentEvent) {
+      case DISCOUNT_SALE -> System.out.println("🏷️ 할인 세일 (20% 할인)");
+      case BONUS_SELL -> System.out.println("💰 고가 매입 (30% 보너스)");
+      case FREE_POTION -> System.out.println("🎁 무료 체력 물약 (미수령)");
+      case RARE_ITEMS -> System.out.println("⭐ 희귀 아이템 특별 판매");
+    }
   }
 
   /**
@@ -220,33 +301,60 @@ public class ShopController {
    */
   private void handleItemPurchase(GameCharacter player, ShopItem shopItem) {
     GameItem item = shopItem.getItem();
+    int originalPrice = shopItem.getPrice();
+    int finalPrice = applyEventDiscount(originalPrice);
 
     // 골드 확인
-    if (player.getGold() < shopItem.getPrice()) {
+    if (player.getGold() < finalPrice) {
       System.out.println("❌ 골드가 부족합니다!");
-      System.out.printf("필요: %d골드, 보유: %d골드%n", shopItem.getPrice(), player.getGold());
+      System.out.printf("필요: %d골드, 보유: %d골드%n", finalPrice, player.getGold());
       InputValidator.waitForAnyKey("계속하려면 Enter를 누르세요...");
       return;
     }
 
     // 구매 수량 결정
-    int maxQuantity = Math.min(shopItem.getStock(), player.getGold() / shopItem.getPrice());
+    int maxQuantity = Math.min(shopItem.getStock(), player.getGold() / finalPrice);
     int quantity = 1;
 
     if (shopItem.getCategory() == ShopItemCategory.CONSUMABLE && maxQuantity > 1) {
       quantity = InputValidator.getIntInput(String.format("구매할 수량 (1~%d): ", maxQuantity), 1, maxQuantity);
     }
 
-    int totalPrice = shopItem.getPrice() * quantity;
+    // 대량 할인 이벤트 적용
+    if (currentEventActive && currentEvent == ShopEvent.BULK_DISCOUNT && quantity >= 3) {
+      finalPrice = (int) (finalPrice * 0.9); // 추가 10% 할인
+      System.out.println("🎁 대량 구매 보너스! 추가 10% 할인 적용!");
+    }
+
+    int totalPrice = finalPrice * quantity;
 
     // 구매 확인
     System.out.printf("\n📦 구매 정보:%n");
     System.out.printf("아이템: %s x%d%n", item.getName(), quantity);
-    System.out.printf("총 가격: %d골드%n", totalPrice);
+
+    if (currentEventActive && currentEvent != null && currentEvent.isBuyEvent()) {
+      System.out.printf("원래 가격: %d골드%n", originalPrice * quantity);
+      System.out.printf("할인 가격: %d골드 (%d%% 할인!)%n", totalPrice, Math.round(currentEvent.getDiscountPercent()));
+    } else {
+      System.out.printf("총 가격: %d골드%n", totalPrice);
+    }
+
     System.out.printf("구매 후 잔액: %d골드%n", player.getGold() - totalPrice);
 
     if (!InputValidator.getConfirmation("구매하시겠습니까?")) {
       return;
+    }
+
+    // 특별 이벤트 효과 적용
+    quantity = applySpecialEventEffects(item, quantity);
+
+    // 행운의 뽑기 이벤트 처리
+    boolean luckyRefund = false;
+    if (currentEventActive && currentEvent == ShopEvent.LUCKY_DRAW) {
+      if (random.nextBoolean()) { // 50% 확률
+        luckyRefund = true;
+        System.out.println("🎰 행운의 뽑기 당첨! 골드가 환급됩니다!");
+      }
     }
 
     // 인벤토리 공간 확인
@@ -257,13 +365,69 @@ public class ShopController {
     }
 
     // 구매 처리
-    player.setGold(player.getGold() - totalPrice);
-    shopItem.reduceStock(quantity);
+    int finalPayment = luckyRefund ? 0 : totalPrice;
+    player.setGold(player.getGold() - finalPayment);
+    shopItem.reduceStock(quantity - getFreeBonusQuantity(item));
 
     System.out.printf("✅ %s x%d을(를) 구매했습니다!%n", item.getName(), quantity);
+    if (luckyRefund) {
+      System.out.println("🎰 행운의 뽑기로 골드가 환급되었습니다!");
+    }
     System.out.printf("💰 잔액: %d골드%n", player.getGold());
 
-    logger.info("아이템 구매: {} -> {} x{} ({}골드)", player.getName(), item.getName(), quantity, totalPrice);
+    logger.info("아이템 구매: {} -> {} x{} ({}골드)", player.getName(), item.getName(), quantity, finalPayment);
+
+    InputValidator.waitForAnyKey("계속하려면 Enter를 누르세요...");
+  }
+
+  /**
+   * 특별 이벤트 효과를 적용합니다.
+   */
+  private int applySpecialEventEffects(GameItem item, int quantity) {
+    if (!currentEventActive || currentEvent == null) {
+      return quantity;
+    }
+
+    switch (currentEvent) {
+      case FREE_POTION -> {
+        if (item.getName().equals("체력 물약")) {
+          quantity++; // 무료로 1개 추가
+          System.out.println("🎁 이벤트 보너스로 체력 물약 1개를 추가로 드립니다!");
+        }
+      }
+      case RARE_ITEMS -> {
+        // 희귀 아이템 이벤트는 상점 아이템 목록에 특별 아이템 추가로 구현
+        // 현재는 메시지만 표시
+        System.out.println("⭐ 희귀 아이템 이벤트로 특별한 혜택을 받으실 수 있습니다!");
+      }
+    }
+
+    return quantity;
+  }
+
+  /**
+   * 무료 보너스 수량을 반환합니다.
+   */
+  private int getFreeBonusQuantity(GameItem item) {
+    if (currentEventActive && currentEvent == ShopEvent.FREE_POTION && item.getName().equals("체력 물약")) {
+      return 1;
+    }
+    return 0;
+  }
+
+  /**
+   * 상점 이벤트를 실행합니다.
+   */
+  public void runShopEvent(GameCharacter player) {
+    if (!currentEventActive) {
+      System.out.println("현재 진행 중인 이벤트가 없습니다.");
+      InputValidator.waitForAnyKey("계속하려면 Enter를 누르세요...");
+      return;
+    }
+
+    System.out.println("\n🎉 === 현재 진행 중인 이벤트 ===");
+    System.out.println(currentEvent.getDetailedInfo());
+    System.out.println("================================");
 
     InputValidator.waitForAnyKey("계속하려면 Enter를 누르세요...");
   }
@@ -290,7 +454,6 @@ public class ShopController {
   }
 
 
-  
 
   /**
    * 카테고리별 아이템 판매를 처리합니다.
@@ -399,54 +562,55 @@ public class ShopController {
    * 아이템 판매 메뉴를 실행합니다.
    */
   private void openShopSell(GameCharacter player) {
-      while (true) {
-          displaySellMenu(player);
-          
-          int choice = InputValidator.getIntInput("선택: ", 1, 6);
-          
-          switch (choice) {
-              case 1:
-                  sellItemsByCategory(player, GameConsumable.class, "소비 아이템");
-                  break;
-              case 2:
-                  sellEquipmentByType(player, GameEquipment.EquipmentType.WEAPON);
-                  break;
-              case 3:
-                  sellEquipmentByType(player, GameEquipment.EquipmentType.ARMOR);
-                  break;
-              case 4:
-                  sellEquipmentByType(player, GameEquipment.EquipmentType.ACCESSORY);
-                  break;
-              case 5:
-                  quickSellLowValueItems(player);
-                  break;
-              case 6:
-                  return;
-          }
+    while (true) {
+      displaySellMenu(player);
+
+      int choice = InputValidator.getIntInput("선택: ", 1, 6);
+
+      switch (choice) {
+        case 1:
+          sellItemsByCategory(player, GameConsumable.class, "소비 아이템");
+          break;
+        case 2:
+          sellEquipmentByType(player, GameEquipment.EquipmentType.WEAPON);
+          break;
+        case 3:
+          sellEquipmentByType(player, GameEquipment.EquipmentType.ARMOR);
+          break;
+        case 4:
+          sellEquipmentByType(player, GameEquipment.EquipmentType.ACCESSORY);
+          break;
+        case 5:
+          quickSellLowValueItems(player);
+          break;
+        case 6:
+          return;
       }
+    }
   }
-  
+
   /**
    * 판매 메뉴를 표시합니다.
    */
   private void displaySellMenu(GameCharacter player) {
-      System.out.println("\n💰 === 아이템 판매 ===");
-      System.out.println("💰 보유 골드: " + player.getGold());
-      System.out.println();
-      System.out.println("1. 🧪 소비 아이템 판매");
-      System.out.println("2. ⚔️ 무기 판매");
-      System.out.println("3. 🛡️ 방어구 판매");
-      System.out.println("4. 💍 장신구 판매");
-      System.out.println("5. ⚡ 일반 아이템 일괄 판매");
-      System.out.println("6. 🔙 돌아가기");
-      System.out.println("====================");
-      
-      // 예상 수익 표시
-      int totalSellValue = calculateTotalSellValue(player);
-      if (totalSellValue > 0) {
-          System.out.println("💡 전체 아이템 판매 시 예상 수익: " + totalSellValue + "골드");
-      }
+    System.out.println("\n💰 === 아이템 판매 ===");
+    System.out.println("💰 보유 골드: " + player.getGold());
+    System.out.println();
+    System.out.println("1. 🧪 소비 아이템 판매");
+    System.out.println("2. ⚔️ 무기 판매");
+    System.out.println("3. 🛡️ 방어구 판매");
+    System.out.println("4. 💍 장신구 판매");
+    System.out.println("5. ⚡ 일반 아이템 일괄 판매");
+    System.out.println("6. 🔙 돌아가기");
+    System.out.println("====================");
+
+    // 예상 수익 표시
+    int totalSellValue = calculateTotalSellValue(player);
+    if (totalSellValue > 0) {
+      System.out.println("💡 전체 아이템 판매 시 예상 수익: " + totalSellValue + "골드");
+    }
   }
+
   /**
    * 아이템 판매를 처리합니다.
    */
@@ -612,12 +776,21 @@ public class ShopController {
   }
 
   /**
+   * 이벤트 할인을 적용합니다.
+   */
+  private int applyEventDiscount(int originalPrice) {
+    if (currentEventActive && currentEvent == ShopEvent.DISCOUNT_SALE) {
+      return (int) (originalPrice * 0.8); // 20% 할인
+    }
+    return originalPrice;
+  }
+
+  /**
    * 아이템의 판매 가격을 계산합니다.
    */
   private int calculateSellPrice(GameItem item) {
     // 기본적으로 원가의 60%로 매입
     int basePrice = (int) (item.getValue() * 0.6);
-
     // 등급에 따른 보너스
     double rarityMultiplier = switch (item.getRarity()) {
       case COMMON -> 1.0;
@@ -627,7 +800,16 @@ public class ShopController {
       case LEGENDARY -> 1.5;
     };
 
-    return Math.max(1, (int) (basePrice * rarityMultiplier));
+    int finalPrice = Math.max(1, (int) (basePrice * rarityMultiplier));
+
+    // 이벤트 보너스 적용
+    if (currentEventActive && currentEvent != null) {
+      
+      finalPrice = currentEvent.applySellBonus(finalPrice);
+    }
+    logger.info("calculateSellPrice result : {},{},{},{}",currentEventActive, currentEvent, basePrice, finalPrice);
+
+    return finalPrice;
   }
 
   /**
@@ -649,28 +831,30 @@ public class ShopController {
       case LEGENDARY -> "전설";
     };
   }
+
   /**
    * 장비 타입을 한국어로 변환합니다.
    */
   private String getEquipmentTypeKorean(GameEquipment.EquipmentType type) {
-      return switch (type) {
-          case WEAPON -> "무기";
-          case ARMOR -> "방어구";
-          case ACCESSORY -> "장신구";
-      };
+    return switch (type) {
+      case WEAPON -> "무기";
+      case ARMOR -> "방어구";
+      case ACCESSORY -> "장신구";
+    };
   }
-  
+
   /**
    * 카테고리를 한국어로 변환합니다.
    */
   private String getCategoryKorean(ShopItemCategory category) {
-      return switch (category) {
-          case CONSUMABLE -> "소비 아이템";
-          case WEAPON -> "무기";
-          case ARMOR -> "방어구";
-          case ACCESSORY -> "장신구";
-      };
+    return switch (category) {
+      case CONSUMABLE -> "소비 아이템";
+      case WEAPON -> "무기";
+      case ARMOR -> "방어구";
+      case ACCESSORY -> "장신구";
+    };
   }
+
   /**
    * 장비 효과 설명을 생성합니다.
    */
@@ -708,21 +892,6 @@ public class ShopController {
 
     System.out.println("⚠️ 재고 부족 아이템: " + lowStockItems + "개");
     System.out.println("📈 총 상품 종류: " + shopItems.size() + "개");
-
-    InputValidator.waitForAnyKey("계속하려면 Enter를 누르세요...");
-  }
-
-  /**
-   * 상점 이벤트를 실행합니다 (특별 할인 등).
-   */
-  public void runShopEvent(GameCharacter player) {
-    System.out.println("\n🎉 === 특별 이벤트 ===");
-    System.out.println("💥 오늘만! 모든 아이템 10% 할인!");
-    System.out.println("💰 판매 시 20% 보너스!");
-    System.out.println("========================");
-
-    // 이벤트 적용 로직은 여기에 구현
-    // 예: 할인율 적용, 판매 보너스 등
 
     InputValidator.waitForAnyKey("계속하려면 Enter를 누르세요...");
   }
