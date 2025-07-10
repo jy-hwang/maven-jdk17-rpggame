@@ -1,52 +1,60 @@
 package controller;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import model.Character;
-import model.Monster;
-import service.GameData;
+import model.GameCharacter;
+import model.Skill;
+import service.GameDataService;
+import service.QuestManager;
 import util.InputValidator;
 
 /**
- * 게임 메인 로직을 담당하는 컨트롤러 클래스
+ * 리팩토링된 메인 게임 컨트롤러 각 기능별 Controller들을 조율하는 역할
  */
 public class Game {
   private static final Logger logger = LoggerFactory.getLogger(Game.class);
 
-  private Random random;
-  private Character player;
-  private List<Monster> monsters;
+  // 게임 상태
+  private GameCharacter player;
+  private QuestManager questManager;
+  private GameDataService.GameState gameState;
   private boolean gameRunning;
+  private long gameStartTime;
+  private int currentSaveSlot;
 
-  // 게임 상수
-  private static final int HEALTH_POTION_PRICE = 20;
-  private static final int HEALTH_POTION_HEAL = 50;
-  private static final int ESCAPE_CHANCE = 50;
+  // 컨트롤러들
+  private BattleController battleController;
+  private InventoryController inventoryController;
+  private QuestController questController;
+  private ShopController shopController;
+  private ExploreController exploreController;
 
   public Game() {
-    this.random = new Random();
     this.gameRunning = true;
-    initializeMonsters();
-    logger.info("게임 인스턴스 생성 완료");
+    this.questManager = new QuestManager();
+    this.gameState = new GameDataService.GameState();
+    this.gameStartTime = System.currentTimeMillis();
+    this.currentSaveSlot = 0;
+
+    initializeControllers();
+    logger.info("게임 인스턴스 생성 완료 (v1.2 - Controller 분리)");
   }
 
   /**
-   * 몬스터 목록을 초기화합니다.
+   * 모든 컨트롤러를 초기화합니다.
    */
-  private void initializeMonsters() {
+  private void initializeControllers() {
     try {
-      monsters = new ArrayList<>();
-      monsters.add(new Monster("슬라임", 20, 5, 10, 5));
-      monsters.add(new Monster("고블린", 30, 8, 15, 10));
-      monsters.add(new Monster("오크", 50, 12, 25, 20));
-      monsters.add(new Monster("드래곤", 100, 20, 50, 50));
+      // 순서 중요: 의존성이 있는 컨트롤러들을 순서대로 초기화
+      inventoryController = new InventoryController();
+      questController = new QuestController(questManager, gameState);
+      battleController = new BattleController(questManager, gameState);
+      shopController = new ShopController(inventoryController);
+      exploreController = new ExploreController(battleController, questController, inventoryController, gameState);
 
-      logger.debug("몬스터 초기화 완료: {}마리", monsters.size());
+      logger.debug("모든 컨트롤러 초기화 완료");
     } catch (Exception e) {
-      logger.error("몬스터 초기화 실패", e);
+      logger.error("컨트롤러 초기화 실패", e);
       throw new RuntimeException("게임 초기화 중 오류가 발생했습니다.", e);
     }
   }
@@ -56,7 +64,7 @@ public class Game {
    */
   public void start() {
     try {
-      logger.info("게임 시작");
+      logger.info("게임 시작 (v1.2)");
       showWelcomeMessage();
 
       // 플레이어 초기화
@@ -72,6 +80,8 @@ public class Game {
       logger.error("게임 실행 중 오류 발생", e);
       System.out.println("게임 실행 중 오류가 발생했습니다. 게임을 종료합니다.");
     } finally {
+      // 플레이 시간 업데이트
+      updatePlayTime();
       logger.info("게임 종료");
     }
   }
@@ -80,15 +90,20 @@ public class Game {
    * 환영 메시지를 표시합니다.
    */
   private void showWelcomeMessage() {
-    System.out.println("==== 간단한 RPG 게임 ====");
-    System.out.println("모험가여, 환영합니다!");
-    System.out.println("========================");
+    System.out.println("====================================");
+    System.out.println("   🎮 RPG 게임 v1.2 🎮   ");
+    System.out.println("====================================");
+    System.out.println("새로운 기능:");
+    System.out.println("• 📦 다중 저장 슬롯 시스템 (5개)");
+    System.out.println("• 🏗️ 개선된 아키텍처 (Controller 분리)");
+    System.out.println("• 🌟 향상된 탐험 시스템");
+    System.out.println("• 🛍️ 확장된 상점 시스템");
+    System.out.println("• 📋 고도화된 퀘스트 관리");
+    System.out.println("====================================");
   }
 
   /**
    * 플레이어를 초기화합니다.
-   * 
-   * @return 초기화 성공 시 true
    */
   private boolean initializePlayer() {
     try {
@@ -109,16 +124,17 @@ public class Game {
 
   /**
    * 새 캐릭터를 생성합니다.
-   * 
-   * @return 생성 성공 시 true
    */
   private boolean createNewCharacter() {
     try {
       String name = InputValidator.getStringInput("캐릭터 이름을 입력하세요: ", 1, 20);
-      player = new Character(name);
+      player = new GameCharacter(name);
 
-      System.out.println("새로운 모험가 " + name + "님, 환영합니다!");
+      System.out.println("🎉 새로운 모험가 " + name + "님, 환영합니다!");
       player.displayStats();
+
+      // 시작 퀘스트 안내
+      System.out.println("\n💡 퀘스트 메뉴에서 첫 번째 퀘스트를 수락해보세요!");
 
       logger.info("새 캐릭터 생성: {}", name);
       return true;
@@ -132,26 +148,46 @@ public class Game {
 
   /**
    * 기존 캐릭터를 불러옵니다.
-   * 
-   * @return 로드 성공 시 true
    */
   private boolean loadExistingCharacter() {
     try {
-      player = GameData.loadGame();
+      // 저장 슬롯 목록 표시
+      GameDataService.displaySaveSlots();
 
-      if (player == null) {
-        System.out.println("저장된 게임이 없습니다. 새 게임을 시작합니다.");
-        return createNewCharacter();
+      int slotNumber = InputValidator.getIntInput("불러올 슬롯 번호 (0: 취소): ", 0, GameDataService.getMaxSaveSlots());
+
+      if (slotNumber == 0) {
+        return createNewCharacter(); // 취소하면 새 게임으로
+      }
+
+      GameDataService.SaveData saveData = GameDataService.loadGame(slotNumber);
+
+      if (saveData == null) {
+        System.out.println("슬롯 " + slotNumber + "에 저장된 게임이 없습니다.");
+        boolean createNew = InputValidator.getConfirmation("새 게임을 시작하시겠습니까?");
+        if (createNew) {
+          return createNewCharacter();
+        } else {
+          return false;
+        }
       } else {
-        System.out.println("게임을 불러왔습니다!");
+        player = saveData.getCharacter();
+        gameState = saveData.getGameState();
+        currentSaveSlot = slotNumber;
+
+        // 컨트롤러들에 새로운 gameState 적용
+        updateControllersWithNewGameState();
+
+        System.out.println("🎮 슬롯 " + slotNumber + "에서 게임을 불러왔습니다!");
         System.out.println("어서오세요, " + player.getName() + "님!");
         player.displayStats();
+        gameState.displayGameStats();
 
-        logger.info("기존 캐릭터 로드: {}", player.getName());
+        logger.info("슬롯 {} 기존 캐릭터 로드: {}", slotNumber, player.getName());
         return true;
       }
 
-    } catch (GameData.GameDataException e) {
+    } catch (GameDataService.GameDataException e) {
       logger.error("게임 로드 실패", e);
       System.out.println("게임 로드 실패: " + e.getMessage());
 
@@ -165,40 +201,61 @@ public class Game {
   }
 
   /**
+   * 새로운 게임 상태로 컨트롤러들을 업데이트합니다.
+   */
+  private void updateControllersWithNewGameState() {
+    questController = new QuestController(questManager, gameState);
+    battleController = new BattleController(questManager, gameState);
+    exploreController = new ExploreController(battleController, questController, inventoryController, gameState);
+  }
+
+  /**
    * 메인 게임 루프를 실행합니다.
    */
   private void gameLoop() {
     while (gameRunning && player.isAlive()) {
       try {
         showMainMenu();
-        int choice = InputValidator.getIntInput("선택: ", 1, 6);
+        int choice = InputValidator.getIntInput("선택: ", 1, 10);
 
         switch (choice) {
           case 1:
-            explore();
+            handleExploration();
             break;
           case 2:
-            player.displayStats();
+            displayPlayerStatus();
             break;
           case 3:
-            shop();
+            inventoryController.manageInventory(player);
             break;
           case 4:
-            saveGame();
+            manageSkills();
             break;
           case 5:
+            questController.manageQuests(player);
+            break;
+          case 6:
+            shopController.openShop(player);
+            break;
+          case 7:
+            saveGame();
+            break;
+          case 8:
+            manageSaveSlots();
+            break;
+          case 9:
             if (confirmExit()) {
               gameRunning = false;
             }
             break;
-          case 6:
+          case 10:
             showHelp();
             break;
           default:
             System.out.println("잘못된 선택입니다.");
         }
 
-        if (gameRunning && choice != 2 && choice != 6) { // 상태 확인과 도움말 제외
+        if (gameRunning && choice != 2 && choice != 10) {
           InputValidator.waitForAnyKey("\n계속하려면 Enter를 누르세요...");
         }
 
@@ -220,251 +277,114 @@ public class Game {
    */
   private void showMainMenu() {
     System.out.println("\n=== 메인 메뉴 ===");
-    System.out.println("1. 탐험하기");
-    System.out.println("2. 상태 확인");
-    System.out.println("3. 상점");
-    System.out.println("4. 게임 저장");
-    System.out.println("5. 게임 종료");
-    System.out.println("6. 도움말");
+    System.out.println("1. 🗡️ 탐험하기");
+    System.out.println("2. 📊 상태 확인");
+    System.out.println("3. 🎒 인벤토리");
+    System.out.println("4. ⚡ 스킬 관리");
+    System.out.println("5. 📋 퀘스트");
+    System.out.println("6. 🏪 상점");
+    System.out.println("7. 💾 게임 저장");
+    System.out.println("8. 📁 저장 관리");
+    System.out.println("9. 🚪 게임 종료");
+    System.out.println("10. ❓ 도움말");
+
+    // 알림 표시
+    showNotifications();
   }
 
   /**
-   * 탐험을 진행합니다.
+   * 게임 알림을 표시합니다.
    */
-  private void explore() {
-    try {
-      System.out.println("\n🌲 탐험을 시작합니다...");
+  private void showNotifications() {
+    if (questController.hasClaimableRewards()) {
+      System.out.println("🎁 수령 가능한 퀘스트 보상이 있습니다!");
+    }
 
-      // 랜덤 이벤트 (10% 확률로 특별한 일 발생)
-      if (random.nextInt(100) < 10) {
-        handleRandomEvent();
-      } else {
-        // 일반적인 몬스터 조우
-        Monster monster = getRandomMonster();
-        System.out.println("⚔️ " + monster.getName() + "을(를) 만났습니다!");
-        battle(monster);
-      }
-
-    } catch (Exception e) {
-      logger.error("탐험 중 오류", e);
-      System.out.println("탐험 중 오류가 발생했습니다.");
+    double inventoryUsage = inventoryController.getInventoryUsageRate(player);
+    if (inventoryUsage > 0.8) {
+      System.out.println("💼 인벤토리가 거의 가득 찼습니다! (" + String.format("%.0f%%", inventoryUsage * 100) + ")");
     }
   }
 
   /**
-   * 랜덤 이벤트를 처리합니다.
+   * 탐험을 처리합니다.
    */
-  private void handleRandomEvent() {
-    int eventType = random.nextInt(3);
+  private void handleExploration() {
+    ExploreController.ExploreResult result = exploreController.startExploration(player);
 
-    switch (eventType) {
-      case 0: // 골드 발견
-        int foundGold = random.nextInt(20) + 5;
-        player.setGold(player.getGold() + foundGold);
-        System.out.println("💰 길에서 " + foundGold + " 골드를 발견했습니다!");
-        logger.debug("랜덤 골드 획득: {}", foundGold);
-        break;
-
-      case 1: // 체력 회복
-        int healAmount = random.nextInt(30) + 10;
-        player.heal(healAmount);
-        System.out.println("💚 신비한 샘물을 발견해 " + healAmount + " 체력을 회복했습니다!");
-        logger.debug("랜덤 체력 회복: {}", healAmount);
-        break;
-
-      case 2: // 경험치 획득
-        int expAmount = random.nextInt(15) + 5;
-        boolean levelUp = player.gainExp(expAmount);
-        System.out.println("📚 고대 문서를 읽어 " + expAmount + " 경험치를 얻었습니다!");
-        if (levelUp) {
-          System.out.println("🎉 깨달음을 얻어 레벨이 올랐습니다!");
-        }
-        logger.debug("랜덤 경험치 획득: {}", expAmount);
-        break;
-    }
-  }
-
-  /**
-   * 랜덤 몬스터를 선택합니다.
-   * 
-   * @return 선택된 몬스터
-   */
-  private Monster getRandomMonster() {
-    Monster template = monsters.get(random.nextInt(monsters.size()));
-    // 몬스터의 새 인스턴스 생성 (원본 데이터 보호)
-    return new Monster(template.getName(), template.getHp(), template.getAttack(),
-        template.getExpReward(), template.getGoldReward());
-  }
-
-  /**
-   * 전투를 진행합니다.
-   * 
-   * @param monster 전투할 몬스터
-   */
-  private void battle(Monster monster) {
-    try {
-      System.out.println("\n⚔️ 전투 시작!");
-      logger.info("전투 시작: {} vs {}", player.getName(), monster.getName());
-
-      while (player.isAlive() && monster.isAlive()) {
-        showBattleStatus(monster);
-
-        int choice = InputValidator.getIntInput("1. 공격\n2. 도망\n선택: ", 1, 2);
-
-        if (choice == 1) {
-          handlePlayerAttack(monster);
-          if (monster.isAlive()) {
-            handleMonsterAttack(monster);
-          }
-        } else {
-          if (attemptEscape()) {
-            return;
-          } else {
-            handleMonsterAttack(monster);
-          }
+    // 탐험 결과에 따른 추가 처리
+    switch (result.getType()) {
+      case BATTLE_DEFEAT -> {
+        if (!player.isAlive()) {
+          System.out.println("💀 전투에서 패배했습니다...");
+          gameRunning = false;
         }
       }
-
-      if (!monster.isAlive()) {
-        handleVictory(monster);
+      case TREASURE -> {
+        // 보물 관련 퀘스트 진행도 업데이트 가능
+        logger.debug("보물 발견 이벤트 완료");
       }
-
-    } catch (Exception e) {
-      logger.error("전투 중 오류", e);
-      System.out.println("전투 중 오류가 발생했습니다.");
-    }
-  }
-
-  /**
-   * 전투 상태를 표시합니다.
-   */
-  private void showBattleStatus(Monster monster) {
-    System.out.println("\n--- 전투 상황 ---");
-    System.out.printf("%s: %d/%d HP%n", player.getName(), player.getHp(), player.getMaxHp());
-    System.out.printf("%s: %d HP%n", monster.getName(), monster.getHp());
-    System.out.println("---------------");
-  }
-
-  /**
-   * 플레이어 공격을 처리합니다.
-   */
-  private void handlePlayerAttack(Monster monster) {
-    int damage = player.getAttack() + random.nextInt(5);
-    monster.takeDamage(damage);
-
-    System.out.println(
-        "💥 " + player.getName() + "이(가) " + monster.getName() + "에게 " + damage + "의 데미지를 입혔습니다!");
-
-    if (!monster.isAlive()) {
-      System.out.println("🎯 " + monster.getName() + "을(를) 물리쳤습니다!");
-    }
-
-    logger.debug("플레이어 공격: {} -> {} (데미지: {})", player.getName(), monster.getName(), damage);
-  }
-
-  /**
-   * 몬스터 공격을 처리합니다.
-   */
-  private void handleMonsterAttack(Monster monster) {
-    int monsterDamage = monster.getAttack() + random.nextInt(3);
-    player.takeDamage(monsterDamage);
-
-    System.out.println("💢 " + monster.getName() + "이(가) " + player.getName() + "에게 "
-        + monsterDamage + "의 데미지를 입혔습니다!");
-    System.out.println("현재 체력: " + player.getHp() + "/" + player.getMaxHp());
-
-    logger.debug("몬스터 공격: {} -> {} (데미지: {})", monster.getName(), player.getName(), monsterDamage);
-  }
-
-  /**
-   * 도망 시도를 처리합니다.
-   * 
-   * @return 도망 성공 시 true
-   */
-  private boolean attemptEscape() {
-    if (random.nextInt(100) < ESCAPE_CHANCE) {
-      System.out.println("🏃 성공적으로 도망쳤습니다!");
-      logger.debug("도망 성공");
-      return true;
-    } else {
-      System.out.println("❌ 도망치지 못했습니다!");
-      logger.debug("도망 실패");
-      return false;
-    }
-  }
-
-  /**
-   * 승리를 처리합니다.
-   */
-  private void handleVictory(Monster monster) {
-    try {
-      System.out.println("\n🏆 승리!");
-
-      boolean levelUp = player.gainExp(monster.getExpReward());
-      player.setGold(player.getGold() + monster.getGoldReward());
-
-      System.out
-          .println("📈 경험치 +" + monster.getExpReward() + ", 💰 골드 +" + monster.getGoldReward());
-
-      if (levelUp) {
-        System.out.println("🎉 축하합니다! 레벨이 올랐습니다!");
+      case KNOWLEDGE -> {
+        // 지식 획득 관련 퀘스트 진행도 업데이트
+        questController.updateLevelProgress(player);
       }
-
-      logger.info("전투 승리: {} (경험치: {}, 골드: {})", monster.getName(), monster.getExpReward(),
-          monster.getGoldReward());
-
-    } catch (Exception e) {
-      logger.error("승리 처리 중 오류", e);
-      System.out.println("승리 보상 처리 중 오류가 발생했습니다.");
     }
   }
 
   /**
-   * 상점을 운영합니다.
+   * 플레이어 상태를 표시합니다.
    */
-  private void shop() {
-    try {
-      System.out.println("\n🏪 === 상점 ===");
-      System.out.println("💰 보유 골드: " + player.getGold());
-      System.out
-          .println("1. 체력 물약 (" + HEALTH_POTION_PRICE + "골드) - " + HEALTH_POTION_HEAL + " HP 회복");
-      System.out.println("2. 나가기");
+  private void displayPlayerStatus() {
+    player.displayStats();
+
+    // 추가 정보 표시
+    System.out.println("\n=== 추가 정보 ===");
+    System.out.println("📍 현재 위치: " + gameState.getCurrentLocation());
+    System.out.println("⚔️ 처치한 몬스터: " + gameState.getMonstersKilled() + "마리");
+    System.out.println("📋 완료한 퀘스트: " + gameState.getQuestsCompleted() + "개");
+    System.out.println("⏰ 총 플레이 시간: " + gameState.getTotalPlayTime() + "분");
+
+    if (currentSaveSlot > 0) {
+      System.out.println("💾 현재 저장 슬롯: " + currentSaveSlot);
+    }
+  }
+
+  /**
+   * 스킬을 관리합니다.
+   */
+  private void manageSkills() {
+    while (true) {
+      player.getSkillManager().displaySkills(player);
+      System.out.println("\n1. 스킬 정보 보기");
+      System.out.println("2. 돌아가기");
 
       int choice = InputValidator.getIntInput("선택: ", 1, 2);
 
       if (choice == 1) {
-        buyHealthPotion();
+        showSkillInfo();
+      } else {
+        break;
       }
-
-    } catch (Exception e) {
-      logger.error("상점 이용 중 오류", e);
-      System.out.println("상점 이용 중 오류가 발생했습니다.");
     }
   }
 
   /**
-   * 체력 물약 구매를 처리합니다.
+   * 스킬 정보를 표시합니다.
    */
-  private void buyHealthPotion() {
-    if (player.getGold() >= HEALTH_POTION_PRICE) {
-      if (player.getHp() == player.getMaxHp()) {
-        System.out.println("💚 체력이 이미 가득합니다!");
-        return;
-      }
-
-      player.setGold(player.getGold() - HEALTH_POTION_PRICE);
-      int oldHp = player.getHp();
-      player.heal(HEALTH_POTION_HEAL);
-      int actualHeal = player.getHp() - oldHp;
-
-      System.out.println("🧪 체력 물약을 구매했습니다! " + actualHeal + " HP 회복");
-      System.out.println("현재 체력: " + player.getHp() + "/" + player.getMaxHp());
-
-      logger.debug("체력 물약 구매: {} HP 회복", actualHeal);
-    } else {
-      System.out.println("❌ 골드가 부족합니다!");
-      logger.debug("체력 물약 구매 실패: 골드 부족 (보유: {}, 필요: {})", player.getGold(), HEALTH_POTION_PRICE);
+  private void showSkillInfo() {
+    var skills = player.getSkillManager().getLearnedSkills();
+    if (skills.isEmpty()) {
+      System.out.println("학습한 스킬이 없습니다.");
+      return;
     }
+
+    int skillIndex = InputValidator.getIntInput("정보를 볼 스킬 번호 (0: 취소): ", 0, skills.size()) - 1;
+    if (skillIndex < 0)
+      return;
+
+    Skill skill = skills.get(skillIndex);
+    System.out.println("\n" + skill.getSkillInfo());
+    InputValidator.waitForAnyKey("계속하려면 Enter를 누르세요...");
   }
 
   /**
@@ -472,18 +392,164 @@ public class Game {
    */
   private void saveGame() {
     try {
-      GameData.saveGame(player);
-      logger.info("게임 저장 완료: {}", player.getName());
-    } catch (GameData.GameDataException e) {
+      updatePlayTime(); // 플레이 시간 업데이트
+
+      // 현재 슬롯이 있으면 그 슬롯에 저장, 없으면 슬롯 선택
+      if (currentSaveSlot > 0) {
+        boolean useSameSlot = InputValidator.getConfirmation("현재 슬롯 " + currentSaveSlot + "에 저장하시겠습니까?");
+
+        if (useSameSlot) {
+          GameDataService.saveGame(player, gameState, currentSaveSlot);
+          logger.info("슬롯 {} 게임 저장 완료: {}", currentSaveSlot, player.getName());
+          return;
+        }
+      }
+
+      // 슬롯 선택해서 저장
+      chooseSlotAndSave();
+
+    } catch (GameDataService.GameDataException e) {
       logger.error("게임 저장 실패", e);
       System.out.println("게임 저장 실패: " + e.getMessage());
     }
   }
 
   /**
+   * 슬롯을 선택해서 저장합니다.
+   */
+  private void chooseSlotAndSave() {
+    try {
+      // 저장 슬롯 목록 표시
+      GameDataService.displaySaveSlots();
+
+      int slotNumber = InputValidator.getIntInput("저장할 슬롯 번호 (0: 취소): ", 0, GameDataService.getMaxSaveSlots());
+
+      if (slotNumber == 0) {
+        System.out.println("저장이 취소되었습니다.");
+        return;
+      }
+
+      // 슬롯이 이미 사용 중인지 확인
+      var slots = GameDataService.getAllSaveSlots();
+      var targetSlot = slots.stream().filter(slot -> slot.getSlotNumber() == slotNumber).findFirst().orElse(null);
+
+      if (targetSlot != null && targetSlot.isOccupied()) {
+        boolean overwrite = InputValidator.getConfirmation("슬롯 " + slotNumber + "에 이미 '" + targetSlot.getCharacterName() + "' 캐릭터가 저장되어 있습니다. 덮어쓰시겠습니까?");
+
+        if (!overwrite) {
+          System.out.println("저장이 취소되었습니다.");
+          return;
+        }
+      }
+
+      GameDataService.saveGame(player, gameState, slotNumber);
+      currentSaveSlot = slotNumber; // 현재 슬롯 업데이트
+      logger.info("슬롯 {} 게임 저장 완료: {}", slotNumber, player.getName());
+
+    } catch (GameDataService.GameDataException e) {
+      logger.error("슬롯 선택 저장 실패", e);
+      System.out.println("게임 저장 실패: " + e.getMessage());
+    }
+  }
+
+  /**
+   * 저장 슬롯을 관리합니다.
+   */
+  private void manageSaveSlots() {
+    while (true) {
+      System.out.println("\n=== 저장 관리 ===");
+      GameDataService.displaySaveSlots();
+      System.out.println("\n1. 게임 불러오기");
+      System.out.println("2. 다른 슬롯에 저장");
+      System.out.println("3. 슬롯 삭제");
+      System.out.println("4. 돌아가기");
+
+      int choice = InputValidator.getIntInput("선택: ", 1, 4);
+
+      switch (choice) {
+        case 1:
+          loadFromSlot();
+          break;
+        case 2:
+          chooseSlotAndSave();
+          break;
+        case 3:
+          deleteSlot();
+          break;
+        case 4:
+          return;
+      }
+    }
+  }
+
+  /**
+   * 다른 슬롯에서 게임을 불러옵니다.
+   */
+  private void loadFromSlot() {
+    try {
+      int slotNumber = InputValidator.getIntInput("불러올 슬롯 번호 (0: 취소): ", 0, GameDataService.getMaxSaveSlots());
+
+      if (slotNumber == 0)
+        return;
+
+      GameDataService.SaveData saveData = GameDataService.loadGame(slotNumber);
+
+      if (saveData == null) {
+        System.out.println("슬롯 " + slotNumber + "에 저장된 게임이 없습니다.");
+        return;
+      }
+
+      boolean confirmLoad = InputValidator.getConfirmation("현재 게임을 '" + saveData.getCharacter().getName() + "' 캐릭터로 교체하시겠습니까? (현재 진행사항은 저장되지 않습니다)");
+
+      if (confirmLoad) {
+        player = saveData.getCharacter();
+        gameState = saveData.getGameState();
+        currentSaveSlot = slotNumber;
+
+        // 컨트롤러들에 새로운 데이터 적용
+        updateControllersWithNewGameState();
+
+        System.out.println("🎮 게임을 불러왔습니다!");
+        player.displayStats();
+      }
+
+    } catch (GameDataService.GameDataException e) {
+      System.out.println("게임 로드 실패: " + e.getMessage());
+    }
+  }
+
+  /**
+   * 슬롯을 삭제합니다.
+   */
+  private void deleteSlot() {
+    int slotNumber = InputValidator.getIntInput("삭제할 슬롯 번호 (0: 취소): ", 0, GameDataService.getMaxSaveSlots());
+
+    if (slotNumber == 0)
+      return;
+
+    if (slotNumber == currentSaveSlot) {
+      System.out.println("현재 사용 중인 슬롯은 삭제할 수 없습니다.");
+      return;
+    }
+
+    boolean confirmDelete = InputValidator.getConfirmation("정말로 슬롯 " + slotNumber + "를 삭제하시겠습니까? (복구할 수 없습니다)");
+
+    if (confirmDelete) {
+      GameDataService.deleteSaveSlot(slotNumber);
+    }
+  }
+
+  /**
+   * 플레이 시간을 업데이트합니다.
+   */
+  private void updatePlayTime() {
+    long playTimeMs = System.currentTimeMillis() - gameStartTime;
+    int playTimeMinutes = (int) (playTimeMs / 60000);
+    gameState.addPlayTime(playTimeMinutes);
+  }
+
+  /**
    * 게임 종료 확인을 처리합니다.
-   * 
-   * @return 종료 확인 시 true
    */
   private boolean confirmExit() {
     boolean shouldSave = InputValidator.getConfirmation("게임을 저장하고 종료하시겠습니까?");
@@ -503,11 +569,13 @@ public class Game {
     System.out.println("모험가 " + player.getName() + "님의 모험이 끝났습니다.");
     System.out.printf("최종 레벨: %d, 획득한 골드: %d%n", player.getLevel(), player.getGold());
 
-    logger.info("게임 오버: {} (레벨: {}, 골드: {})", player.getName(), player.getLevel(),
-        player.getGold());
+    // 게임 통계 표시
+    gameState.displayGameStats();
 
-    if (InputValidator.getConfirmation("저장 파일을 삭제하시겠습니까?")) {
-      GameData.deleteSaveFile();
+    logger.info("게임 오버: {} (레벨: {}, 골드: {})", player.getName(), player.getLevel(), player.getGold());
+
+    if (currentSaveSlot > 0 && InputValidator.getConfirmation("현재 슬롯의 저장 파일을 삭제하시겠습니까?")) {
+      GameDataService.deleteSaveSlot(currentSaveSlot);
     }
   }
 
@@ -516,12 +584,20 @@ public class Game {
    */
   private void showHelp() {
     System.out.println("\n📖 === 게임 도움말 ===");
-    System.out.println("• 탐험하기: 몬스터와 싸우고 경험치와 골드를 획득하세요");
-    System.out.println("• 상태 확인: 캐릭터의 현재 상태를 확인하세요");
-    System.out.println("• 상점: 골드로 체력 물약을 구매하세요");
-    System.out.println("• 게임 저장: 현재 진행 상황을 저장하세요");
-    System.out.println("• 레벨업: 경험치가 가득 차면 자동으로 레벨업됩니다");
-    System.out.println("• 체력: 0이 되면 게임 오버입니다");
+    System.out.println("🗡️ 탐험하기: 몬스터와 싸우고 다양한 이벤트를 경험하세요");
+    System.out.println("📊 상태 확인: 캐릭터의 현재 상태와 게임 진행도를 확인하세요");
+    System.out.println("🎒 인벤토리: 아이템을 관리하고 장비를 착용하세요");
+    System.out.println("⚡ 스킬 관리: 학습한 스킬을 확인하고 전투에서 사용하세요");
+    System.out.println("📋 퀘스트: 퀘스트를 수락하고 완료하여 보상을 받으세요");
+    System.out.println("🏪 상점: 골드로 유용한 아이템과 장비를 구매하세요");
+    System.out.println("💾 게임 저장: 현재 진행 상황을 저장하세요 (5개 슬롯 지원)");
+    System.out.println("📁 저장 관리: 다중 저장 슬롯을 관리하세요");
+    System.out.println("\n💡 새로운 기능:");
+    System.out.println("• 탐험 중 다양한 랜덤 이벤트 (보물, 치유의 샘, 상인 등)");
+    System.out.println("• 향상된 전투 시스템 (스킬과 아이템 활용)");
+    System.out.println("• 확장된 상점 시스템 (카테고리별 아이템 구매)");
+    System.out.println("• 고도화된 퀘스트 관리 (진행도 추적 및 보상 시스템)");
+    System.out.println("• 다중 저장 슬롯 (최대 5개 캐릭터 동시 관리)");
     System.out.println("====================");
   }
 }
