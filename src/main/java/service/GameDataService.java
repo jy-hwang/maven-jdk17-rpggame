@@ -141,7 +141,6 @@ public class GameDataService {
                         saveData.getSaveTime(),
                         saveData.getGameState().getTotalPlayTime()
                     );
-                    System.out.println(slotInfo);
                     slots.add(slotInfo);
                 } catch (IOException e) {
                     logger.warn("슬롯 {} 정보 읽기 실패: {}", i, e.getMessage());
