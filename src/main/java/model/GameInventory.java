@@ -491,7 +491,7 @@ public class GameInventory {
    * 착용 가능한 장비 목록을 반환합니다.
    */
   public List<GameEquipment> getEquippableItems() {
-    return items.stream().filter(stack -> stack.getItem() instanceof GameEquipment).map(stack -> (GameEquipment) stack.getItem()).toList();
+    return new ArrayList<>(items.stream().filter(stack -> stack.getItem() instanceof GameEquipment).map(stack -> (GameEquipment) stack.getItem()).toList());
   }
 
   /**
