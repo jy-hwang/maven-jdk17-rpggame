@@ -21,7 +21,7 @@ import model.GameCharacter;
 public class GameDataService {
     private static final Logger logger = LoggerFactory.getLogger(GameDataService.class);
     
-    private static final String SAVE_DIRECTORY = "data";
+    private static final String SAVE_DIRECTORY = "save";
     private static final String SAVE_FILE_PREFIX = "rpg_save_slot";
     private static final String BACKUP_PREFIX = "rpg_save_backup_";
     private static final int MAX_SAVE_SLOTS = 5; // 최대 저장 슬롯 수

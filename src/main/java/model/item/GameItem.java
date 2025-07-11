@@ -10,32 +10,14 @@ import model.GameCharacter;
  * 게임 아이템의 기본 클래스
  */
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
-@JsonSubTypes({@JsonSubTypes.Type(value = GameEquipment.class, name = "equipment"), @JsonSubTypes.Type(value = GameConsumable.class, name = "GameConsumable")})
+@JsonSubTypes({@JsonSubTypes.Type(value = GameEquipment.class, name = "equipment")
+, @JsonSubTypes.Type(value = GameConsumable.class, name = "GameConsumable")})
 public abstract class GameItem {
   protected String name;
   protected String description;
   protected int value; // 판매 가격
   protected ItemRarity rarity;
 
-  public enum ItemRarity {
-    COMMON("일반", 1.0), UNCOMMON("고급", 1.5), RARE("희귀", 2.0), EPIC("영웅", 3.0), LEGENDARY("전설", 5.0);
-
-    private final String displayName;
-    private final double valueMultiplier;
-
-    ItemRarity(String displayName, double valueMultiplier) {
-      this.displayName = displayName;
-      this.valueMultiplier = valueMultiplier;
-    }
-
-    public String getDisplayName() {
-      return displayName;
-    }
-
-    public double getValueMultiplier() {
-      return valueMultiplier;
-    }
-  }
 
   @JsonCreator
   public GameItem(@JsonProperty("name") String name, @JsonProperty("description") String description, @JsonProperty("value") int value, @JsonProperty("rarity") ItemRarity rarity) {

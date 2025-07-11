@@ -1,54 +1,79 @@
 package model.effect;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import model.GameCharacter;
 
+/**
+ * HP 회복 효과
+ */
 public class HealHpEffect implements GameEffect {
+  private static final Logger logger = LoggerFactory.getLogger(HealHpEffect.class);
 
-  private final int healAmount;
+  private final int value;
   private final boolean isPercentage;
 
-  @JsonCreator
-  public HealHpEffect(@JsonProperty("value") int healAmount, @JsonProperty("isPercentage") Boolean isPercentage) {
-    this.healAmount = healAmount;
-    this.isPercentage = isPercentage != null ? isPercentage : false;
+  public HealHpEffect(int value, boolean isPercentage) {
+    this.value = Math.max(0, value);
+    this.isPercentage = isPercentage;
+    logger.debug("HealHpEffect 생성: {} {}", value, isPercentage ? "%" : "고정값");
   }
 
   @Override
   public boolean apply(GameCharacter target) {
-    int actualHeal;
-    if (isPercentage) {
-      actualHeal = (int) (target.getTotalMaxHp() * (healAmount / 100.0));
-    } else {
-      actualHeal = healAmount;
+    if (!canApplyTo(target)) {
+      logger.debug("HP 회복 효과 적용 불가: {}", target != null ? target.getName() : "null");
+      return false;
     }
 
     int oldHp = target.getHp();
-    target.heal(actualHeal);
-    int healedAmount = target.getHp() - oldHp;
+    int healAmount;
 
-    System.out.println("💚 " + healedAmount + " HP 회복! (현재: " + target.getHp() + "/" + target.getTotalMaxHp() + ")");
-    return healedAmount > 0;
+    if (isPercentage) {
+      healAmount = (int) (target.getTotalMaxHp() * value / 100.0);
+    } else {
+      healAmount = value;
+    }
+
+    target.heal(healAmount);
+    int actualHealed = target.getHp() - oldHp;
+
+    if (actualHealed > 0) {
+      System.out.println(getApplyMessage(target, true));
+      logger.info("{} HP 회복 적용: {} -> {} (+{})", target.getName(), oldHp, target.getHp(), actualHealed);
+      return true;
+    } else {
+      System.out.println(getApplyMessage(target, false));
+      return false;
+    }
   }
 
   @Override
   public String getDescription() {
     if (isPercentage) {
-      return "HP를 " + healAmount + "% 회복";
+      return "HP " + value + "% 회복";
     } else {
-      return "HP를 " + healAmount + " 회복";
+      return "HP +" + value;
     }
   }
 
   @Override
   public GameEffectType getType() {
-    return GameEffectType.HEAL_HP;
+    return isPercentage ? GameEffectType.HEAL_HP_PERCENT : GameEffectType.HEAL_HP;
   }
 
   @Override
   public int getValue() {
-    return healAmount;
+    return value;
   }
 
+  @Override
+  public boolean isPercentage() {
+    return isPercentage;
+  }
+
+  @Override
+  public String toString() {
+    return String.format("HealHpEffect{value=%d, percentage=%b}", value, isPercentage);
+  }
 }

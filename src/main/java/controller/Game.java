@@ -4,6 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import model.GameCharacter;
 import model.Skill;
+import model.factory.GameItemFactory;
+import model.item.GameConsumable;
+import model.item.GameItem;
 import service.GameDataService;
 import service.QuestManager;
 import util.InputValidator;
@@ -39,7 +42,7 @@ public class Game {
     this.currentSaveSlot = 0;
 
     initializeControllers();
-    logger.info("게임 인스턴스 생성 완료 (v"+GAME_VERSION+"- 상점판매기능 추가)");
+    logger.info("게임 인스턴스 생성 완료 (v" + GAME_VERSION + "- 상점판매기능 추가)");
   }
 
   /**
@@ -66,7 +69,7 @@ public class Game {
    */
   public void start() {
     try {
-      logger.info("게임 시작 (v"+GAME_VERSION+")");
+      logger.info("게임 시작 (v" + GAME_VERSION + ")");
       showWelcomeMessage();
 
       // 메인 메뉴 루프
@@ -100,7 +103,7 @@ public class Game {
    */
   private void showWelcomeMessage() {
     System.out.println("====================================");
-    System.out.println("   🎮 RPG 게임 v"+GAME_VERSION+" 🎮   ");
+    System.out.println("   🎮 RPG 게임 v" + GAME_VERSION + " 🎮   ");
     System.out.println("====================================");
     System.out.println("새로운 기능:");
     System.out.println("• 📦 다중 저장 슬롯 시스템 (5개)");
@@ -152,6 +155,9 @@ public class Game {
       gameStartTime = System.currentTimeMillis();
       currentSaveSlot = 0;
 
+      // 🔥 시작 아이템으로 기본 물약 지급
+      giveStartingItems();
+
       // 컨트롤러들에 새로운 게임 상태 적용
       updateControllersWithNewGameState();
 
@@ -173,6 +179,41 @@ public class Game {
     }
   }
 
+  /**
+   * 시작 아이템 지급
+   */
+  private void giveStartingItems() {
+    GameItemFactory factory = GameItemFactory.getInstance();
+    
+    // 기본 체력 물약 3개 지급
+    GameItem healthPotion = factory.createItem("HEALTH_POTION");
+    if (healthPotion != null && healthPotion instanceof GameConsumable) {
+        player.getInventory().addItem(healthPotion, 3);
+        logger.info("시작 아이템 지급: {} x3", healthPotion.getName());
+    } else {
+        logger.error("체력 물약 생성 실패: HEALTH_POTION");
+    }
+    
+    // 기본 마나 물약 2개 지급
+    GameItem manaPotion = factory.createItem("MANA_POTION");
+    if (manaPotion != null && manaPotion instanceof GameConsumable) {
+        player.getInventory().addItem(manaPotion, 2);
+        logger.info("시작 아이템 지급: {} x2", manaPotion.getName());
+    } else {
+        logger.error("마나 물약 생성 실패: MANA_POTION");
+    }
+    
+    // 결과 출력
+    System.out.println("🎁 시작 아이템을 받았습니다!");
+    if (healthPotion != null) {
+        System.out.println("• " + healthPotion.getName() + " x3");
+    }
+    if (manaPotion != null) {
+        System.out.println("• " + manaPotion.getName() + " x2");
+    }
+    
+    logger.debug("시작 아이템 지급 완료");
+  }
 
   /**
    * 게임을 불러옵니다.
@@ -347,11 +388,11 @@ public class Game {
     if (shouldSave) {
       saveGame();
     }
-    
-    //updatePlayTime(); // 플레이 시간 업데이트
+
+    // updatePlayTime(); // 플레이 시간 업데이트
     inGameLoop = false;
     System.out.println("🏠 메인 메뉴로 돌아갑니다.");
-  
+
   }
 
   /**

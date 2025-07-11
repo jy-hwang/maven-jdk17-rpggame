@@ -1,0 +1,32 @@
+[
+  {
+    "id": "SMALL_HEALTH_POTION",
+    "name": "작은 체력 물약",
+    "description": "HP를 30 회복합니다",
+    "type": "CONSUMABLE",
+    "value": 25,
+    "rarity": "COMMON",
+    "stackable": true,
+    "effects": [
+      {
+        "type": "HEAL_HP",
+        "value": 30
+      }
+    ]
+  },
+  {
+    "id": "SMALL_MANA_POTION",
+    "name": "작은 마나 물약",
+    "description": "MP를 20 회복합니다",
+    "type": "CONSUMABLE",
+    "value": 30,
+    "rarity": "COMMON",
+    "stackable": true,
+    "effects": [
+      {
+        "type": "HEAL_MP",
+        "value": 20
+      }
+    ]
+  }
+]

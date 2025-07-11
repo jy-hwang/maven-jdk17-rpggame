@@ -5,18 +5,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import model.GameCharacter;
 import model.GameInventory;
+import model.factory.GameItemFactory;
 import model.item.GameConsumable;
 import model.item.GameEquipment;
 import model.item.GameItem;
+import model.item.ItemRarity;
 import util.InputValidator;
 
 /**
- * 인벤토리 및 장비 시스템을 전담하는 컨트롤러 (GameInventory 기반)
+ * 인벤토리 및 장비 시스템을 전담하는 컨트롤러 (최신 버전) GameItemFactory와 새로운 아이템 시스템 사용
  */
 public class InventoryController {
   private static final Logger logger = LoggerFactory.getLogger(InventoryController.class);
+  private final GameItemFactory itemFactory;
 
   public InventoryController() {
+    this.itemFactory = GameItemFactory.getInstance();
     logger.debug("InventoryController 초기화 완료");
   }
 
@@ -34,7 +38,7 @@ public class InventoryController {
   /**
    * 아이템 등급을 한국어로 변환합니다.
    */
-  private String getRarityKorean(GameItem.ItemRarity rarity) {
+  private String getRarityKorean(ItemRarity rarity) {
     return switch (rarity) {
       case COMMON -> "일반";
       case UNCOMMON -> "고급";
@@ -43,6 +47,7 @@ public class InventoryController {
       case LEGENDARY -> "전설";
     };
   }
+
   /**
    * 인벤토리 관리 메뉴를 실행합니다.
    * 
@@ -151,8 +156,6 @@ public class InventoryController {
     return newTotal > currentTotal;
   }
 
-
-
   /**
    * 인벤토리 아이템을 사용합니다.
    */
@@ -172,14 +175,7 @@ public class InventoryController {
 
       System.out.printf("%d. %s x%d%n", i + 1, item.getName(), quantity);
       System.out.printf("   📝 %s%n", item.getDescription());
-
-      if (item.getHpRestore() > 0) {
-        System.out.printf("   ❤️ 체력 회복: %d%n", item.getHpRestore());
-      }
-
-      if (item instanceof GameConsumable && item.getExpGain() > 0) {
-        System.out.printf("   📈 경험치: %d%n", item.getExpGain());
-      }
+      System.out.printf("   ✨ 효과: %s%n", item.getEffectsDescription());
     }
 
     int itemIndex = InputValidator.getIntInput("사용할 아이템 번호 (0: 취소): ", 0, usableItems.size()) - 1;
@@ -188,14 +184,8 @@ public class InventoryController {
 
     GameConsumable selectedItem = usableItems.get(itemIndex);
 
-    // 사용 전 효과 확인
-    if (selectedItem.getHpRestore() > 0 && player.getHp() >= player.getTotalMaxHp()) {
-      if (!InputValidator.getConfirmation("체력이 이미 가득합니다. 정말 사용하시겠습니까?")) {
-        return;
-      }
-    }
-
-    if (player.getInventory().useItem(selectedItem.getName(), player)) {
+    // 사용 전 효과 확인 및 사용
+    if (useItemWithConfirmation(player, selectedItem)) {
       System.out.println("✅ " + selectedItem.getName() + "을(를) 사용했습니다!");
       logger.debug("아이템 사용 성공: {}", selectedItem.getName());
     } else {
@@ -204,6 +194,41 @@ public class InventoryController {
     }
 
     InputValidator.waitForAnyKey("계속하려면 Enter를 누르세요...");
+  }
+
+  /**
+   * 아이템 사용 확인 및 처리
+   */
+  private boolean useItemWithConfirmation(GameCharacter player, GameConsumable item) {
+    // 체력이 가득 찬 상태에서 체력 물약 사용 시 확인
+    if (isHealingItem(item) && player.getHp() >= player.getTotalMaxHp()) {
+      if (!InputValidator.getConfirmation("체력이 이미 가득합니다. 정말 사용하시겠습니까?")) {
+        return false;
+      }
+    }
+
+    // 마나가 가득 찬 상태에서 마나 물약 사용 시 확인
+    if (isManaItem(item) && player.getMana() >= player.getMaxMana()) {
+      if (!InputValidator.getConfirmation("마나가 이미 가득합니다. 정말 사용하시겠습니까?")) {
+        return false;
+      }
+    }
+
+    return player.getInventory().useItem(item.getName(), player);
+  }
+
+  /**
+   * 체력 회복 아이템인지 확인
+   */
+  private boolean isHealingItem(GameConsumable item) {
+    return item.getEffectsDescription().toLowerCase().contains("hp") || item.getName().toLowerCase().contains("체력") || item.getName().toLowerCase().contains("health");
+  }
+
+  /**
+   * 마나 회복 아이템인지 확인
+   */
+  private boolean isManaItem(GameConsumable item) {
+    return item.getEffectsDescription().toLowerCase().contains("mp") || item.getName().toLowerCase().contains("마나") || item.getName().toLowerCase().contains("mana");
   }
 
   /**
@@ -555,12 +580,13 @@ public class InventoryController {
     System.out.printf("🆓 여유 공간: %d슬롯%n", inventory.getFreeSlots());
 
     // 아이템 타입별 개수
-    var consumables = inventory.getItemsByType(GameConsumable.class);
-    var equipments = inventory.getItemsByType(GameEquipment.class);
+    var allItems = inventory.getItems();
+    long consumables = allItems.stream().filter(stack -> stack.getItem() instanceof GameConsumable).count();
+    long equipments = allItems.stream().filter(stack -> stack.getItem() instanceof GameEquipment).count();
 
     System.out.println("\n📊 아이템 분류:");
-    System.out.printf("🧪 소비 아이템: %d개%n", consumables.size());
-    System.out.printf("⚔️ 장비: %d개%n", equipments.size());
+    System.out.printf("🧪 소비 아이템: %d종류%n", consumables);
+    System.out.printf("⚔️ 장비: %d종류%n", equipments);
 
     // 등급별 통계
     displayRarityStatistics(inventory);
@@ -578,13 +604,13 @@ public class InventoryController {
   private void displayRarityStatistics(GameInventory inventory) {
     System.out.println("\n⭐ 등급별 분포:");
 
-    var rarityCount = new java.util.HashMap<GameItem.ItemRarity, Integer>();
+    var rarityCount = new java.util.HashMap<ItemRarity, Integer>();
     for (var stack : inventory.getItems()) {
-      GameItem.ItemRarity rarity = stack.getItem().getRarity();
+      ItemRarity rarity = stack.getItem().getRarity();
       rarityCount.put(rarity, rarityCount.getOrDefault(rarity, 0) + 1);
     }
 
-    for (GameItem.ItemRarity rarity : GameItem.ItemRarity.values()) {
+    for (ItemRarity rarity : ItemRarity.values()) {
       int count = rarityCount.getOrDefault(rarity, 0);
       if (count > 0) {
         System.out.printf("  %s: %d개%n", getRarityKorean(rarity), count);
@@ -818,6 +844,7 @@ public class InventoryController {
     System.out.println("⭐ 등급: " + getRarityKorean(item.getRarity()));
     System.out.println("💰 가격: " + item.getValue() + " 골드");
     System.out.println("📊 수량: " + stack.getQuantity() + "개");
+    System.out.println("🔄 중첩 가능: " + (itemFactory.isStackable(item.getName()) ? "예" : "아니오"));
 
     if (item instanceof GameEquipment equipment) {
       System.out.println("🏷️ 타입: " + getEquipmentTypeKorean(equipment.getEquipmentType()));
@@ -838,13 +865,7 @@ public class InventoryController {
 
     } else if (item instanceof GameConsumable consumable) {
       System.out.println("🧪 타입: 소비 아이템");
-      if (consumable.getHpRestore() > 0) {
-        System.out.println("❤️ 체력 회복: " + consumable.getHpRestore());
-      }
-      if (consumable.getExpGain() > 0) {
-        System.out.println("📈 경험치: " + consumable.getExpGain());
-      }
-      System.out.println("🔄 스택 가능: " + (consumable.isStackable() ? "예" : "아니오"));
+      System.out.println("✨ 효과: " + consumable.getEffectsDescription());
     }
 
     System.out.println("=".repeat(50));
@@ -883,6 +904,8 @@ public class InventoryController {
     return effects.length() > 0 ? effects.toString().trim() : "특별한 효과 없음";
   }
 
+  // ==================== 공개 헬퍼 메서드들 ====================
+
   /**
    * 빠른 아이템 사용 (전투 중 등에서 호출)
    * 
@@ -900,7 +923,6 @@ public class InventoryController {
     return success;
   }
 
-
   /**
    * 아이템 추가 (드롭, 구매 등에서 호출)
    * 
@@ -910,33 +932,15 @@ public class InventoryController {
    * @return 추가 성공 여부
    */
   public boolean addItem(GameCharacter player, GameItem item, int quantity) {
-      boolean success = player.getInventory().addItem(item, quantity);
-      if (success) {
-          logger.debug("아이템 추가 성공: {} x{}", item.getName(), quantity);
-      } else {
-          logger.debug("아이템 추가 실패 (인벤토리 가득참): {} x{}", item.getName(), quantity);
-      }
-      return success;
+    boolean success = player.getInventory().addItem(item, quantity);
+    if (success) {
+      logger.debug("아이템 추가 성공: {} x{}", item.getName(), quantity);
+    } else {
+      logger.debug("아이템 추가 실패 (인벤토리 가득참): {} x{}", item.getName(), quantity);
+    }
+    return success;
   }
-  
-  /**
-   * 아이템 제거 (판매, 사용 등에서 호출)
-   * 
-   * @param player 플레이어 캐릭터
-   * @param itemName 제거할 아이템 이름
-   * @param quantity 제거할 수량
-   * @return 제거 성공 여부
-   */
-  public boolean removeItem(GameCharacter player, String itemName, int quantity) {
-      boolean success = player.getInventory().removeItem(itemName, quantity);
-      if (success) {
-          logger.debug("아이템 제거 성공: {} x{}", itemName, quantity);
-      } else {
-          logger.debug("아이템 제거 실패 (아이템 없음): {} x{}", itemName, quantity);
-      }
-      return success;
-  }
-  
+
   /**
    * 특정 아이템이 인벤토리에 있는지 확인
    * 
@@ -945,9 +949,9 @@ public class InventoryController {
    * @return 보유 여부
    */
   public boolean hasItem(GameCharacter player, String itemName) {
-      return player.getInventory().getItemCount(itemName) > 0;
+    return player.getInventory().getItemCount(itemName) > 0;
   }
-  
+
   /**
    * 특정 수량만큼 아이템이 있는지 확인
    * 
@@ -957,59 +961,19 @@ public class InventoryController {
    * @return 충분한 수량 보유 여부
    */
   public boolean hasEnoughItems(GameCharacter player, String itemName, int requiredQuantity) {
-      return player.getInventory().getItemCount(itemName) >= requiredQuantity;
+    return player.getInventory().getItemCount(itemName) >= requiredQuantity;
   }
-  
+
   /**
-   * 여러 아이템을 한 번에 추가
+   * 인벤토리 사용률 반환
    * 
    * @param player 플레이어 캐릭터
-   * @param itemsToAdd 추가할 아이템과 수량의 맵
-   * @return 모든 아이템 추가 성공 여부
+   * @return 사용률 (0.0 ~ 1.0)
    */
-  public boolean addMultipleItems(GameCharacter player, java.util.Map<GameItem, Integer> itemsToAdd) {
-      // 먼저 공간이 충분한지 확인
-      int requiredSlots = 0;
-      for (var entry : itemsToAdd.entrySet()) {
-          GameItem item = entry.getKey();
-          // 스택 가능한 아이템이 아니라면 각각 슬롯이 필요
-          if (!(item instanceof GameConsumable && ((GameConsumable) item).isStackable()) ||
-              !hasItem(player, item.getName())) {
-              requiredSlots++;
-          }
-      }
-      
-      if (player.getInventory().getFreeSlots() < requiredSlots) {
-          logger.warn("인벤토리 공간 부족: 필요 {}, 여유 {}", requiredSlots, player.getInventory().getFreeSlots());
-          return false;
-      }
-      
-      // 모든 아이템 추가
-      boolean allSuccess = true;
-      for (var entry : itemsToAdd.entrySet()) {
-          GameItem item = entry.getKey();
-          int quantity = entry.getValue();
-          
-          if (!addItem(player, item, quantity)) {
-              allSuccess = false;
-              logger.warn("다중 아이템 추가 중 실패: {} x{}", item.getName(), quantity);
-          }
-      }
-      
-      return allSuccess;
+  public double getInventoryUsageRate(GameCharacter player) {
+    return player.getInventory().getUsageRate();
   }
-  
-  /**
-   * 인벤토리 공간 확인
-   * 
-   * @param player 플레이어 캐릭터
-   * @param requiredSlots 필요한 슬롯 수
-   * @return 충분한 공간 여부
-   */
-  public boolean hasEnoughSpace(GameCharacter player, int requiredSlots) {
-      return player.getInventory().getFreeSlots() >= requiredSlots;
-  }
-  
+
   /**
    * 인벤토리 요약 정보 반환
    * 
@@ -1017,67 +981,7 @@ public class InventoryController {
    * @return 인벤토리 요약 문자열
    */
   public String getInventorySummary(GameCharacter player) {
-      GameInventory inventory = player.getInventory();
-      return String.format("인벤토리: %d/%d (%.0f%%) | 장비: %s | 총 가치: %d골드", 
-                         inventory.getCurrentSize(), 
-                         inventory.getMaxSize(), 
-                         inventory.getUsageRate() * 100,
-                         getEquipmentSummary(player),
-                         calculateInventoryValue(player));
-  }
-  
-  /**
-   * 인벤토리 총 가치를 계산합니다.
-   */
-  private int calculateInventoryValue(GameCharacter player) {
-      return player.getInventory().getItems().stream()
-              .mapToInt(stack -> stack.getItem().getValue() * stack.getQuantity())
-              .sum();
-  }
-  
-  /**
-   * 인벤토리 상태 확인
-   * 
-   * @param player 플레이어 캐릭터
-   * @return 인벤토리 사용률 (0.0 ~ 1.0)
-   */
-  public double getInventoryUsageRate(GameCharacter player) {
-      return player.getInventory().getUsageRate();
-  }
-  
-  /**
-   * 특정 아이템의 보유 수량 확인
-   * 
-   * @param player 플레이어 캐릭터
-   * @param itemName 아이템 이름
-   * @return 보유 수량
-   */
-  public int getItemQuantity(GameCharacter player, String itemName) {
-      return player.getInventory().getItemCount(itemName);
-  }
-  
-  /**
-   * 인벤토리 상태 요약을 반환합니다.
-   */
-  public String getInventoryStatusSummary(GameCharacter player) {
-      GameInventory inventory = player.getInventory();
-      return String.format("인벤토리: %d/%d (%.0f%%)", 
-                         inventory.getCurrentSize(), 
-                         inventory.getMaxSize(), 
-                         inventory.getUsageRate() * 100);
-  }
-  
-  /**
-   * 착용 장비 요약을 반환합니다.
-   */
-  public String getEquipmentSummary(GameCharacter player) {
-      GameInventory inventory = player.getInventory();
-      int equippedCount = 0;
-      
-      if (inventory.getEquippedWeapon() != null) equippedCount++;
-      if (inventory.getEquippedArmor() != null) equippedCount++;
-      if (inventory.getEquippedAccessory() != null) equippedCount++;
-      
-      return String.format("착용 장비: %d/3개", equippedCount);
+    GameInventory inventory = player.getInventory();
+    return String.format("인벤토리: %d/%d (%.0f%%) | 골드: %dG", inventory.getCurrentSize(), inventory.getMaxSize(), inventory.getUsageRate() * 100, player.getGold());
   }
 }

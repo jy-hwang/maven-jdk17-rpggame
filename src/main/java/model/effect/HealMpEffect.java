@@ -1,52 +1,79 @@
 package model.effect;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import model.GameCharacter;
 
+/**
+ * MP 회복 효과
+ */
 public class HealMpEffect implements GameEffect {
-  private final int mpAmount;
+  private static final Logger logger = LoggerFactory.getLogger(HealMpEffect.class);
+
+  private final int value;
   private final boolean isPercentage;
 
-  @JsonCreator
-  public HealMpEffect(@JsonProperty("value") int mpAmount, @JsonProperty("isPercentage") Boolean isPercentage) {
-    this.mpAmount = mpAmount;
-    this.isPercentage = isPercentage != null ? isPercentage : false;
+  public HealMpEffect(int value, boolean isPercentage) {
+    this.value = Math.max(0, value);
+    this.isPercentage = isPercentage;
+    logger.debug("HealMpEffect 생성: {} {}", value, isPercentage ? "%" : "고정값");
   }
 
   @Override
   public boolean apply(GameCharacter target) {
-    int actualRestore;
-    if (isPercentage) {
-      actualRestore = (int) (target.getMaxMana() * (mpAmount / 100.0));
-    } else {
-      actualRestore = mpAmount;
+    if (!canApplyTo(target)) {
+      logger.debug("MP 회복 효과 적용 불가: {}", target != null ? target.getName() : "null");
+      return false;
     }
 
     int oldMp = target.getMana();
-    target.restoreMana(actualRestore);
-    int restoredAmount = target.getMana() - oldMp;
+    int restoreAmount;
 
-    System.out.println("💙 " + restoredAmount + " MP 회복! (현재: " + target.getMana() + "/" + target.getMaxMana() + ")");
-    return restoredAmount > 0;
+    if (isPercentage) {
+      restoreAmount = (int) (target.getMaxMana() * value / 100.0);
+    } else {
+      restoreAmount = value;
+    }
+
+    target.restoreMana(restoreAmount);
+    int actualRestored = target.getMana() - oldMp;
+
+    if (actualRestored > 0) {
+      System.out.println(getApplyMessage(target, true));
+      logger.info("{} MP 회복 적용: {} -> {} (+{})", target.getName(), oldMp, target.getMana(), actualRestored);
+      return true;
+    } else {
+      System.out.println(getApplyMessage(target, false));
+      return false;
+    }
   }
 
   @Override
   public String getDescription() {
     if (isPercentage) {
-      return "MP를 " + mpAmount + "% 회복";
+      return "MP " + value + "% 회복";
     } else {
-      return "MP를 " + mpAmount + " 회복";
+      return "MP +" + value;
     }
   }
 
   @Override
   public GameEffectType getType() {
-    return GameEffectType.HEAL_MP;
+    return isPercentage ? GameEffectType.HEAL_MP_PERCENT : GameEffectType.HEAL_MP;
   }
 
   @Override
   public int getValue() {
-    return mpAmount;
+    return value;
+  }
+
+  @Override
+  public boolean isPercentage() {
+    return isPercentage;
+  }
+
+  @Override
+  public String toString() {
+    return String.format("HealMpEffect{value=%d, percentage=%b}", value, isPercentage);
   }
 }

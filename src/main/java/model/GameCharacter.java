@@ -4,8 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import model.item.GameConsumable;
-import model.item.GameItem;
+import model.effect.GameStatusCondition;
 
 /**
  * 향상된 게임 캐릭터 클래스 (인벤토리, 스킬, 마나 시스템 포함)
@@ -25,6 +24,7 @@ public class GameCharacter {
   private int gold;
   private GameInventory inventory;
   private SkillManager skillManager;
+  private GameStatusCondition playerStatusCondition;
 
   // 상수 정의
   private static final int INITIAL_LEVEL = 1;
@@ -59,11 +59,9 @@ public class GameCharacter {
     this.baseAttack = INITIAL_ATTACK;
     this.baseDefense = INITIAL_DEFENSE;
     this.gold = INITIAL_GOLD;
-    this.inventory = new GameInventory();
+    this.inventory = new GameInventory(20);
     this.skillManager = new SkillManager();
-
-    // 시작 아이템 지급
-    giveStartingItems();
+    this.playerStatusCondition = GameStatusCondition.NORMAL;
 
     logger.info("새 캐릭터 생성: {}", this.name);
   }
@@ -72,12 +70,23 @@ public class GameCharacter {
    * 저장된 데이터로 캐릭터 생성자
    */
   @JsonCreator
-  public GameCharacter(@JsonProperty("name") String name, @JsonProperty("level") int level,
-      @JsonProperty("hp") int hp, @JsonProperty("maxHp") int maxHp, @JsonProperty("mana") int mana,
-      @JsonProperty("maxMana") int maxMana, @JsonProperty("exp") int exp,
-      @JsonProperty("baseAttack") int baseAttack, @JsonProperty("baseDefense") int baseDefense,
-      @JsonProperty("gold") int gold, @JsonProperty("inventory") GameInventory inventory,
-      @JsonProperty("skillManager") SkillManager skillManager) {
+  public GameCharacter(
+  //@formatter:off
+      @JsonProperty("name") String name,
+      @JsonProperty("level") int level,
+      @JsonProperty("hp") int hp,
+      @JsonProperty("maxHp") int maxHp,
+      @JsonProperty("mana") int mana,
+      @JsonProperty("maxMana") int maxMana,
+      @JsonProperty("exp") int exp,
+      @JsonProperty("baseAttack") int baseAttack,
+      @JsonProperty("baseDefense") int baseDefense,
+      @JsonProperty("gold") int gold,
+      @JsonProperty("inventory") GameInventory inventory,
+      @JsonProperty("skillManager") SkillManager skillManager,
+      @JsonProperty("playerStatusCondition") GameStatusCondition playerStatusCondition
+      //@formatter:on
+  ) {
     if (name == null || name.trim().isEmpty()) {
       logger.error("저장된 캐릭터 이름이 유효하지 않음: {}", name);
       throw new IllegalArgumentException("캐릭터 이름은 비어있을 수 없습니다.");
@@ -95,34 +104,16 @@ public class GameCharacter {
     this.baseAttack = Math.max(1, baseAttack);
     this.baseDefense = Math.max(0, baseDefense);
     this.gold = Math.max(0, gold);
-    this.inventory = inventory != null ? inventory : new GameInventory();
+    this.inventory = inventory != null ? inventory : new GameInventory(20);
     this.skillManager = skillManager != null ? skillManager : new SkillManager();
-
+    this.playerStatusCondition = playerStatusCondition != null ? playerStatusCondition : GameStatusCondition.NORMAL;
     logger.info("저장된 캐릭터 로드: {} (레벨: {})", this.name, this.level);
-  }
-
-  /**
-   * 시작 아이템을 지급합니다.
-   */
-  private void giveStartingItems() {
-    // 기본 체력 물약 3개
-    GameItem healthPotion =
-        new GameConsumable("체력 물약", "HP를 50 회복합니다", 20, GameItem.ItemRarity.COMMON, 50, 0, 0, true);
-    inventory.addItem(healthPotion, 3);
-
-    // 기본 마나 물약 2개
-    GameItem manaPotion = 
-        new GameConsumable("마나 물약", "MP를 30 회복합니다", 25, GameItem.ItemRarity.COMMON, 0, 30, 0, true);
-    inventory.addItem(manaPotion, 2);
-
-    logger.debug("시작 아이템 지급 완료");
   }
 
   /**
    * 스탯 값들의 유효성을 검증합니다.
    */
-  private void validateStats(int level, int hp, int maxHp, int exp, int attack, int defense,
-      int gold) {
+  private void validateStats(int level, int hp, int maxHp, int exp, int attack, int defense, int gold) {
     if (level < 1 || level > 1000) {
       logger.warn("비정상적인 레벨 값: {}", level);
       throw new IllegalArgumentException("레벨은 1~1000 사이여야 합니다.");
@@ -200,8 +191,7 @@ public class GameCharacter {
         }
       }
 
-      logger.info("{} 레벨업 완료 - 레벨: {}, 최대HP: {}, 최대마나: {}, 공격력: {}, 방어력: {}", name, level, maxHp,
-          maxMana, baseAttack, baseDefense);
+      logger.info("{} 레벨업 완료 - 레벨: {}, 최대HP: {}, 최대마나: {}, 공격력: {}, 방어력: {}", name, level, maxHp, maxMana, baseAttack, baseDefense);
 
     } catch (Exception e) {
       logger.error("레벨업 처리 중 오류 발생", e);
@@ -273,8 +263,7 @@ public class GameCharacter {
     if (this.hp < 0)
       this.hp = 0;
 
-    logger.debug("{} 데미지 받음: {} -> {} (-{}, 방어력: {})", name, oldHp, this.hp, actualDamage,
-        totalDefense);
+    logger.debug("{} 데미지 받음: {} -> {} (-{}, 방어력: {})", name, oldHp, this.hp, actualDamage, totalDefense);
 
     if (!isAlive()) {
       logger.info("{} 사망", name);
@@ -342,7 +331,7 @@ public class GameCharacter {
         System.out.printf(" (%d+%d)", baseDefense, bonus.getDefenseBonus());
       }
       System.out.println();
-
+      System.out.println("상태: " + playerStatusCondition);
       System.out.println("골드: " + gold);
       System.out.println("=========================");
 
@@ -436,8 +425,7 @@ public class GameCharacter {
    * @return CSV 형식 문자열
    */
   public String toCsv() {
-    String csvData = String.format("%s,%d,%d,%d,%d,%d,%d,%d,%d,%d", name, level, hp, maxHp, mana,
-        maxMana, exp, baseAttack, baseDefense, gold);
+    String csvData = String.format("%s,%d,%d,%d,%d,%d,%d,%d,%d,%d", name, level, hp, maxHp, mana, maxMana, exp, baseAttack, baseDefense, gold);
     logger.debug("캐릭터 CSV 변환: {}", csvData);
     return csvData;
   }
@@ -473,9 +461,9 @@ public class GameCharacter {
           Integer.parseInt(parts[7].trim()), // baseAttack
           Integer.parseInt(parts[8].trim()), // baseDefense
           Integer.parseInt(parts[9].trim()), // gold
-          new GameInventory(), // 새 인벤토리 생성
-          new SkillManager() // 새 스킬 매니저 생성
-      );
+          new GameInventory(20), // 새 인벤토리 생성
+          new SkillManager(), // 새 스킬 매니저 생성
+          GameStatusCondition.NORMAL);
 
       // 레벨에 맞는 스킬들을 다시 학습시킴
       character.getSkillManager().checkAndLearnNewSkills(character.getLevel());
@@ -491,4 +479,6 @@ public class GameCharacter {
       throw new IllegalArgumentException("CSV 데이터 파싱 중 오류가 발생했습니다.", e);
     }
   }
+
+
 }

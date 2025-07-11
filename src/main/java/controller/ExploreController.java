@@ -10,6 +10,7 @@ import model.Monster;
 import model.item.GameConsumable;
 import model.item.GameEquipment;
 import model.item.GameItem;
+import model.item.ItemRarity;
 import service.GameDataService;
 
 /**
@@ -332,9 +333,9 @@ public class ExploreController {
    * 랜덤 보물 아이템을 생성합니다.
    */
   private GameItem generateRandomTreasureItem() {
-    GameItem[] treasureItems = {new GameConsumable("고급 체력 물약", "HP를 100 회복합니다", 50, GameItem.ItemRarity.UNCOMMON, 100, 0, 0, true),
-        new GameEquipment("은검", "은으로 만든 아름다운 검", 150, GameItem.ItemRarity.UNCOMMON, GameEquipment.EquipmentType.WEAPON, 12, 0, 0),
-        new GameEquipment("마법사의 로브", "마법사가 입던 로브", 120, GameItem.ItemRarity.RARE, GameEquipment.EquipmentType.ARMOR, 0, 8, 20)};
+    GameItem[] treasureItems = {new GameConsumable("고급 체력 물약", "HP를 100 회복합니다", 50, ItemRarity.UNCOMMON, 100, 0, 0, true),
+        new GameEquipment("은검", "은으로 만든 아름다운 검", 150, ItemRarity.UNCOMMON, GameEquipment.EquipmentType.WEAPON, 12, 0, 0),
+        new GameEquipment("마법사의 로브", "마법사가 입던 로브", 120, ItemRarity.RARE, GameEquipment.EquipmentType.ARMOR, 0, 8, 20)};
 
     return treasureItems[random.nextInt(treasureItems.length)];
   }
@@ -343,9 +344,9 @@ public class ExploreController {
    * 특별한 상인 아이템을 생성합니다.
    */
   private GameItem generateSpecialMerchantItem() {
-    GameItem[] merchantItems = {new GameEquipment("여행자의 부츠", "이동 속도를 증가시키는 부츠", 75, GameItem.ItemRarity.RARE, GameEquipment.EquipmentType.ACCESSORY, 0, 3, 15),
-        new GameConsumable("신비한 물약", "HP와 MP를 100 회복", 80, GameItem.ItemRarity.RARE, 100, 100, 0, true),
-        new GameEquipment("고대의 목걸이", "경험치 획득량을 증가시킴", 100, GameItem.ItemRarity.EPIC, GameEquipment.EquipmentType.ACCESSORY, 0, 0, 25)};
+    GameItem[] merchantItems = {new GameEquipment("여행자의 부츠", "이동 속도를 증가시키는 부츠", 75, ItemRarity.RARE, GameEquipment.EquipmentType.ACCESSORY, 0, 3, 15),
+        new GameConsumable("신비한 물약", "HP와 MP를 100 회복", 80, ItemRarity.RARE, 100, 100, 0, true),
+        new GameEquipment("고대의 목걸이", "경험치 획득량을 증가시킴", 100, ItemRarity.EPIC, GameEquipment.EquipmentType.ACCESSORY, 0, 0, 25)};
 
     return merchantItems[random.nextInt(merchantItems.length)];
   }
@@ -354,10 +355,9 @@ public class ExploreController {
    * 랜덤 드롭 아이템을 생성합니다.
    */
   private GameItem generateRandomDropItem() {
-    GameItem[] dropItems =
-        {new GameConsumable("체력 물약", "HP를 50 회복합니다", 20, GameItem.ItemRarity.COMMON, 50, 0, 0, true), new GameConsumable("마나 물약", "마나를 30 회복합니다", 25, GameItem.ItemRarity.COMMON, 0, 30, 0, true),
-            new GameEquipment("낡은 검", "사용감이 있지만 쓸만한 검", 40, GameItem.ItemRarity.COMMON, GameEquipment.EquipmentType.WEAPON, 5, 0, 0),
-            new GameEquipment("가죽 갑옷", "기본적인 가죽 갑옷", 60, GameItem.ItemRarity.COMMON, GameEquipment.EquipmentType.ARMOR, 0, 4, 5)};
+    GameItem[] dropItems = {new GameConsumable("체력 물약", "HP를 50 회복합니다", 20, ItemRarity.COMMON, 50, 0, 0, true), new GameConsumable("마나 물약", "마나를 30 회복합니다", 25, ItemRarity.COMMON, 0, 30, 0, true),
+        new GameEquipment("낡은 검", "사용감이 있지만 쓸만한 검", 40, ItemRarity.COMMON, GameEquipment.EquipmentType.WEAPON, 5, 0, 0),
+        new GameEquipment("가죽 갑옷", "기본적인 가죽 갑옷", 60, ItemRarity.COMMON, GameEquipment.EquipmentType.ARMOR, 0, 4, 5)};
 
     return dropItems[random.nextInt(dropItems.length)];
   }

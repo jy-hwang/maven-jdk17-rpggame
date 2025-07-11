@@ -9,6 +9,7 @@ import model.Skill;
 import model.item.GameConsumable;
 import model.item.GameEquipment;
 import model.item.GameItem;
+import model.item.ItemRarity;
 import service.GameDataService;
 import service.QuestManager;
 import util.InputValidator;
@@ -277,10 +278,9 @@ public class BattleController {
    * 랜덤 아이템을 드롭합니다.
    */
   private void dropRandomItem(GameCharacter player) {
-    GameItem[] possibleDrops =
-        {new GameConsumable("체력 물약", "HP를 50 회복합니다", 20, GameItem.ItemRarity.COMMON, 50, 0, 0, true), new GameConsumable("마나 물약", "마나를 30 회복합니다", 25, GameItem.ItemRarity.COMMON, 0, 30, 0, true),
-            new GameEquipment("철검", "날카로운 철검", 80, GameItem.ItemRarity.UNCOMMON, GameEquipment.EquipmentType.WEAPON, 8, 0, 0),
-            new GameEquipment("가죽 갑옷", "질긴 가죽으로 만든 갑옷", 60, GameItem.ItemRarity.COMMON, GameEquipment.EquipmentType.ARMOR, 0, 6, 10)};
+    GameItem[] possibleDrops = {new GameConsumable("체력 물약", "HP를 50 회복합니다", 20, ItemRarity.COMMON, 50, 0, 0, true), new GameConsumable("마나 물약", "마나를 30 회복합니다", 25, ItemRarity.COMMON, 0, 30, 0, true),
+        new GameEquipment("철검", "날카로운 철검", 80, ItemRarity.UNCOMMON, GameEquipment.EquipmentType.WEAPON, 8, 0, 0),
+        new GameEquipment("가죽 갑옷", "질긴 가죽으로 만든 갑옷", 60, ItemRarity.COMMON, GameEquipment.EquipmentType.ARMOR, 0, 6, 10)};
 
     GameItem droppedItem = possibleDrops[random.nextInt(possibleDrops.length)];
 
