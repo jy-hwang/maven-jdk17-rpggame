@@ -14,6 +14,8 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import config.BaseConstant;
+import dto.SaveGameDto;
+import dto.mapper.SaveGameMapper;
 import model.GameCharacter;
 
 /**
@@ -52,14 +54,14 @@ public class GameDataService {
   }
 
   /**
-   * 지정된 슬롯에 게임을 저장합니다.
+   * 게임 저장 (DTO 패턴 적용)
    */
   public static void saveGame(GameCharacter character, GameState gameState, int slotNumber) throws GameDataException {
     if (character == null) {
       throw new GameDataException("저장할 캐릭터 데이터가 없습니다.");
     }
 
-    if (slotNumber < 1 || slotNumber > BaseConstant.MAX_SAVE_SLOTS) {
+    if (slotNumber < BaseConstant.NUMBER_ONE || slotNumber > BaseConstant.MAX_SAVE_SLOTS) {
       throw new GameDataException("저장 슬롯 번호는 1~" + BaseConstant.MAX_SAVE_SLOTS + " 사이여야 합니다.");
     }
 
@@ -72,11 +74,11 @@ public class GameDataService {
         createJsonBackup(saveFilePath, slotNumber);
       }
 
-      // 저장할 데이터 구성
-      SaveData saveData = new SaveData(character, gameState, slotNumber);
+      // 도메인 모델을 DTO로 변환
+      SaveGameDto saveDto = SaveGameMapper.toDto(character, gameState, slotNumber);
 
-      // JSON 파일로 저장
-      objectMapper.writeValue(saveFilePath.toFile(), saveData);
+      // DTO를 JSON으로 저장
+      objectMapper.writeValue(saveFilePath.toFile(), saveDto);
 
       logger.info("슬롯 {} JSON 게임 저장 완료: {} (캐릭터: {})", slotNumber, saveFilePath.toAbsolutePath(), character.getName());
       System.out.println("게임이 슬롯 " + slotNumber + "에 저장되었습니다!");
@@ -88,7 +90,7 @@ public class GameDataService {
   }
 
   /**
-   * 지정된 슬롯에서 게임을 불러옵니다.
+   * 게임 로드 (DTO 패턴 적용)
    */
   public static SaveData loadGame(int slotNumber) throws GameDataException {
     if (slotNumber < 1 || slotNumber > BaseConstant.MAX_SAVE_SLOTS) {
@@ -104,7 +106,12 @@ public class GameDataService {
     }
 
     try {
-      SaveData saveData = objectMapper.readValue(saveFilePath.toFile(), SaveData.class);
+      // JSON을 DTO로 역직렬화
+      SaveGameDto saveDto = objectMapper.readValue(saveFilePath.toFile(), SaveGameDto.class);
+
+      // DTO를 도메인 모델로 변환
+      SaveData saveData = SaveGameMapper.fromDto(saveDto);
+
       logger.info("슬롯 {} JSON 게임 로드 완료: {} (캐릭터: {})", slotNumber, saveFilePath, saveData.getCharacter().getName());
       return saveData;
 
@@ -115,21 +122,25 @@ public class GameDataService {
   }
 
   /**
-   * 모든 저장 슬롯의 정보를 조회합니다.
+   * 모든 저장 슬롯 정보 조회 (DTO 패턴 적용, private 필드 대응)
    */
   public static List<SaveSlotInfo> getAllSaveSlots() {
     List<SaveSlotInfo> slots = new ArrayList<>();
 
-    for (int i = 1; i <= BaseConstant.MAX_SAVE_SLOTS; i++) {
+    for (int i = BaseConstant.NUMBER_ONE; i <= BaseConstant.MAX_SAVE_SLOTS; i++) {
       String fileName = BaseConstant.SAVE_FILE_PREFIX + i + ".json";
       Path saveFilePath = Paths.get(BaseConstant.SAVE_DIRECTORY, fileName);
 
       if (Files.exists(saveFilePath)) {
         try {
-          SaveData saveData = objectMapper.readValue(saveFilePath.toFile(), SaveData.class);
-          logger.debug("saveData : ", saveData);
-          SaveSlotInfo slotInfo = new SaveSlotInfo(i, true, saveData.getCharacter().getName(), saveData.getCharacter().getLevel(),
-              saveData.getSaveTime(), saveData.getGameState().getTotalPlayTime());
+          // DTO로 읽어서 필요한 정보만 추출 (getter 사용)
+          SaveGameDto saveDto = objectMapper.readValue(saveFilePath.toFile(), SaveGameDto.class);
+
+          SaveSlotInfo slotInfo = new SaveSlotInfo(i, true, saveDto.getCharacter().getName(), // getter 사용
+              saveDto.getCharacter().getLevel(), // getter 사용
+              saveDto.getSaveTime(), // getter 사용
+              saveDto.getGameState().getTotalPlayTime() // getter 사용
+          );
           slots.add(slotInfo);
         } catch (IOException e) {
           logger.warn("슬롯 {} 정보 읽기 실패: {}", i, e.getMessage());
@@ -141,6 +152,7 @@ public class GameDataService {
     }
 
     return slots;
+
   }
 
   /**
@@ -224,7 +236,7 @@ public class GameDataService {
       Path saveDir = Paths.get(BaseConstant.SAVE_DIRECTORY);
       Files.list(saveDir).filter(path -> path.getFileName().toString().startsWith(BaseConstant.BACKUP_PREFIX))
           .filter(path -> path.getFileName().toString().endsWith(".json"))
-          .sorted((p1, p2) -> p2.getFileName().toString().compareTo(p1.getFileName().toString())).skip(10) // 최신 10개는 유지 (슬롯 5개 × 백업 2개)
+          .sorted((p1, p2) -> p2.getFileName().toString().compareTo(p1.getFileName().toString())).skip(10) // 최신 10개는 유지
           .forEach(path -> {
             try {
               Files.deleteIfExists(path);

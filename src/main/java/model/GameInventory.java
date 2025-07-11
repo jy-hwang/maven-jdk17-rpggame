@@ -400,6 +400,18 @@ public class GameInventory {
     return equippedAccessory;
   }
 
+  public void setEquippedWeapon(GameEquipment equippedWeapon) {
+    this.equippedWeapon = equippedWeapon;
+  }
+
+  public void setEquippedArmor(GameEquipment equippedArmor) {
+    this.equippedArmor = equippedArmor;
+  }
+
+  public void setEquippedAccessory(GameEquipment equippedAccessory) {
+    this.equippedAccessory = equippedAccessory;
+  }
+
   /**
    * 아이템 스택 클래스
    */

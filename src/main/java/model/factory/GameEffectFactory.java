@@ -380,4 +380,8 @@ public class GameEffectFactory {
     System.out.printf("DEBUG: 효과 - 타입: %s, 값: %d, 퍼센트: %b, 설명: %s%n", effect.getType().getDisplayName(), effect.getValue(), effect.isPercentage(),
         effect.getDescription());
   }
+
+  public static GameEffect createEffect(String type, int value) {
+    return createSimpleEffect(type, value);
+  }
 }

@@ -191,4 +191,24 @@ public class SkillManager {
   public Map<String, Integer> getSkillCooldowns() {
     return new HashMap<>(skillCooldowns);
   }
+  
+  /**
+   * 스킬을 학습합니다.
+   */
+  public void learnSkill(Skill skill) {
+      if (skill != null && !learnedSkills.contains(skill)) {
+          learnedSkills.add(skill);
+          logger.debug("스킬 학습: {}", skill.getName());
+      }
+  }
+
+  /**
+   * 스킬 쿨다운을 설정합니다.
+   */
+  public void setSkillCooldown(String skillName, int remainingTurns) {
+      if (skillName != null && remainingTurns > 0) {
+          skillCooldowns.put(skillName, remainingTurns);
+      }
+  }
+
 }
