@@ -1,6 +1,7 @@
 package controller;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 import org.slf4j.Logger;
@@ -408,10 +409,66 @@ public class ShopController {
   }
 
   /**
-   * 카테고리별 아이템 목록을 표시하고 구매를 처리합니다.
+   * 플레이어 레벨에 맞는 스마트 정렬을 반환합니다
+   * 콘솔 UX를 고려하여 적합한 아이템을 맨 아래(보기 쉬운 곳)에 표시
+   */
+  private Comparator<ShopItem> getSmartSorting(GameCharacter player) {
+      return Comparator.comparing((ShopItem item) -> getRarityPriority(item.getItem().getRarity(), player.getLevel()))
+                       .thenComparingInt(ShopItem::getPrice)
+                       .reversed();  // 전체 순서를 뒤집어서 적합한 아이템이 아래로
+  }
+
+  /**
+   * 플레이어 레벨에 따른 등급별 우선순위를 반환합니다 낮은 숫자일수록 먼저 표시됨
+   */
+  private int getRarityPriority(ItemRarity rarity, int playerLevel) {
+    if (playerLevel <= 5) {
+      // 초보자 (1-5레벨): 기본 아이템 위주
+      return switch (rarity) {
+        case COMMON -> 1; // 가장 먼저
+        case UNCOMMON -> 2;
+        case RARE -> 3;
+        case EPIC -> 4;
+        case LEGENDARY -> 5; // 가장 나중
+      };
+    } else if (playerLevel <= 15) {
+      // 중급자 (6-15레벨): 일반~고급 아이템 위주
+      return switch (rarity) {
+        case UNCOMMON -> 1; // 가장 먼저
+        case COMMON -> 2;
+        case RARE -> 2; // COMMON과 같은 우선순위
+        case EPIC -> 3;
+        case LEGENDARY -> 4;
+      };
+    } else if (playerLevel <= 25) {
+      // 고급자 (16-25레벨): 고급 아이템 위주
+      return switch (rarity) {
+        case RARE -> 1; // 가장 먼저
+        case UNCOMMON -> 2;
+        case EPIC -> 2; // UNCOMMON과 같은 우선순위
+        case COMMON -> 3;
+        case LEGENDARY -> 3; // COMMON과 같은 우선순위
+      };
+    } else {
+      // 전문가 (26+레벨): 최고급 아이템 위주
+      return switch (rarity) {
+        case EPIC -> 1; // 가장 먼저
+        case LEGENDARY -> 1; // EPIC과 같은 우선순위
+        case RARE -> 2;
+        case UNCOMMON -> 3;
+        case COMMON -> 4; // 가장 나중
+      };
+    }
+  }
+
+  /**
+   * 카테고리별 아이템 목록을 표시하고 구매를 처리합니다 (스마트 정렬 적용)
    */
   private void browseCategoryItems(GameCharacter player, ShopItemCategory category) {
-    var categoryItems = shopItems.stream().filter(item -> item.getCategory() == category).filter(item -> item.getStock() > 0).toList();
+    var categoryItems =
+        shopItems.stream().filter(item -> item.getCategory() == category).filter(item -> item.getStock() > 0).sorted(getSmartSorting(player)) // 스마트
+                                                                                                                                              // 정렬 적용
+            .toList();
 
     if (categoryItems.isEmpty()) {
       System.out.println("현재 " + getCategoryKorean(category) + " 카테고리에 판매 중인 아이템이 없습니다.");
@@ -430,8 +487,9 @@ public class ShopController {
       ShopItem selectedItem = categoryItems.get(choice - 1);
       handleItemPurchase(player, selectedItem);
 
-      // 재고가 떨어진 아이템 제거
-      categoryItems = categoryItems.stream().filter(item -> item.getStock() > 0).toList();
+      // 재고가 떨어진 아이템 제거 후 다시 정렬
+      categoryItems = categoryItems.stream().filter(item -> item.getStock() > 0).sorted(getSmartSorting(player)) // 재정렬
+          .toList();
 
       if (categoryItems.isEmpty()) {
         System.out.println("🔄 해당 카테고리의 모든 아이템이 품절되었습니다.");
@@ -442,12 +500,35 @@ public class ShopController {
   }
 
   /**
-   * 카테고리별 아이템 목록을 표시합니다.
+   * 스마트 정렬 정보를 플레이어에게 표시합니다 (선택적)
+   */
+  private void displaySmartSortingInfo(GameCharacter player, ShopItemCategory category) {
+    String sortingInfo = getSortingDescription(player.getLevel());
+    System.out.println("💡 정렬 기준: " + sortingInfo);
+    System.out.println();
+  }
+
+  /**
+   * 현재 정렬 방식에 대한 설명을 반환합니다
+   */
+  private String getSortingDescription(int playerLevel) {
+    if (playerLevel <= 5) {
+      return "기본 아이템 위주 (레벨 " + playerLevel + ")";
+    } else if (playerLevel <= 15) {
+      return "일반~고급 아이템 위주 (레벨 " + playerLevel + ")";
+    } else if (playerLevel <= 25) {
+      return "고급 아이템 위주 (레벨 " + playerLevel + ")";
+    } else {
+      return "최고급 아이템 위주 (레벨 " + playerLevel + ")";
+    }
+  }
+
+  /**
+   * 카테고리별 아이템 목록을 표시합니다 (정렬 정보 포함)
    */
   private void displayCategoryItems(GameCharacter player, ShopItemCategory category, List<ShopItem> items) {
     System.out.println("\n🏪 === " + getCategoryKorean(category) + " ===");
-    System.out.println("💰 보유 골드: " + player.getGold());
-    System.out.println();
+   
 
     for (int i = 0; i < items.size(); i++) {
       ShopItem shopItem = items.get(i);
@@ -479,7 +560,12 @@ public class ShopController {
 
       System.out.println();
     }
+    
+    System.out.println("💰 보유 골드: " + player.getGold());
 
+    // 스마트 정렬 정보 표시 (선택적)
+    displaySmartSortingInfo(player, category);
+    
     System.out.println("0. 🔙 뒤로가기");
     System.out.println("====================");
   }
