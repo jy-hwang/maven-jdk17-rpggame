@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import config.BaseConstant;
 import model.factory.GameItemFactory;
 import model.item.GameConsumable;
@@ -27,11 +29,47 @@ public class GameInventory {
   private GameEquipment equippedArmor;
   private GameEquipment equippedAccessory;
 
+  // 기존 생성자 (새 캐릭터용)
   public GameInventory(int maxSlots) {
     this.items = new ArrayList<>();
     this.maxSlots = maxSlots;
+    this.equippedWeapon = null;
+    this.equippedArmor = null;
+    this.equippedAccessory = null;
 
     logger.debug("GameInventory 생성: 최대 {}슬롯", maxSlots);
+  }
+
+  // Jackson 역직렬화용 생성자 추가
+  @JsonCreator
+  public GameInventory(
+ //@formatter:off
+   @JsonProperty("items") List<ItemStack> items
+ , @JsonProperty("maxSlots") int maxSlots
+ , @JsonProperty("equippedWeapon") GameEquipment equippedWeapon
+ , @JsonProperty("equippedArmor") GameEquipment equippedArmor
+ , @JsonProperty("equippedAccessory") GameEquipment equippedAccessory
+ , @JsonProperty("maxSize") int maxSize
+ , @JsonProperty("usageRate") double usageRate
+ , @JsonProperty("equippableItems") List<GameEquipment> equippableItems
+ , @JsonProperty("usableItems") List<GameConsumable> usableItems
+ , @JsonProperty("freeSlots") int freeSlots
+ , @JsonProperty("currentSize") int currentSize
+ , @JsonProperty("totalBonus") EquipmentBonus totalBonus
+ //@formatter:on
+  ) {
+    // items 초기화
+    this.items = items != null ? new ArrayList<>(items) : new ArrayList<>();
+
+    // maxSlots 설정 (maxSize도 같은 값일 것)
+    this.maxSlots = maxSlots > BaseConstant.NUMBER_ZERO ? maxSlots : (maxSize > BaseConstant.NUMBER_ZERO ? maxSize : BaseConstant.NUMBER_TWENTY);
+
+    // 장비 설정
+    this.equippedWeapon = equippedWeapon;
+    this.equippedArmor = equippedArmor;
+    this.equippedAccessory = equippedAccessory;
+
+    logger.debug("GameInventory 역직렬화: 최대 {}슬롯, 아이템 {}개", this.maxSlots, this.items.size());
   }
 
   /**
@@ -369,7 +407,14 @@ public class GameInventory {
     private final GameItem item;
     private int quantity;
 
-    public ItemStack(GameItem item, int quantity) {
+    // Jackson 역직렬화용 생성자 추가
+    @JsonCreator
+    public ItemStack(
+//@formatter:off
+  @JsonProperty("item") GameItem item
+, @JsonProperty("quantity") int quantity
+//@formatter:on
+    ) {
       this.item = item;
       this.quantity = quantity;
     }
@@ -399,7 +444,15 @@ public class GameInventory {
     private final int defenseBonus;
     private final int hpBonus;
 
-    public EquipmentBonus(int attackBonus, int defenseBonus, int hpBonus) {
+    // Jackson 역직렬화용 생성자 추가
+    @JsonCreator
+    public EquipmentBonus(
+//@formatter:off
+  @JsonProperty("attackBonus") int attackBonus
+, @JsonProperty("defenseBonus") int defenseBonus
+, @JsonProperty("hpBonus") int hpBonus
+//@formatter:on
+    ) {
       this.attackBonus = attackBonus;
       this.defenseBonus = defenseBonus;
       this.hpBonus = hpBonus;
