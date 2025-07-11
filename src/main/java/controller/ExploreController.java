@@ -7,11 +7,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import config.BaseConstant;
 import model.GameCharacter;
-import model.Monster;
 import model.item.GameConsumable;
 import model.item.GameEquipment;
 import model.item.GameItem;
 import model.item.ItemRarity;
+import model.monster.Monster;
 import service.GameDataService;
 
 /**

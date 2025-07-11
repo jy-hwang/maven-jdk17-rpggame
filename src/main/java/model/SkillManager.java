@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import config.BaseConstant;
+import model.monster.Monster;
 
 /**
  * 캐릭터의 스킬 관리 클래스

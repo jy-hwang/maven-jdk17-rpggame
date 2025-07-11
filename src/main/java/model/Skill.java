@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import config.BaseConstant;
+import model.monster.Monster;
 
 /**
  * 캐릭터 스킬을 나타내는 클래스
