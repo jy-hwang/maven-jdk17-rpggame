@@ -249,7 +249,7 @@ public class GameCharacter {
   /**
    * 데미지를 받습니다.
    */
-  public void takeDamage(int damage) {
+  public int takeDamage(int damage) {
     if (damage < BaseConstant.NUMBER_ZERO) {
       logger.warn("음수 데미지 시도: {}", damage);
       throw new IllegalArgumentException("데미지는 " + BaseConstant.NUMBER_ZERO + " 이상이어야 합니다.");
@@ -267,6 +267,8 @@ public class GameCharacter {
     if (!isAlive()) {
       logger.info("{} 사망", name);
     }
+
+    return actualDamage;
   }
 
   /**
@@ -343,19 +345,11 @@ public class GameCharacter {
   }
 
   /**
-   * 턴 종료 처리 (스킬 쿨다운 감소, 체력/마나 자연 회복 등)
+   * 턴 종료 처리 (스킬 쿨다운 감소 등)
    */
   public void endTurn() {
     // 스킬 쿨다운 감소
     skillManager.reduceCooldowns();
-
-    // 체력 자연 회복
-    int hpRegenAmount = (int) Math.max(BaseConstant.NUMBER_ONE, Math.round(maxHp / this.restoreHp));
-    heal(hpRegenAmount);
-
-    // 마나 자연 회복
-    int manaRegenAmount = (int) Math.max(BaseConstant.NUMBER_ONE, Math.round(maxMana) / this.restoreMana);
-    restoreMana(manaRegenAmount);
 
     logger.debug("{} 턴 종료 처리 완료", name);
   }
@@ -385,6 +379,22 @@ public class GameCharacter {
     return maxMana;
   }
 
+  public double getRestoreHp() {
+    return restoreHp;
+  }
+
+  public void setRestoreHp(double restoreHp) {
+    this.restoreHp = restoreHp;
+  }
+
+  public double getRestoreMana() {
+    return restoreMana;
+  }
+
+  public void setRestoreMana(double restoreMana) {
+    this.restoreMana = restoreMana;
+  }
+
   public int getExp() {
     return exp;
   }
@@ -409,6 +419,10 @@ public class GameCharacter {
     return skillManager;
   }
 
+  public GameStatusCondition getPlayerStatusCondition() {
+    return playerStatusCondition;
+  }
+
   /**
    * 골드를 설정합니다.
    */
@@ -423,4 +437,15 @@ public class GameCharacter {
     logger.debug("{} 골드 변경: {} -> {}", name, oldGold, gold);
   }
 
+  // GameCharacter.java
+  public void postBattleRegeneration() {
+    // 전투 종료 후 자연 회복
+    int hpRegenAmount = (int) Math.max(BaseConstant.NUMBER_ONE, Math.round(maxHp * this.restoreHp / 100.0));
+    heal(hpRegenAmount);
+
+    int manaRegenAmount = (int) Math.max(BaseConstant.NUMBER_ONE, Math.round(maxMana * this.restoreMana / 100.0));
+    restoreMana(manaRegenAmount);
+
+    logger.debug("{} 전투 후 체력 회복량 : {}, 마나 회복량 : {}", name,hpRegenAmount, manaRegenAmount);
+  }
 }

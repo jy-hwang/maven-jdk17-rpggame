@@ -64,6 +64,7 @@ public class BattleController {
             break;
           case ESCAPE:
             if (attemptEscape()) {
+              player.postBattleRegeneration();  // 도망 성공 시 회복
               return BattleResult.ESCAPED;
             }
             playerTurnUsed = true;
@@ -81,6 +82,7 @@ public class BattleController {
 
       if (!monster.isAlive()) {
         handleVictory(player, monster);
+        player.postBattleRegeneration();  // 승리 후 회복
         return BattleResult.VICTORY;
       } else {
         return BattleResult.DEFEAT;
@@ -146,12 +148,12 @@ public class BattleController {
    */
   private void handleMonsterAttack(GameCharacter player, Monster monster) {
     int monsterDamage = monster.getAttack() + random.nextInt(3);
-    player.takeDamage(monsterDamage);
+    int actualDamage = player.takeDamage(monsterDamage);
 
-    System.out.println("💢 " + monster.getName() + "이(가) " + player.getName() + "에게 " + monsterDamage + "의 데미지를 입혔습니다!");
+    System.out.println("💢 " + monster.getName() + "이(가) " + player.getName() + "에게 " + actualDamage + "의 데미지를 입혔습니다!");
     System.out.printf("현재 체력: %d/%d%n", player.getHp(), player.getTotalMaxHp());
 
-    logger.debug("몬스터 공격: {} -> {} (데미지: {})", monster.getName(), player.getName(), monsterDamage);
+    logger.debug("몬스터 공격: {} -> {} (데미지: {})", monster.getName(), player.getName(), actualDamage);
   }
 
   /**
