@@ -187,7 +187,7 @@ public class Game {
     GameItemFactory factory = GameItemFactory.getInstance();
 
     // 기본 체력 물약 3개 지급
-    GameItem healthPotion = factory.createItem("HEALTH_POTION");
+    GameItem healthPotion = factory.createItem("SMALL_HEALTH_POTION");
     if (healthPotion != null && healthPotion instanceof GameConsumable) {
       player.getInventory().addItem(healthPotion, 3);
       logger.info("시작 아이템 지급: {} x3", healthPotion.getName());
@@ -196,7 +196,7 @@ public class Game {
     }
 
     // 기본 마나 물약 2개 지급
-    GameItem manaPotion = factory.createItem("MANA_POTION");
+    GameItem manaPotion = factory.createItem("SMALL_MANA_POTION");
     if (manaPotion != null && manaPotion instanceof GameConsumable) {
       player.getInventory().addItem(manaPotion, 2);
       logger.info("시작 아이템 지급: {} x2", manaPotion.getName());
