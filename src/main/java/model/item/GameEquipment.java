@@ -1,7 +1,8 @@
-package model;
+package model.item;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import model.GameCharacter;
 
 /**
  * 장비 아이템 클래스

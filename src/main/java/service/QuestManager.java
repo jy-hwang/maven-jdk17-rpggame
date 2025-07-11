@@ -9,11 +9,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import model.GameCharacter;
-import model.GameConsumable;
-import model.GameEquipment;
-import model.GameItem;
 import model.Quest;
 import model.QuestReward;
+import model.item.GameConsumable;
+import model.item.GameEquipment;
+import model.item.GameItem;
 
 /**
  * 퀘스트를 관리하는 서비스 클래스

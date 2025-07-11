@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import model.item.GameItem;
 
 /**
  * 퀘스트를 나타내는 클래스 (QuestReward와 연동)

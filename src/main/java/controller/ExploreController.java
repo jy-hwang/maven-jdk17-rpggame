@@ -6,10 +6,10 @@ import java.util.Random;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import model.GameCharacter;
-import model.GameConsumable;
-import model.GameEquipment;
-import model.GameItem;
 import model.Monster;
+import model.item.GameConsumable;
+import model.item.GameEquipment;
+import model.item.GameItem;
 import service.GameDataService;
 
 /**

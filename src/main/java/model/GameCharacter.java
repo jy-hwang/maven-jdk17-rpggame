@@ -4,6 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import model.item.GameConsumable;
+import model.item.GameItem;
 
 /**
  * 향상된 게임 캐릭터 클래스 (인벤토리, 스킬, 마나 시스템 포함)

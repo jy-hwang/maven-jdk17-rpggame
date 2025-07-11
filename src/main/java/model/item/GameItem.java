@@ -1,9 +1,10 @@
-package model;
+package model.item;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import model.GameCharacter;
 
 /**
  * 게임 아이템의 기본 클래스

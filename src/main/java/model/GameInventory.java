@@ -10,6 +10,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import model.item.GameConsumable;
+import model.item.GameEquipment;
+import model.item.GameItem;
 
 /**
  * 캐릭터의 인벤토리를 관리하는 클래스 (GameInventory 기반)

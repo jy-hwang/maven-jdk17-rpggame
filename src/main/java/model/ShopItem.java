@@ -1,5 +1,7 @@
 package model;
 
+import model.item.GameItem;
+
 public class ShopItem {
 
   private final GameItem item;
