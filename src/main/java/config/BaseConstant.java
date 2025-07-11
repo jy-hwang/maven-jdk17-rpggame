@@ -12,6 +12,9 @@ public class BaseConstant {
 
   // 설정 파일 경로
   public static final String BASIC_POTIONS_CONFIG = "/config/basic_potions.json";
+  public static final String BASIC_WEAPONS_CONFIG = "/config/basic_weapons.json";
+  public static final String BASIC_ARMORS_CONFIG = "/config/basic_armors.json";
+  public static final String BASIC_ACCESSORIES_CONFIG = "/config/basic_accessories.json";
 
   // 전투 관련 상수
   public static final int ESCAPE_CHANCE = 50;

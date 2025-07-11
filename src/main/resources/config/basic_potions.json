@@ -15,6 +15,51 @@
     ]
   },
   {
+    "id": "HEALTH_POTION",
+    "name": "체력 물약",
+    "description": "HP를 50 회복합니다",
+    "type": "CONSUMABLE",
+    "value": 50,
+    "rarity": "COMMON",
+    "stackable": true,
+    "effects": [
+      {
+        "type": "HEAL_HP",
+        "value": 50
+      }
+    ]
+  },
+  {
+    "id": "LARGE_HEALTH_POTION",
+    "name": "큰 체력 물약",
+    "description": "HP를 100 회복합니다",
+    "type": "CONSUMABLE",
+    "value": 120,
+    "rarity": "UNCOMMON",
+    "stackable": true,
+    "effects": [
+      {
+        "type": "HEAL_HP",
+        "value": 100
+      }
+    ]
+  },
+  {
+    "id": "SUPER_HEALTH_POTION",
+    "name": "고급 체력 물약",
+    "description": "HP를 200 회복합니다",
+    "type": "CONSUMABLE",
+    "value": 250,
+    "rarity": "RARE",
+    "stackable": true,
+    "effects": [
+      {
+        "type": "HEAL_HP",
+        "value": 200
+      }
+    ]
+  },
+  {
     "id": "SMALL_MANA_POTION",
     "name": "작은 마나 물약",
     "description": "MP를 20 회복합니다",
@@ -26,6 +71,70 @@
       {
         "type": "HEAL_MP",
         "value": 20
+      }
+    ]
+  },
+  {
+    "id": "MANA_POTION",
+    "name": "마나 물약",
+    "description": "MP를 40 회복합니다",
+    "type": "CONSUMABLE",
+    "value": 60,
+    "rarity": "COMMON",
+    "stackable": true,
+    "effects": [
+      {
+        "type": "HEAL_MP",
+        "value": 40
+      }
+    ]
+  },
+  {
+    "id": "LARGE_MANA_POTION",
+    "name": "큰 마나 물약",
+    "description": "MP를 80 회복합니다",
+    "type": "CONSUMABLE",
+    "value": 140,
+    "rarity": "UNCOMMON",
+    "stackable": true,
+    "effects": [
+      {
+        "type": "HEAL_MP",
+        "value": 80
+      }
+    ]
+  },
+  {
+    "id": "ELIXIR_OF_LIFE",
+    "name": "생명의 영약",
+    "description": "HP와 MP를 모두 완전히 회복합니다",
+    "type": "CONSUMABLE",
+    "value": 500,
+    "rarity": "EPIC",
+    "stackable": true,
+    "effects": [
+      {
+        "type": "HEAL_HP_PERCENT",
+        "value": 100
+      },
+      {
+        "type": "HEAL_MP_PERCENT",
+        "value": 100
+      }
+    ]
+  },
+  {
+    "id": "EXPERIENCE_POTION",
+    "name": "경험치 물약",
+    "description": "경험치를 100 얻습니다",
+    "type": "CONSUMABLE",
+    "value": 200,
+    "rarity": "RARE",
+    "stackable": true,
+    "effects": [
+      {
+        "type": "GAIN_EXP",
+        "value": 100
       }
     ]
   }

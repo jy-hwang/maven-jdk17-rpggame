@@ -16,6 +16,7 @@ import loader.GameDataLoader;
 import model.effect.GameEffect;
 import model.item.GameConsumable;
 import model.item.GameEffectData;
+import model.item.GameEquipment;
 import model.item.GameItem;
 import model.item.GameItemData;
 import model.item.ItemRarity;
@@ -53,32 +54,28 @@ public class GameItemFactory {
   }
 
   /**
-   * 팩토리 초기화
+   * 초기화 메서드 수정
    */
   private void initialize() {
     if (initialized) {
-      logger.debug("GameItemFactory는 이미 초기화됨");
       return;
     }
 
     logger.info("GameItemFactory 초기화 중...");
 
     try {
-      // 게임 데이터 로드
-      itemDatabase = GameDataLoader.loadBasicPotions();
+      // 모든 아이템 데이터 로드 (통합)
+      itemDatabase = GameDataLoader.loadAllItems();
 
       if (itemDatabase.isEmpty()) {
-        logger.warn("아이템 데이터가 비어있음 - 기본 데이터 생성");
+        logger.warn("아이템 데이터가 비어있음. 기본 아이템 생성...");
         createDefaultItems();
       }
 
-      initialized = true;
-      logger.info("GameItemFactory 초기화 완료: {}개 아이템 로드", itemDatabase.size());
+      logger.info("GameItemFactory 초기화 완료: {}개 아이템", itemDatabase.size());
+      logLoadedItems();
 
-      // 로드된 아이템 로그 출력
-      if (logger.isDebugEnabled()) {
-        logLoadedItems();
-      }
+      initialized = true;
 
     } catch (Exception e) {
       logger.error("GameItemFactory 초기화 실패", e);
@@ -155,30 +152,51 @@ public class GameItemFactory {
   }
 
   /**
-   * 무기 아이템 생성 (향후 구현)
+   * 무기 아이템 생성 (구현)
    */
   private GameItem createWeaponItem(GameItemData data) {
-    logger.debug("무기 아이템 생성 (미구현): {}", data.getName());
-    // TODO: GameWeapon 클래스 구현 후 생성
-    return null;
+    try {
+      GameEquipment.EquipmentType equipType = GameEquipment.EquipmentType.WEAPON;
+
+      return new GameEquipment(data.getName(), data.getDescription(), data.getValue(), data.getRarity(), equipType, data.getAttackBonus(),
+          data.getDefenseBonus(), data.getHpBonus());
+
+    } catch (Exception e) {
+      logger.error("무기 아이템 생성 실패: {}", data.getName(), e);
+      return null;
+    }
   }
 
   /**
-   * 방어구 아이템 생성 (향후 구현)
+   * 방어구 아이템 생성 (구현)
    */
   private GameItem createArmorItem(GameItemData data) {
-    logger.debug("방어구 아이템 생성 (미구현): {}", data.getName());
-    // TODO: GameArmor 클래스 구현 후 생성
-    return null;
+    try {
+      GameEquipment.EquipmentType equipType = GameEquipment.EquipmentType.ARMOR;
+
+      return new GameEquipment(data.getName(), data.getDescription(), data.getValue(), data.getRarity(), equipType, data.getAttackBonus(),
+          data.getDefenseBonus(), data.getHpBonus());
+
+    } catch (Exception e) {
+      logger.error("방어구 아이템 생성 실패: {}", data.getName(), e);
+      return null;
+    }
   }
 
   /**
-   * 액세서리 아이템 생성 (향후 구현)
+   * 액세서리 아이템 생성 (구현)
    */
   private GameItem createAccessoryItem(GameItemData data) {
-    logger.debug("액세서리 아이템 생성 (미구현): {}", data.getName());
-    // TODO: GameAccessory 클래스 구현 후 생성
-    return null;
+    try {
+      GameEquipment.EquipmentType equipType = GameEquipment.EquipmentType.ACCESSORY;
+
+      return new GameEquipment(data.getName(), data.getDescription(), data.getValue(), data.getRarity(), equipType, data.getAttackBonus(),
+          data.getDefenseBonus(), data.getHpBonus());
+
+    } catch (Exception e) {
+      logger.error("액세서리 아이템 생성 실패: {}", data.getName(), e);
+      return null;
+    }
   }
 
   /**
@@ -406,7 +424,7 @@ public class GameItemFactory {
   private void addDefaultItem(String id, String name, String description, String type, int value, ItemRarity rarity, boolean stackable,
       List<GameEffectData> effects) {
     GameItemData item = new GameItemData(id, name, description, type, value, rarity.name(), // ItemRarity enum을 String으로 변환
-        stackable, effects);
+        stackable, effects, null, null, null, null);
     itemDatabase.put(id, item);
     logger.debug("기본 아이템 추가: {}", name);
   }

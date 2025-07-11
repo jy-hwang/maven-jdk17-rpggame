@@ -1,6 +1,7 @@
 package loader;
 
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -16,8 +17,58 @@ public class GameDataLoader {
   private static final Logger logger = LoggerFactory.getLogger(GameDataLoader.class);
   private static final ObjectMapper objectMapper = new ObjectMapper();
 
+  /**
+   * 모든 아이템 데이터 로드 (통합 메서드)
+   */
+  public static Map<String, GameItemData> loadAllItems() {
+    logger.info("전체 아이템 데이터 로드 시작...");
 
+    Map<String, GameItemData> allItems = new HashMap<>();
 
+    // 1. 소비 아이템 (물약) 로드
+    Map<String, GameItemData> potions = loadBasicPotions();
+    allItems.putAll(potions);
+    logger.info("소비 아이템 로드 완료: {}개", potions.size());
+
+    // 2. 무기 로드
+    Map<String, GameItemData> weapons = loadBasicWeapons();
+    allItems.putAll(weapons);
+    logger.info("무기 로드 완료: {}개", weapons.size());
+
+    // 3. 방어구 로드
+    Map<String, GameItemData> armors = loadBasicArmors();
+    allItems.putAll(armors);
+    logger.info("방어구 로드 완료: {}개", armors.size());
+
+    // 4. 액세서리 로드
+    Map<String, GameItemData> accessories = loadBasicAccessories();
+    allItems.putAll(accessories);
+    logger.info("액세서리 로드 완료: {}개", accessories.size());
+
+    logger.info("전체 아이템 로드 완료: {}개", allItems.size());
+    return allItems;
+  }
+
+  /**
+   * 설정 파일 존재 여부 확인 (범용)
+   */
+  public static boolean isConfigFileExists(String configPath) {
+      InputStream inputStream = GameDataLoader.class.getResourceAsStream(configPath);
+      boolean exists = inputStream != null;
+      
+      if (exists) {
+          try {
+              inputStream.close();
+          } catch (Exception e) {
+              logger.debug("InputStream 닫기 실패", e);
+          }
+      }
+      
+      logger.debug("설정 파일 존재 여부: {} ({})", exists, configPath);
+      return exists;
+  }
+  
+  
   /**
    * 기본 물약 데이터 로드
    */
@@ -25,13 +76,14 @@ public class GameDataLoader {
     try {
       logger.info("기본 물약 데이터 로드 시작...");
 
-      InputStream inputStream = GameDataLoader.class.getResourceAsStream(BaseConstant.BASIC_POTIONS_CONFIG);
-
-      if (inputStream == null) {
-        logger.error("물약 설정 파일을 찾을 수 없습니다: {}", BaseConstant.BASIC_POTIONS_CONFIG);
-        return createDefaultPotions();
+      // 설정 파일 존재 여부 확인 (범용 메서드 사용)
+      if (!isConfigFileExists(BaseConstant.BASIC_POTIONS_CONFIG)) {
+          logger.warn("물약 설정 파일을 찾을 수 없습니다: {}", BaseConstant.BASIC_POTIONS_CONFIG);
+          return createDefaultPotions();
       }
 
+      // JSON 파일 로드
+      InputStream inputStream = GameDataLoader.class.getResourceAsStream(BaseConstant.BASIC_POTIONS_CONFIG);
       List<GameItemData> potionList = objectMapper.readValue(inputStream, new TypeReference<List<GameItemData>>() {});
 
       Map<String, GameItemData> potionMap = potionList.stream().collect(Collectors.toMap(GameItemData::getId, item -> item));
@@ -120,9 +172,10 @@ public class GameDataLoader {
       List<GameEffectData> largeHpEffect = List.of(new GameEffectData("HEAL_HP", 100));
 
       Map<String, GameItemData> defaultPotions = Map.of("HEALTH_POTION",
-          new GameItemData("HEALTH_POTION", "체력 물약", "HP를 50 회복합니다", "CONSUMABLE", 50, "COMMON", true, hpEffect), "MANA_POTION",
-          new GameItemData("MANA_POTION", "마나 물약", "MP를 40 회복합니다", "CONSUMABLE", 60, "COMMON", true, mpEffect), "LARGE_HEALTH_POTION",
-          new GameItemData("LARGE_HEALTH_POTION", "큰 체력 물약", "HP를 100 회복합니다", "CONSUMABLE", 120, "UNCOMMON", true, largeHpEffect));
+          new GameItemData("HEALTH_POTION", "체력 물약", "HP를 50 회복합니다", "CONSUMABLE", 50, "COMMON", true, hpEffect, null, null, null, null),
+          "MANA_POTION", new GameItemData("MANA_POTION", "마나 물약", "MP를 40 회복합니다", "CONSUMABLE", 60, "COMMON", true, mpEffect, null, null, null, null),
+          "LARGE_HEALTH_POTION", new GameItemData("LARGE_HEALTH_POTION", "큰 체력 물약", "HP를 100 회복합니다", "CONSUMABLE", 120, "UNCOMMON", true,
+              largeHpEffect, null, null, null, null));
 
       logger.info("기본 물약 생성 완료: {}개", defaultPotions.size());
 
@@ -138,45 +191,177 @@ public class GameDataLoader {
   }
 
   /**
-   * 설정 파일 존재 여부 확인
+   * 무기 데이터 로드
    */
-  public static boolean isConfigFileExists() {
-    InputStream inputStream = GameDataLoader.class.getResourceAsStream(BaseConstant.BASIC_POTIONS_CONFIG);
-    boolean exists = inputStream != null;
+  public static Map<String, GameItemData> loadBasicWeapons() {
+    try {
+      logger.info("무기 데이터 로드 시작...");
 
-    if (exists) {
-      try {
-        inputStream.close();
-      } catch (Exception e) {
-        logger.debug("InputStream 닫기 실패", e);
+      // 설정 파일 존재 여부 확인 (범용 메서드 사용)
+      if (!isConfigFileExists(BaseConstant.BASIC_WEAPONS_CONFIG)) {
+          logger.warn("무기 설정 파일을 찾을 수 없습니다: {}", BaseConstant.BASIC_WEAPONS_CONFIG);
+          return createDefaultWeapons();
       }
-    }
 
-    logger.debug("설정 파일 존재 여부: {} ({})", exists, BaseConstant.BASIC_POTIONS_CONFIG);
-    return exists;
+      // JSON 파일 로드
+      InputStream inputStream = GameDataLoader.class.getResourceAsStream(BaseConstant.BASIC_WEAPONS_CONFIG);
+      
+      List<GameItemData> weaponList = objectMapper.readValue(inputStream, new TypeReference<List<GameItemData>>() {});
+      Map<String, GameItemData> weaponMap = weaponList.stream().collect(Collectors.toMap(GameItemData::getId, item -> item));
+
+      logger.info("무기 데이터 로드 완료: {}개", weaponList.size());
+      validateEquipmentData(weaponList, "무기");
+
+      return weaponMap;
+
+    } catch (Exception e) {
+      logger.error("무기 데이터 로드 실패", e);
+      return createDefaultWeapons();
+    }
   }
 
   /**
-   * 게임 데이터 전체 로드 (확장 가능)
+   * 방어구 데이터 로드
    */
-  public static void loadAllGameData() {
-    logger.info("전체 게임 데이터 로드 시작...");
+  public static Map<String, GameItemData> loadBasicArmors() {
+    try {
+      logger.info("방어구 데이터 로드 시작...");
 
-    // 현재는 물약만 로드하지만, 나중에 확장 가능
-    Map<String, GameItemData> potions = loadBasicPotions();
+      // 설정 파일 존재 여부 확인 (범용 메서드 사용)
+      if (!isConfigFileExists(BaseConstant.BASIC_ARMORS_CONFIG)) {
+          logger.warn("방어구 설정 파일을 찾을 수 없습니다: {}", BaseConstant.BASIC_ARMORS_CONFIG);
+          return createDefaultArmors();
+      }
 
-    // 추후 추가할 데이터들
-    // Map<String, MonsterData> monsters = loadMonsters();
-    // Map<String, SkillData> skills = loadSkills();
-    // Map<String, QuestData> quests = loadQuests();
+      InputStream inputStream = GameDataLoader.class.getResourceAsStream(BaseConstant.BASIC_ARMORS_CONFIG);
 
-    logger.info("전체 게임 데이터 로드 완료");
-    logger.info("로드된 데이터: 물약 {}개", potions.size());
+      List<GameItemData> armorList = objectMapper.readValue(inputStream, new TypeReference<List<GameItemData>>() {});
+      Map<String, GameItemData> armorMap = armorList.stream().collect(Collectors.toMap(GameItemData::getId, item -> item));
 
-    // 통계 정보 출력
-    if (logger.isInfoEnabled()) {
-      printDataStatistics(potions);
+      logger.info("방어구 데이터 로드 완료: {}개", armorList.size());
+      validateEquipmentData(armorList, "방어구");
+
+      return armorMap;
+
+    } catch (Exception e) {
+      logger.error("방어구 데이터 로드 실패", e);
+      return createDefaultArmors();
     }
+  }
+
+  /**
+   * 액세서리 데이터 로드
+   */
+  public static Map<String, GameItemData> loadBasicAccessories() {
+    try {
+      logger.info("액세서리 데이터 로드 시작...");
+
+      // 설정 파일 존재 여부 확인 (범용 메서드 사용)
+      if (!isConfigFileExists(BaseConstant.BASIC_ACCESSORIES_CONFIG)) {
+          logger.warn("액세서리 설정 파일을 찾을 수 없습니다: {}", BaseConstant.BASIC_ACCESSORIES_CONFIG);
+          return createDefaultAccessories();
+      }
+      InputStream inputStream = GameDataLoader.class.getResourceAsStream(BaseConstant.BASIC_ACCESSORIES_CONFIG);
+      
+      List<GameItemData> accessoryList = objectMapper.readValue(inputStream, new TypeReference<List<GameItemData>>() {});
+      Map<String, GameItemData> accessoryMap = accessoryList.stream().collect(Collectors.toMap(GameItemData::getId, item -> item));
+
+      logger.info("액세서리 데이터 로드 완료: {}개", accessoryList.size());
+      validateEquipmentData(accessoryList, "액세서리");
+
+      return accessoryMap;
+
+    } catch (Exception e) {
+      logger.error("액세서리 데이터 로드 실패", e);
+      return createDefaultAccessories();
+    }
+  }
+
+  /**
+   * 기본 무기 생성 (JSON 파일이 없을 때)
+   */
+  private static Map<String, GameItemData> createDefaultWeapons() {
+    logger.info("기본 무기 데이터를 코드로 생성 중...");
+
+    Map<String, GameItemData> defaultWeapons =
+        Map.of("WOODEN_SWORD", new GameItemData("WOODEN_SWORD", "나무 검", "기본적인 나무 검", "WEAPON", 30, "COMMON", false, null, "WEAPON", 5, 0, 0),
+            "IRON_SWORD", new GameItemData("IRON_SWORD", "철 검", "날카로운 철 검", "WEAPON", 100, "UNCOMMON", false, null, "WEAPON", 12, 0, 0),
+            "STEEL_SWORD", new GameItemData("STEEL_SWORD", "강철 검", "단단한 강철 검", "WEAPON", 250, "RARE", false, null, "WEAPON", 20, 0, 0), "WOODEN_BOW",
+            new GameItemData("WOODEN_BOW", "나무 활", "기본적인 나무 활", "WEAPON", 40, "COMMON", false, null, "WEAPON", 7, 0, 0), "MAGIC_STAFF",
+            new GameItemData("MAGIC_STAFF", "마법 지팡이", "마법력을 증폭시키는 지팡이", "WEAPON", 120, "UNCOMMON", false, null, "WEAPON", 8, 0, 10));
+
+    logger.info("기본 무기 생성 완료: {}개", defaultWeapons.size());
+    return defaultWeapons;
+  }
+
+  /**
+   * 기본 방어구 생성 (JSON 파일이 없을 때)
+   */
+  private static Map<String, GameItemData> createDefaultArmors() {
+    logger.info("기본 방어구 데이터를 코드로 생성 중...");
+
+    Map<String, GameItemData> defaultArmors =
+        Map.of("LEATHER_ARMOR", new GameItemData("LEATHER_ARMOR", "가죽 갑옷", "질긴 가죽으로 만든 갑옷", "ARMOR", 60, "COMMON", false, null, "ARMOR", 0, 8, 15),
+            "CHAIN_MAIL", new GameItemData("CHAIN_MAIL", "사슬 갑옷", "쇠사슬로 엮은 갑옷", "ARMOR", 150, "UNCOMMON", false, null, "ARMOR", 0, 15, 25),
+            "PLATE_ARMOR", new GameItemData("PLATE_ARMOR", "판금 갑옷", "두꺼운 강철 판으로 만든 갑옷", "ARMOR", 400, "RARE", false, null, "ARMOR", 0, 25, 50),
+            "ROBE", new GameItemData("ROBE", "마법사 로브", "마나 흐름을 돕는 로브", "ARMOR", 80, "COMMON", false, null, "ARMOR", 0, 3, 20));
+
+    logger.info("기본 방어구 생성 완료: {}개", defaultArmors.size());
+    return defaultArmors;
+  }
+
+  /**
+   * 기본 액세서리 생성 (JSON 파일이 없을 때)
+   */
+  private static Map<String, GameItemData> createDefaultAccessories() {
+    logger.info("기본 액세서리 데이터를 코드로 생성 중...");
+
+    Map<String, GameItemData> defaultAccessories = Map.of("POWER_RING",
+        new GameItemData("POWER_RING", "힘의 반지", "공격력을 높여주는 반지", "ACCESSORY", 200, "UNCOMMON", false, null, "ACCESSORY", 5, 0, 0), "DEFENSE_RING",
+        new GameItemData("DEFENSE_RING", "수호의 반지", "방어력을 높여주는 반지", "ACCESSORY", 180, "UNCOMMON", false, null, "ACCESSORY", 0, 5, 0), "HEALTH_AMULET",
+        new GameItemData("HEALTH_AMULET", "생명의 목걸이", "최대 체력을 증가시키는 목걸이", "ACCESSORY", 300, "RARE", false, null, "ACCESSORY", 0, 0, 30));
+
+    logger.info("기본 액세서리 생성 완료: {}개", defaultAccessories.size());
+    return defaultAccessories;
+  }
+
+  /**
+   * 장비 데이터 검증
+   */
+  private static void validateEquipmentData(List<GameItemData> equipmentList, String type) {
+    int validCount = 0;
+    int invalidCount = 0;
+
+    for (GameItemData equipment : equipmentList) {
+      boolean isValid = true;
+
+      // 기본 검증
+      if (equipment.getId() == null || equipment.getName() == null) {
+        logger.warn("{} ID 또는 이름이 비어있음: {}", type, equipment.getId());
+        isValid = false;
+      }
+
+      // 장비별 스탯 검증
+      if ("WEAPON".equals(equipment.getType()) && equipment.getAttackBonus() <= 0) {
+        logger.warn("무기의 공격력이 0 이하: {} (공격력: {})", equipment.getName(), equipment.getAttackBonus());
+        isValid = false;
+      }
+
+      if ("ARMOR".equals(equipment.getType()) && equipment.getDefenseBonus() <= 0) {
+        logger.warn("방어구의 방어력이 0 이하: {} (방어력: {})", equipment.getName(), equipment.getDefenseBonus());
+        isValid = false;
+      }
+
+      if (isValid) {
+        validCount++;
+        logger.debug("유효한 {}: {} (공격: {}, 방어: {}, 체력: {})", type, equipment.getName(), equipment.getAttackBonus(), equipment.getDefenseBonus(),
+            equipment.getHpBonus());
+      } else {
+        invalidCount++;
+      }
+    }
+
+    logger.info("{} 데이터 검증 완료: 유효 {}개, 무효 {}개", type, validCount, invalidCount);
   }
 
   /**
@@ -231,7 +416,7 @@ public class GameDataLoader {
     // clearCache();
 
     // 데이터 다시 로드
-    loadAllGameData();
+    loadAllItems();
 
     logger.info("게임 데이터 리로드 완료");
   }

@@ -1,0 +1,93 @@
+[
+  {
+    "id": "POWER_RING",
+    "name": "힘의 반지",
+    "description": "착용자의 공격력을 높여주는 마법의 반지입니다",
+    "type": "ACCESSORY",
+    "value": 200,
+    "rarity": "UNCOMMON",
+    "stackable": false,
+    "equipmentType": "ACCESSORY",
+    "attackBonus": 5,
+    "defenseBonus": 0,
+    "hpBonus": 0
+  },
+  {
+    "id": "DEFENSE_RING",
+    "name": "수호의 반지",
+    "description": "착용자의 방어력을 높여주는 마법의 반지입니다",
+    "type": "ACCESSORY",
+    "value": 180,
+    "rarity": "UNCOMMON",
+    "stackable": false,
+    "equipmentType": "ACCESSORY",
+    "attackBonus": 0,
+    "defenseBonus": 5,
+    "hpBonus": 0
+  },
+  {
+    "id": "HEALTH_AMULET",
+    "name": "생명의 목걸이",
+    "description": "착용자의 최대 체력을 증가시키는 목걸이입니다",
+    "type": "ACCESSORY",
+    "value": 300,
+    "rarity": "RARE",
+    "stackable": false,
+    "equipmentType": "ACCESSORY",
+    "attackBonus": 0,
+    "defenseBonus": 0,
+    "hpBonus": 40
+  },
+  {
+    "id": "BALANCED_AMULET",
+    "name": "균형의 목걸이",
+    "description": "모든 능력치를 골고루 향상시키는 목걸이입니다",
+    "type": "ACCESSORY",
+    "value": 450,
+    "rarity": "RARE",
+    "stackable": false,
+    "equipmentType": "ACCESSORY",
+    "attackBonus": 3,
+    "defenseBonus": 3,
+    "hpBonus": 20
+  },
+  {
+    "id": "BERSERKER_RING",
+    "name": "광전사의 반지",
+    "description": "공격력을 크게 증가시키지만 방어력을 감소시킵니다",
+    "type": "ACCESSORY",
+    "value": 350,
+    "rarity": "RARE",
+    "stackable": false,
+    "equipmentType": "ACCESSORY",
+    "attackBonus": 12,
+    "defenseBonus": -3,
+    "hpBonus": 0
+  },
+  {
+    "id": "GUARDIAN_AMULET",
+    "name": "수호자의 목걸이",
+    "description": "방어력과 체력을 크게 증가시키는 수호 목걸이입니다",
+    "type": "ACCESSORY",
+    "value": 600,
+    "rarity": "EPIC",
+    "stackable": false,
+    "equipmentType": "ACCESSORY",
+    "attackBonus": 0,
+    "defenseBonus": 8,
+    "hpBonus": 60
+  },
+  {
+    "id": "LUCKY_CHARM",
+    "name": "행운의 부적",
+    "description": "착용자에게 행운을 가져다주는 신비한 부적입니다",
+    "type": "ACCESSORY",
+    "value": 150,
+    "rarity": "UNCOMMON",
+    "stackable": false,
+    "equipmentType": "ACCESSORY",
+    "attackBonus": 2,
+    "defenseBonus": 2,
+    "hpBonus": 10
+  }
+]

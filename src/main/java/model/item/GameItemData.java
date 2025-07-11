@@ -15,6 +15,12 @@ public class GameItemData {
   private final boolean stackable;
   private final List<GameEffectData> effects;
 
+  // 장비 전용 필드들 (nullable)
+  private final String equipmentType; // "WEAPON", "ARMOR", "ACCESSORY"
+  private final Integer attackBonus; // null이면 0으로 처리
+  private final Integer defenseBonus; // null이면 0으로 처리
+  private final Integer hpBonus; // null이면 0으로 처리
+
   @JsonCreator
   public GameItemData(
 //@formatter:off
@@ -26,6 +32,11 @@ public class GameItemData {
 , @JsonProperty("rarity") String rarity
 , @JsonProperty("stackable") boolean stackable
 , @JsonProperty("effects") List<GameEffectData> effects
+// 장비 전용 필드들 (Optional)
+, @JsonProperty("equipmentType") String equipmentType
+, @JsonProperty("attackBonus") Integer attackBonus
+, @JsonProperty("defenseBonus") Integer defenseBonus
+, @JsonProperty("hpBonus") Integer hpBonus
 //@formatter:on
   ) {
     this.id = id;
@@ -36,6 +47,10 @@ public class GameItemData {
     this.rarity = ItemRarity.valueOf(rarity.toUpperCase());
     this.stackable = stackable;
     this.effects = effects != null ? new ArrayList<>(effects) : new ArrayList<>();
+    this.equipmentType = equipmentType;
+    this.attackBonus = attackBonus;
+    this.defenseBonus = defenseBonus;
+    this.hpBonus = hpBonus;
   }
 
   // Getters
@@ -71,4 +86,19 @@ public class GameItemData {
     return new ArrayList<>(effects);
   }
 
+  public String getEquipmentType() {
+    return equipmentType;
+  }
+
+  public int getAttackBonus() {
+    return attackBonus != null ? attackBonus : 0;
+  }
+
+  public int getDefenseBonus() {
+    return defenseBonus != null ? defenseBonus : 0;
+  }
+
+  public int getHpBonus() {
+    return hpBonus != null ? hpBonus : 0;
+  }
 }

@@ -1,0 +1,93 @@
+[
+  {
+    "id": "CLOTH_ROBE",
+    "name": "천 로브",
+    "description": "간단한 천으로 만든 로브입니다",
+    "type": "ARMOR",
+    "value": 25,
+    "rarity": "COMMON",
+    "stackable": false,
+    "equipmentType": "ARMOR",
+    "attackBonus": 0,
+    "defenseBonus": 3,
+    "hpBonus": 10
+  },
+  {
+    "id": "LEATHER_ARMOR",
+    "name": "가죽 갑옷",
+    "description": "질긴 가죽으로 만든 갑옷입니다",
+    "type": "ARMOR",
+    "value": 60,
+    "rarity": "COMMON",
+    "stackable": false,
+    "equipmentType": "ARMOR",
+    "attackBonus": 0,
+    "defenseBonus": 8,
+    "hpBonus": 20
+  },
+  {
+    "id": "CHAIN_MAIL",
+    "name": "사슬 갑옷",
+    "description": "쇠사슬로 엮어 만든 갑옷입니다",
+    "type": "ARMOR",
+    "value": 150,
+    "rarity": "UNCOMMON",
+    "stackable": false,
+    "equipmentType": "ARMOR",
+    "attackBonus": 0,
+    "defenseBonus": 15,
+    "hpBonus": 35
+  },
+  {
+    "id": "PLATE_ARMOR",
+    "name": "판금 갑옷",
+    "description": "두꺼운 강철 판으로 만든 갑옷입니다",
+    "type": "ARMOR",
+    "value": 400,
+    "rarity": "RARE",
+    "stackable": false,
+    "equipmentType": "ARMOR",
+    "attackBonus": 0,
+    "defenseBonus": 25,
+    "hpBonus": 60
+  },
+  {
+    "id": "DRAGON_SCALE_ARMOR",
+    "name": "용린 갑옷",
+    "description": "드래곤의 비늘로 만든 전설의 갑옷입니다",
+    "type": "ARMOR",
+    "value": 800,
+    "rarity": "EPIC",
+    "stackable": false,
+    "equipmentType": "ARMOR",
+    "attackBonus": 0,
+    "defenseBonus": 40,
+    "hpBonus": 100
+  },
+  {
+    "id": "MAGE_ROBE",
+    "name": "마법사 로브",
+    "description": "마법 연구에 특화된 로브입니다",
+    "type": "ARMOR",
+    "value": 80,
+    "rarity": "COMMON",
+    "stackable": false,
+    "equipmentType": "ARMOR",
+    "attackBonus": 0,
+    "defenseBonus": 5,
+    "hpBonus": 30
+  },
+  {
+    "id": "ARCHMAGE_ROBE",
+    "name": "대마법사 로브",
+    "description": "고급 마법사들이 착용하는 로브입니다",
+    "type": "ARMOR",
+    "value": 300,
+    "rarity": "RARE",
+    "stackable": false,
+    "equipmentType": "ARMOR",
+    "attackBonus": 0,
+    "defenseBonus": 12,
+    "hpBonus": 50
+  }
+]
