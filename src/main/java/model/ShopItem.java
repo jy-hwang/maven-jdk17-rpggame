@@ -1,5 +1,6 @@
 package model;
 
+import config.BaseConstant;
 import model.item.GameItem;
 
 public class ShopItem {
@@ -39,7 +40,7 @@ public class ShopItem {
   }
 
   public void reduceStock(int amount) {
-    this.stock = Math.max(0, this.stock - amount);
+    this.stock = Math.max(BaseConstant.NUMBER_ZERO, this.stock - amount);
   }
 
   public void restockTo(int amount) {

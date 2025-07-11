@@ -162,7 +162,8 @@ public interface GameEffect {
    * @return JSON 문자열
    */
   default String toJsonString() {
-    return String.format("{\"type\":\"%s\",\"value\":%d,\"percentage\":%b,\"duration\":%d}", getType().name(), getValue(), isPercentage(), getDuration());
+    return String.format("{\"type\":\"%s\",\"value\":%d,\"percentage\":%b,\"duration\":%d}", getType().name(), getValue(), isPercentage(),
+        getDuration());
   }
 
   /**

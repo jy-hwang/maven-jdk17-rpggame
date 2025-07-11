@@ -2,6 +2,7 @@ package model.item;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import config.BaseConstant;
 import model.GameCharacter;
 
 /**
@@ -28,8 +29,18 @@ public class GameEquipment extends GameItem {
   }
 
   @JsonCreator
-  public GameEquipment(@JsonProperty("name") String name, @JsonProperty("description") String description, @JsonProperty("value") int value, @JsonProperty("rarity") ItemRarity rarity,
-      @JsonProperty("equipmentType") EquipmentType equipmentType, @JsonProperty("attackBonus") int attackBonus, @JsonProperty("defenseBonus") int defenseBonus, @JsonProperty("hpBonus") int hpBonus) {
+  public GameEquipment(
+//@formatter:off
+  @JsonProperty("name") String name
+, @JsonProperty("description") String description
+, @JsonProperty("value") int value
+, @JsonProperty("rarity") ItemRarity rarity
+, @JsonProperty("equipmentType") EquipmentType equipmentType
+, @JsonProperty("attackBonus") int attackBonus
+, @JsonProperty("defenseBonus") int defenseBonus
+, @JsonProperty("hpBonus") int hpBonus
+//@formatter:on
+  ) {
     super(name, description, value, rarity);
     this.equipmentType = equipmentType;
     this.attackBonus = attackBonus;
@@ -48,11 +59,11 @@ public class GameEquipment extends GameItem {
     StringBuilder info = new StringBuilder();
     info.append(toString()).append("\n");
     info.append("종류: ").append(equipmentType.getDisplayName()).append("\n");
-    if (attackBonus > 0)
+    if (attackBonus > BaseConstant.NUMBER_ZERO)
       info.append("공격력 +").append(attackBonus).append("\n");
-    if (defenseBonus > 0)
+    if (defenseBonus > BaseConstant.NUMBER_ZERO)
       info.append("방어력 +").append(defenseBonus).append("\n");
-    if (hpBonus > 0)
+    if (hpBonus > BaseConstant.NUMBER_ZERO)
       info.append("체력 +").append(hpBonus).append("\n");
     info.append("가격: ").append(getValue()).append(" 골드");
     return info.toString();

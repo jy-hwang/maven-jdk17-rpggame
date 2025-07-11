@@ -56,7 +56,8 @@ public class FileController {
       var targetSlot = slots.stream().filter(slot -> slot.getSlotNumber() == slotNumber).findFirst().orElse(null);
 
       if (targetSlot != null && targetSlot.isOccupied()) {
-        boolean overwrite = InputValidator.getConfirmation("슬롯 " + slotNumber + "에 이미 '" + targetSlot.getCharacterName() + "' 캐릭터가 저장되어 있습니다. 덮어쓰시겠습니까?");
+        boolean overwrite =
+            InputValidator.getConfirmation("슬롯 " + slotNumber + "에 이미 '" + targetSlot.getCharacterName() + "' 캐릭터가 저장되어 있습니다. 덮어쓰시겠습니까?");
 
         if (!overwrite) {
           System.out.println("저장이 취소되었습니다.");

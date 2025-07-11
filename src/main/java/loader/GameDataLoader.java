@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import config.BaseConstant;
 import model.item.GameEffectData;
 import model.item.GameItemData;
 
@@ -15,8 +16,7 @@ public class GameDataLoader {
   private static final Logger logger = LoggerFactory.getLogger(GameDataLoader.class);
   private static final ObjectMapper objectMapper = new ObjectMapper();
 
-  // 설정 파일 경로
-  private static final String BASIC_POTIONS_CONFIG = "config/basic_potions.json";
+
 
   /**
    * 기본 물약 데이터 로드
@@ -25,10 +25,10 @@ public class GameDataLoader {
     try {
       logger.info("기본 물약 데이터 로드 시작...");
 
-      InputStream inputStream = GameDataLoader.class.getResourceAsStream(BASIC_POTIONS_CONFIG);
+      InputStream inputStream = GameDataLoader.class.getResourceAsStream(BaseConstant.BASIC_POTIONS_CONFIG);
 
       if (inputStream == null) {
-        logger.error("물약 설정 파일을 찾을 수 없습니다: {}", BASIC_POTIONS_CONFIG);
+        logger.error("물약 설정 파일을 찾을 수 없습니다: {}", BaseConstant.BASIC_POTIONS_CONFIG);
         return createDefaultPotions();
       }
 
@@ -119,7 +119,8 @@ public class GameDataLoader {
       // 큰 HP 회복 물약
       List<GameEffectData> largeHpEffect = List.of(new GameEffectData("HEAL_HP", 100));
 
-      Map<String, GameItemData> defaultPotions = Map.of("HEALTH_POTION", new GameItemData("HEALTH_POTION", "체력 물약", "HP를 50 회복합니다", "CONSUMABLE", 50, "COMMON", true, hpEffect), "MANA_POTION",
+      Map<String, GameItemData> defaultPotions = Map.of("HEALTH_POTION",
+          new GameItemData("HEALTH_POTION", "체력 물약", "HP를 50 회복합니다", "CONSUMABLE", 50, "COMMON", true, hpEffect), "MANA_POTION",
           new GameItemData("MANA_POTION", "마나 물약", "MP를 40 회복합니다", "CONSUMABLE", 60, "COMMON", true, mpEffect), "LARGE_HEALTH_POTION",
           new GameItemData("LARGE_HEALTH_POTION", "큰 체력 물약", "HP를 100 회복합니다", "CONSUMABLE", 120, "UNCOMMON", true, largeHpEffect));
 
@@ -140,7 +141,7 @@ public class GameDataLoader {
    * 설정 파일 존재 여부 확인
    */
   public static boolean isConfigFileExists() {
-    InputStream inputStream = GameDataLoader.class.getResourceAsStream(BASIC_POTIONS_CONFIG);
+    InputStream inputStream = GameDataLoader.class.getResourceAsStream(BaseConstant.BASIC_POTIONS_CONFIG);
     boolean exists = inputStream != null;
 
     if (exists) {
@@ -151,7 +152,7 @@ public class GameDataLoader {
       }
     }
 
-    logger.debug("설정 파일 존재 여부: {} ({})", exists, BASIC_POTIONS_CONFIG);
+    logger.debug("설정 파일 존재 여부: {} ({})", exists, BaseConstant.BASIC_POTIONS_CONFIG);
     return exists;
   }
 
@@ -191,13 +192,15 @@ public class GameDataLoader {
     Map<String, Long> typeStats = potions.values().stream().collect(Collectors.groupingBy(GameItemData::getType, Collectors.counting()));
 
     // 등급별 통계
-    Map<String, Long> rarityStats = potions.values().stream().collect(Collectors.groupingBy(item -> item.getRarity().getDisplayName(), Collectors.counting()));
+    Map<String, Long> rarityStats =
+        potions.values().stream().collect(Collectors.groupingBy(item -> item.getRarity().getDisplayName(), Collectors.counting()));
 
     // 중첩 가능 통계
     long stackableCount = potions.values().stream().mapToLong(item -> item.isStackable() ? 1 : 0).sum();
 
     // 효과별 통계
-    Map<String, Long> effectStats = potions.values().stream().flatMap(item -> item.getEffects().stream()).collect(Collectors.groupingBy(GameEffectData::getType, Collectors.counting()));
+    Map<String, Long> effectStats = potions.values().stream().flatMap(item -> item.getEffects().stream())
+        .collect(Collectors.groupingBy(GameEffectData::getType, Collectors.counting()));
 
     logger.info("=== 데이터 통계 ===");
     logger.info("총 아이템: {}개", potions.size());
@@ -214,7 +217,8 @@ public class GameDataLoader {
   public static Map<String, GameItemData> loadItemsByType(String itemType) {
     Map<String, GameItemData> allItems = loadBasicPotions();
 
-    return allItems.entrySet().stream().filter(entry -> entry.getValue().getType().equalsIgnoreCase(itemType)).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    return allItems.entrySet().stream().filter(entry -> entry.getValue().getType().equalsIgnoreCase(itemType))
+        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
   }
 
   /**

@@ -3,6 +3,7 @@ package controller;
 import java.util.Random;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import config.BaseConstant;
 import model.GameCharacter;
 import model.Monster;
 import model.Skill;
@@ -23,9 +24,6 @@ public class BattleController {
   private final Random random;
   private final QuestManager questManager;
   private final GameDataService.GameState gameState;
-
-  // 전투 관련 상수
-  private static final int ESCAPE_CHANCE = 50;
 
   public BattleController(QuestManager questManager, GameDataService.GameState gameState) {
     this.random = new Random();
@@ -121,7 +119,8 @@ public class BattleController {
    */
   private void showBattleStatus(GameCharacter player, Monster monster) {
     System.out.println("\n--- 전투 상황 ---");
-    System.out.printf("🧙 %s: %d/%d HP | %d/%d MP%n", player.getName(), player.getHp(), player.getTotalMaxHp(), player.getMana(), player.getMaxMana());
+    System.out.printf("🧙 %s: %d/%d HP | %d/%d MP%n", player.getName(), player.getHp(), player.getTotalMaxHp(), player.getMana(),
+        player.getMaxMana());
     System.out.printf("👹 %s: %d HP%n", monster.getName(), monster.getHp());
     System.out.println("---------------");
   }
@@ -228,7 +227,7 @@ public class BattleController {
    * 도망 시도를 처리합니다.
    */
   private boolean attemptEscape() {
-    if (random.nextInt(100) < ESCAPE_CHANCE) {
+    if (random.nextInt(100) < BaseConstant.ESCAPE_CHANCE) {
       System.out.println("🏃 성공적으로 도망쳤습니다!");
       logger.debug("도망 성공");
       return true;
@@ -278,7 +277,8 @@ public class BattleController {
    * 랜덤 아이템을 드롭합니다.
    */
   private void dropRandomItem(GameCharacter player) {
-    GameItem[] possibleDrops = {new GameConsumable("체력 물약", "HP를 50 회복합니다", 20, ItemRarity.COMMON, 50, 0, 0, true), new GameConsumable("마나 물약", "마나를 30 회복합니다", 25, ItemRarity.COMMON, 0, 30, 0, true),
+    GameItem[] possibleDrops = {new GameConsumable("체력 물약", "HP를 50 회복합니다", 20, ItemRarity.COMMON, 50, 0, 0, true),
+        new GameConsumable("마나 물약", "마나를 30 회복합니다", 25, ItemRarity.COMMON, 0, 30, 0, true),
         new GameEquipment("철검", "날카로운 철검", 80, ItemRarity.UNCOMMON, GameEquipment.EquipmentType.WEAPON, 8, 0, 0),
         new GameEquipment("가죽 갑옷", "질긴 가죽으로 만든 갑옷", 60, ItemRarity.COMMON, GameEquipment.EquipmentType.ARMOR, 0, 6, 10)};
 

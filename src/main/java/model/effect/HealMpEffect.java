@@ -2,6 +2,7 @@ package model.effect;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import config.BaseConstant;
 import model.GameCharacter;
 
 /**
@@ -14,7 +15,7 @@ public class HealMpEffect implements GameEffect {
   private final boolean isPercentage;
 
   public HealMpEffect(int value, boolean isPercentage) {
-    this.value = Math.max(0, value);
+    this.value = Math.max(BaseConstant.NUMBER_ZERO, value);
     this.isPercentage = isPercentage;
     logger.debug("HealMpEffect 생성: {} {}", value, isPercentage ? "%" : "고정값");
   }
@@ -38,7 +39,7 @@ public class HealMpEffect implements GameEffect {
     target.restoreMana(restoreAmount);
     int actualRestored = target.getMana() - oldMp;
 
-    if (actualRestored > 0) {
+    if (actualRestored > BaseConstant.NUMBER_ZERO) {
       System.out.println(getApplyMessage(target, true));
       logger.info("{} MP 회복 적용: {} -> {} (+{})", target.getName(), oldMp, target.getMana(), actualRestored);
       return true;

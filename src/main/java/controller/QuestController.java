@@ -3,6 +3,7 @@ package controller;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import config.BaseConstant;
 import model.GameCharacter;
 import model.Quest;
 import model.QuestReward;
@@ -183,9 +184,9 @@ public class QuestController {
     System.out.println("\n=== 보상 수령 가능한 퀘스트 ===");
     for (int i = 0; i < completedQuests.size(); i++) {
       Quest quest = completedQuests.get(i);
-      System.out.printf("%d. %s%n", i + 1, quest.getTitle());
+      System.out.printf("%d. %s%n", i + BaseConstant.NUMBER_ONE, quest.getTitle());
 
-     QuestReward reward = quest.getReward();
+      QuestReward reward = quest.getReward();
       if (reward != null) {
         System.out.print("   보상: ");
         if (reward.getExpReward() > 0)
@@ -228,10 +229,10 @@ public class QuestController {
    * 보상 상세 내용을 표시합니다.
    */
   private void displayRewardDetails(QuestReward reward) {
-    if (reward.getExpReward() > 0) {
+    if (reward.getExpReward() > BaseConstant.NUMBER_ZERO) {
       System.out.println("📈 경험치 +" + reward.getExpReward() + " 획득!");
     }
-    if (reward.getGoldReward() > 0) {
+    if (reward.getGoldReward() > BaseConstant.NUMBER_ZERO) {
       System.out.println("💰 골드 +" + reward.getGoldReward() + " 획득!");
     }
 
@@ -259,7 +260,7 @@ public class QuestController {
     System.out.println("🎁 완료 (수령): " + stats.getClaimedCount() + "개");
     System.out.println("📊 총 퀘스트: " + stats.getTotalCount() + "개");
 
-    if (stats.getTotalCount() > 0) {
+    if (stats.getTotalCount() > BaseConstant.NUMBER_ZERO) {
       System.out.printf("🏆 완료율: %.1f%%\n", stats.getCompletionRate());
 
       // 진행도 바 표시
@@ -267,7 +268,7 @@ public class QuestController {
     }
 
     // 다음 해금 퀘스트 안내
-    if (stats.getAvailableCount() == 0 && player.getLevel() < 8) {
+    if (stats.getAvailableCount() == BaseConstant.NUMBER_ZERO && player.getLevel() <= BaseConstant.INTERMEDIATE_LEVEL) {
       System.out.println("\n💡 팁: 레벨을 올리면 새로운 퀘스트가 해금됩니다!");
     }
 
@@ -279,11 +280,11 @@ public class QuestController {
    * 진행도 바를 표시합니다.
    */
   private void displayProgressBar(double percentage) {
-    int barLength = 20;
-    int filledLength = (int) (barLength * percentage / 100);
+    int barLength = BaseConstant.NUMBER_TWENTY;
+    int filledLength = (int) (barLength * percentage / BaseConstant.NUMBER_HUNDRED);
 
     System.out.print("📊 진행도: [");
-    for (int i = 0; i < barLength; i++) {
+    for (int i = BaseConstant.NUMBER_ZERO; i < barLength; i++) {
       if (i < filledLength) {
         System.out.print("█");
       } else {
@@ -382,7 +383,7 @@ public class QuestController {
    * 퀘스트 완료 알림을 표시합니다.
    */
   public void showQuestCompletionNotification(Quest quest) {
-    System.out.println("\n" + "★".repeat(40));
+    System.out.println("\n" + "★".repeat(BaseConstant.NUMBER_TWENTY));
     System.out.println("🎉 퀘스트 완료! 🎉");
     System.out.println("📋 " + quest.getTitle());
 
@@ -392,7 +393,7 @@ public class QuestController {
       System.out.println("💡 퀘스트 메뉴에서 보상을 수령하세요!");
     }
 
-    System.out.println("★".repeat(40));
+    System.out.println("★".repeat(BaseConstant.NUMBER_TWENTY));
   }
 
   /**
@@ -433,16 +434,16 @@ public class QuestController {
   public String getQuestProgressSummary(GameCharacter player) {
     QuestManager.QuestStatistics stats = questManager.getStatistics(player);
 
-    if (stats.getActiveCount() == 0 && stats.getClaimableCount() == 0) {
+    if (stats.getActiveCount() == BaseConstant.NUMBER_ZERO && stats.getClaimableCount() == 0) {
       return "현재 진행 중인 퀘스트가 없습니다.";
     }
 
     StringBuilder summary = new StringBuilder();
-    if (stats.getActiveCount() > 0) {
+    if (stats.getActiveCount() > BaseConstant.NUMBER_ZERO) {
       summary.append("진행 중: ").append(stats.getActiveCount()).append("개");
     }
-    if (stats.getClaimableCount() > 0) {
-      if (summary.length() > 0)
+    if (stats.getClaimableCount() > BaseConstant.NUMBER_ZERO) {
+      if (summary.length() > BaseConstant.NUMBER_ZERO)
         summary.append(", ");
       summary.append("보상 수령 대기: ").append(stats.getClaimableCount()).append("개");
     }

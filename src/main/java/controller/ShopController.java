@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Random;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import config.BaseConstant;
 import model.GameCharacter;
 import model.GameInventory;
 import model.ShopItem;
@@ -34,8 +35,7 @@ public class ShopController {
   private final GameItemFactory itemFactory;
   private final Random random;
 
-  // 이벤트 관련 상수
-  private static final int EVENT_CHANCE = 15; // 15% 확률로 이벤트 발생
+
   private boolean currentEventActive = false;
   private ShopEvent currentEvent = null;
 
@@ -374,7 +374,8 @@ public class ShopController {
     List<ShopItem> recommendations = new ArrayList<>();
 
     // 구매 가능한 아이템들 중에서 선택
-    List<ShopItem> affordableItems = shopItems.stream().filter(item -> item.getStock() > 0).filter(item -> player.getGold() >= item.getPrice()).toList();
+    List<ShopItem> affordableItems =
+        shopItems.stream().filter(item -> item.getStock() > 0).filter(item -> player.getGold() >= item.getPrice()).toList();
 
     if (affordableItems.isEmpty()) {
       return recommendations;
@@ -615,7 +616,7 @@ public class ShopController {
    * 랜덤 상점 이벤트를 체크합니다.
    */
   private void checkForRandomEvent() {
-    if (random.nextInt(100) < EVENT_CHANCE) {
+    if (random.nextInt(100) < BaseConstant.EVENT_CHANCE) {
       triggerRandomEvent();
     }
   }
@@ -897,8 +898,8 @@ public class ShopController {
     System.out.println("💡 일반 등급 아이템들을 빠르게 판매합니다.");
     System.out.println();
 
-    var commonItems =
-        player.getInventory().getItems().stream().filter(stack -> stack.getItem().getRarity() == ItemRarity.COMMON).filter(stack -> !isCurrentlyEquipped(player, stack.getItem())).toList();
+    var commonItems = player.getInventory().getItems().stream().filter(stack -> stack.getItem().getRarity() == ItemRarity.COMMON)
+        .filter(stack -> !isCurrentlyEquipped(player, stack.getItem())).toList();
 
     if (commonItems.isEmpty()) {
       System.out.println("일괄 판매할 일반 아이템이 없습니다.");
@@ -1050,7 +1051,8 @@ public class ShopController {
    */
   private boolean isCurrentlyEquipped(GameCharacter player, GameEquipment equipment) {
     GameInventory inventory = player.getInventory();
-    return equipment.equals(inventory.getEquippedWeapon()) || equipment.equals(inventory.getEquippedArmor()) || equipment.equals(inventory.getEquippedAccessory());
+    return equipment.equals(inventory.getEquippedWeapon()) || equipment.equals(inventory.getEquippedArmor())
+        || equipment.equals(inventory.getEquippedAccessory());
   }
 
   /**
@@ -1166,7 +1168,8 @@ public class ShopController {
    * 상점 이벤트 타입
    */
   public enum ShopEvent {
-    DISCOUNT_SALE("할인 세일", "모든 아이템 20% 할인"), BONUS_SELL("고가 매입", "판매 시 30% 보너스 지급"), FREE_POTION("무료 증정", "체력 물약 무료 증정"), RARE_ITEMS("희귀 아이템", "특별한 아이템 판매");
+    DISCOUNT_SALE("할인 세일", "모든 아이템 20% 할인"), BONUS_SELL("고가 매입", "판매 시 30% 보너스 지급"), FREE_POTION("무료 증정", "체력 물약 무료 증정"), RARE_ITEMS("희귀 아이템",
+        "특별한 아이템 판매");
 
     private final String name;
     private final String description;

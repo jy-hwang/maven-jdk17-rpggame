@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import config.BaseConstant;
 import model.item.GameItem;
 
 /**
@@ -29,8 +30,13 @@ public class Quest {
   }
 
   @JsonCreator
-  public Quest(@JsonProperty("id") String id, @JsonProperty("title") String title, @JsonProperty("description") String description, @JsonProperty("type") QuestType type,
-      @JsonProperty("requiredLevel") int requiredLevel, @JsonProperty("objectives") Map<String, Integer> objectives, @JsonProperty("reward") QuestReward reward) {
+  public Quest(
+      // @fotmatter:off
+      @JsonProperty("id") String id, @JsonProperty("title") String title, @JsonProperty("description") String description,
+      @JsonProperty("type") QuestType type, @JsonProperty("requiredLevel") int requiredLevel,
+      @JsonProperty("objectives") Map<String, Integer> objectives, @JsonProperty("reward") QuestReward reward
+  // @fotmatter:on
+  ) {
     this.id = id;
     this.title = title;
     this.description = description;
@@ -110,12 +116,12 @@ public class Quest {
     // 보상 지급
     if (reward != null) {
       // 경험치 보상
-      if (reward.getExpReward() > 0) {
+      if (reward.getExpReward() > BaseConstant.NUMBER_ZERO) {
         character.gainExp(reward.getExpReward());
       }
 
       // 골드 보상
-      if (reward.getGoldReward() > 0) {
+      if (reward.getGoldReward() > BaseConstant.NUMBER_ZERO) {
         character.setGold(character.getGold() + reward.getGoldReward());
       }
 
@@ -147,7 +153,7 @@ public class Quest {
       String key = entry.getKey();
       int target = entry.getValue();
 
-      if (desc.length() > 0)
+      if (desc.length() > BaseConstant.NUMBER_ZERO)
         desc.append(", ");
 
       if (key.startsWith("kill_")) {
@@ -175,9 +181,9 @@ public class Quest {
     for (Map.Entry<String, Integer> entry : objectives.entrySet()) {
       String key = entry.getKey();
       int target = entry.getValue();
-      int current = currentProgress.getOrDefault(key, 0);
+      int current = currentProgress.getOrDefault(key, BaseConstant.NUMBER_ZERO);
 
-      if (desc.length() > 0)
+      if (desc.length() > BaseConstant.NUMBER_ZERO)
         desc.append(", ");
       desc.append(current).append("/").append(target);
     }
@@ -189,7 +195,7 @@ public class Quest {
    * 퀘스트 정보를 표시합니다.
    */
   public void displayQuestInfo() {
-    System.out.println("\n" + "=".repeat(40));
+    System.out.println("\n" + "=".repeat(BaseConstant.NUMBER_TWENTY));
     System.out.println("📋 " + title);
     System.out.println("📝 " + description);
     System.out.println("🎯 목표: " + getObjectiveDescription());
@@ -206,7 +212,7 @@ public class Quest {
       System.out.println("🎁 보상: " + reward.getRewardDescription());
     }
 
-    System.out.println("=".repeat(40));
+    System.out.println("=".repeat(BaseConstant.NUMBER_TWENTY));
   }
 
   /**

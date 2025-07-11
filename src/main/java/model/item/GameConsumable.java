@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import config.BaseConstant;
 import model.GameCharacter;
 import model.effect.GameEffect;
 import model.effect.GameEffectType;
@@ -20,8 +21,7 @@ public class GameConsumable extends GameItem {
   /**
    * GameEffect 시스템을 사용하는 생성자 (권장)
    */
-  public GameConsumable(String name, String description, int value, ItemRarity rarity, 
-                       List<GameEffect> effects, int cooldown) {
+  public GameConsumable(String name, String description, int value, ItemRarity rarity, List<GameEffect> effects, int cooldown) {
     super(name, description, value, rarity);
     this.effects = new ArrayList<>(effects);
     this.cooldown = cooldown;
@@ -31,62 +31,59 @@ public class GameConsumable extends GameItem {
 
   /**
    * 레거시 생성자 1 - 기존 시그니처 (hpRestore, expGain, stackable)
+   * 
    * @deprecated GameEffect 시스템을 사용하는 생성자를 권장
    */
   @Deprecated
-  public GameConsumable(String name, String description, int value, ItemRarity rarity,
-                       int hpRestore, int expGain, boolean stackable) {
+  public GameConsumable(String name, String description, int value, ItemRarity rarity, int hpRestore, int expGain, boolean stackable) {
     super(name, description, value, rarity);
-    this.cooldown = 0;
-    
+    this.cooldown = BaseConstant.NUMBER_ZERO;
+
     // 레거시 파라미터를 효과로 변환
     this.effects = new ArrayList<>();
-    if (hpRestore > 0) {
+    if (hpRestore > BaseConstant.NUMBER_ZERO) {
       this.effects.add(new SimpleHealEffect("HP", hpRestore));
     }
-    if (expGain > 0) {
+    if (expGain > BaseConstant.NUMBER_ZERO) {
       this.effects.add(new SimpleExpEffect(expGain));
     }
-    
-    logger.debug("GameConsumable 생성 (레거시 1): {} (HP: {}, EXP: {})", 
-                name, hpRestore, expGain);
+
+    logger.debug("GameConsumable 생성 (레거시 1): {} (HP: {}, EXP: {})", name, hpRestore, expGain);
   }
 
   /**
    * 레거시 생성자 2 - QuestManager 호환 시그니처 (hpRestore, mpRestore, expGain, stackable)
+   * 
    * @deprecated GameEffect 시스템을 사용하는 생성자를 권장
    */
   @Deprecated
-  public GameConsumable(String name, String description, int value, ItemRarity rarity,
-                       int hpRestore, int mpRestore, int expGain, boolean stackable) {
+  public GameConsumable(String name, String description, int value, ItemRarity rarity, int hpRestore, int mpRestore, int expGain, boolean stackable) {
     super(name, description, value, rarity);
-    this.cooldown = 0;
-    
+    this.cooldown = BaseConstant.NUMBER_ZERO;
+
     // 레거시 파라미터를 효과로 변환
     this.effects = new ArrayList<>();
-    if (hpRestore > 0) {
+    if (hpRestore > BaseConstant.NUMBER_ZERO) {
       this.effects.add(new SimpleHealEffect("HP", hpRestore));
     }
-    if (mpRestore > 0) {
+    if (mpRestore > BaseConstant.NUMBER_ZERO) {
       this.effects.add(new SimpleHealEffect("MP", mpRestore));
     }
-    if (expGain > 0) {
+    if (expGain > BaseConstant.NUMBER_ZERO) {
       this.effects.add(new SimpleExpEffect(expGain));
     }
-    
-    logger.debug("GameConsumable 생성 (레거시 2): {} (HP: {}, MP: {}, EXP: {})", 
-                name, hpRestore, mpRestore, expGain);
+
+    logger.debug("GameConsumable 생성 (레거시 2): {} (HP: {}, MP: {}, EXP: {})", name, hpRestore, mpRestore, expGain);
   }
 
   /**
    * 간단한 단일 효과 생성자 (편의용)
    */
-  public GameConsumable(String name, String description, int value, ItemRarity rarity,
-                       String effectType, int effectValue) {
+  public GameConsumable(String name, String description, int value, ItemRarity rarity, String effectType, int effectValue) {
     super(name, description, value, rarity);
-    this.cooldown = 0;
+    this.cooldown = BaseConstant.NUMBER_ZERO;
     this.effects = new ArrayList<>();
-    
+
     // 효과 타입에 따라 적절한 효과 생성
     switch (effectType.toUpperCase()) {
       case "HP", "HEAL_HP" -> this.effects.add(new SimpleHealEffect("HP", effectValue));
@@ -97,7 +94,7 @@ public class GameConsumable extends GameItem {
         this.effects.add(new SimpleHealEffect("HP", effectValue)); // 기본값
       }
     }
-    
+
     logger.debug("GameConsumable 생성 (단일 효과): {} ({}:{})", name, effectType, effectValue);
   }
 
@@ -168,6 +165,7 @@ public class GameConsumable extends GameItem {
 
   /**
    * 레거시 지원: HP 회복량 반환
+   * 
    * @deprecated 효과 시스템 사용 권장
    */
   @Deprecated
@@ -183,6 +181,7 @@ public class GameConsumable extends GameItem {
 
   /**
    * 레거시 지원: MP 회복량 반환
+   * 
    * @deprecated 효과 시스템 사용 권장
    */
   @Deprecated
@@ -198,6 +197,7 @@ public class GameConsumable extends GameItem {
 
   /**
    * 레거시 지원: 경험치 획득량 반환
+   * 
    * @deprecated 효과 시스템 사용 권장
    */
   @Deprecated
@@ -287,8 +287,8 @@ public class GameConsumable extends GameItem {
       return type + " +" + value;
     }
 
-    public int getValue() { 
-      return value; 
+    public int getValue() {
+      return value;
     }
 
     @Override
@@ -319,12 +319,13 @@ public class GameConsumable extends GameItem {
       return "경험치 +" + value;
     }
 
-    public int getValue() { 
-      return value; 
+    public int getValue() {
+      return value;
     }
+
     @Override
     public GameEffectType getType() {
-     
+
       return GameEffectType.GAIN_EXP;
     }
   }

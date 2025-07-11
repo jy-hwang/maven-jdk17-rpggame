@@ -1,15 +1,17 @@
 package model.item;
 
+import config.BaseConstant;
+
 /**
  * 아이템 등급 enum (최신 버전) 이모지, 색상 코드, 확률 등 포함
  */
 public enum ItemRarity {
   //@formatter:off
-  COMMON("일반", "⚪", "#FFFFFF", "#808080", 60.0, 1.0),
-  UNCOMMON("고급", "🟢", "#00FF00", "#00AA00", 25.0, 1.2),
-  RARE("희귀", "🔵", "#0080FF", "#0060CC", 10.0, 1.5),
-  EPIC("영웅", "🟣", "#8000FF", "#6000CC", 4.0, 2.0),
-  LEGENDARY("전설", "🟡", "#FFD700", "#CC9900", 1.0, 3.0);
+  COMMON("일반", "⚪", "#FFFFFF", "#808080", BaseConstant.COMMON_RATE, BaseConstant.COMMON_MULTIPL)
+, UNCOMMON("고급", "🟢", "#00FF00", "#00AA00", BaseConstant.UNCOMMON_RATE, BaseConstant.UNCOMMON_MULTIPL)
+, RARE("희귀", "🔵", "#0080FF", "#0060CC", BaseConstant.RARE_RATE, BaseConstant.RARE_MULTIPL)
+, EPIC("영웅", "🟣", "#8000FF", "#6000CC", BaseConstant.EPIC_RATE, BaseConstant.EPIC_MULTIPL)
+, LEGENDARY("전설", "🟡", "#FFD700", "#CC9900", BaseConstant.LEGENDARY_RATE, BaseConstant.LEGENDARY_MULTIPL);
   //@formatter:on    
   private final String displayName;
   private final String emoji;

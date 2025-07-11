@@ -8,6 +8,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import config.BaseConstant;
 
 /**
  * 캐릭터의 스킬 관리 클래스
@@ -30,9 +31,8 @@ public class SkillManager {
    */
   private void initializeDefaultSkills() {
     // 레벨 1 기본 스킬
-    learnSkills(
-        Arrays.asList(new Skill("강타", "강력한 공격을 가합니다", Skill.SkillType.ATTACK, 1, 5, 2, 1.5, 0, 0),
-            new Skill("치유", "체력을 회복합니다", Skill.SkillType.HEAL, 1, 8, 3, 0, 30, 0)));
+    learnSkills(Arrays.asList(new Skill("강타", "강력한 공격을 가합니다", Skill.SkillType.ATTACK, 1, 5, 2, 1.5, 0, 0),
+        new Skill("치유", "체력을 회복합니다", Skill.SkillType.HEAL, 1, 8, 3, 0, 30, 0)));
   }
 
   /**
@@ -52,29 +52,26 @@ public class SkillManager {
     List<Skill> newSkills = new ArrayList<>();
 
     // 레벨별 스킬 해금
-    if (currentLevel >= 3 && !hasSkill("화염구")) {
-      Skill fireball =
-          new Skill("화염구", "불타는 화염구를 던집니다", Skill.SkillType.ATTACK, 3, 12, 4, 2.0, 0, 0);
+    if (currentLevel >= BaseConstant.BEGINNER_LEVEL && !hasSkill("화염구")) {
+      Skill fireball = new Skill("화염구", "불타는 화염구를 던집니다", Skill.SkillType.ATTACK, 3, 12, 4, 2.0, 0, 0);
       learnedSkills.add(fireball);
       newSkills.add(fireball);
     }
 
-    if (currentLevel >= 5 && !hasSkill("방어 강화")) {
-      Skill defenseBoost =
-          new Skill("방어 강화", "일시적으로 방어력을 증가시킵니다", Skill.SkillType.BUFF, 5, 10, 5, 0, 0, 3);
+    if (currentLevel >= BaseConstant.NUMBER_FIVE && !hasSkill("방어 강화")) {
+      Skill defenseBoost = new Skill("방어 강화", "일시적으로 방어력을 증가시킵니다", Skill.SkillType.BUFF, 5, 10, 5, 0, 0, 3);
       learnedSkills.add(defenseBoost);
       newSkills.add(defenseBoost);
     }
 
-    if (currentLevel >= 7 && !hasSkill("대치유")) {
+    if (currentLevel >= BaseConstant.INTERMEDIATE_LEVEL && !hasSkill("대치유")) {
       Skill greatHeal = new Skill("대치유", "강력한 치유 마법입니다", Skill.SkillType.HEAL, 7, 20, 5, 0, 80, 0);
       learnedSkills.add(greatHeal);
       newSkills.add(greatHeal);
     }
 
-    if (currentLevel >= 10 && !hasSkill("연쇄 번개")) {
-      Skill chainLightning =
-          new Skill("연쇄 번개", "강력한 번개 공격입니다", Skill.SkillType.ATTACK, 10, 25, 6, 3.0, 0, 0);
+    if (currentLevel >= BaseConstant.NUMBER_TEN && !hasSkill("연쇄 번개")) {
+      Skill chainLightning = new Skill("연쇄 번개", "강력한 번개 공격입니다", Skill.SkillType.ATTACK, 10, 25, 6, 3.0, 0, 0);
       learnedSkills.add(chainLightning);
       newSkills.add(chainLightning);
     }
@@ -87,7 +84,7 @@ public class SkillManager {
    */
   public boolean canUseSkill(Skill skill, GameCharacter character) {
     // 쿨다운 확인
-    if (skillCooldowns.getOrDefault(skill.getName(), 0) > 0) {
+    if (skillCooldowns.getOrDefault(skill.getName(), BaseConstant.NUMBER_ZERO) > BaseConstant.NUMBER_ZERO) {
       return false;
     }
 
@@ -105,14 +102,14 @@ public class SkillManager {
   public Skill.SkillResult useSkill(String skillName, GameCharacter caster, Monster target) {
     Skill skill = getSkillByName(skillName);
     if (skill == null) {
-      return new Skill.SkillResult(false, "해당 스킬을 찾을 수 없습니다.", 0);
+      return new Skill.SkillResult(false, "해당 스킬을 찾을 수 없습니다.", BaseConstant.NUMBER_ZERO);
     }
 
     if (!canUseSkill(skill, caster)) {
-      if (skillCooldowns.getOrDefault(skillName, 0) > 0) {
-        return new Skill.SkillResult(false, "스킬이 아직 쿨다운 중입니다.", 0);
+      if (skillCooldowns.getOrDefault(skillName, BaseConstant.NUMBER_ZERO) > BaseConstant.NUMBER_ZERO) {
+        return new Skill.SkillResult(false, "스킬이 아직 쿨다운 중입니다.", BaseConstant.NUMBER_ZERO);
       } else {
-        return new Skill.SkillResult(false, "마나가 부족합니다.", 0);
+        return new Skill.SkillResult(false, "마나가 부족합니다.", BaseConstant.NUMBER_ZERO);
       }
     }
 
@@ -130,16 +127,16 @@ public class SkillManager {
    * 턴이 끝날 때 쿨다운을 감소시킵니다.
    */
   public void reduceCooldowns() {
-    skillCooldowns.replaceAll((name, cooldown) -> Math.max(0, cooldown - 1));
-    skillCooldowns.entrySet().removeIf(entry -> entry.getValue() <= 0);
+    skillCooldowns.replaceAll((name, cooldown) -> Math.max(BaseConstant.NUMBER_ZERO, cooldown - BaseConstant.NUMBER_ONE));
+    skillCooldowns.entrySet().removeIf(entry -> entry.getValue() <= BaseConstant.NUMBER_ZERO);
   }
 
   /**
    * 사용 가능한 스킬 목록을 반환합니다.
    */
   public List<Skill> getAvailableSkills(GameCharacter character) {
-    return learnedSkills.stream().filter(skill -> skill.getRequiredLevel() <= character.getLevel())
-        .filter(skill -> canUseSkill(skill, character)).toList();
+    return learnedSkills.stream().filter(skill -> skill.getRequiredLevel() <= character.getLevel()).filter(skill -> canUseSkill(skill, character))
+        .toList();
   }
 
   /**
@@ -152,13 +149,13 @@ public class SkillManager {
       return;
     }
 
-    for (int i = 0; i < learnedSkills.size(); i++) {
+    for (int i = BaseConstant.NUMBER_ZERO; i < learnedSkills.size(); i++) {
       Skill skill = learnedSkills.get(i);
       String status = "";
 
       if (skill.getRequiredLevel() > character.getLevel()) {
         status = " (레벨 부족)";
-      } else if (skillCooldowns.getOrDefault(skill.getName(), 0) > 0) {
+      } else if (skillCooldowns.getOrDefault(skill.getName(), BaseConstant.NUMBER_ZERO) > BaseConstant.NUMBER_ZERO) {
         status = " (쿨다운: " + skillCooldowns.get(skill.getName()) + "턴)";
       } else if (character.getMana() < skill.getManaCost()) {
         status = " (마나 부족)";
@@ -166,7 +163,7 @@ public class SkillManager {
         status = " (사용 가능)";
       }
 
-      System.out.printf("%d. %s%s%n", i + 1, skill.getName(), status);
+      System.out.printf("%d. %s%s%n", i + BaseConstant.NUMBER_ONE, skill.getName(), status);
     }
     System.out.println("================");
   }
@@ -176,12 +173,11 @@ public class SkillManager {
   }
 
   private Skill getSkillByName(String name) {
-    return learnedSkills.stream().filter(skill -> skill.getName().equals(name)).findFirst()
-        .orElse(null);
+    return learnedSkills.stream().filter(skill -> skill.getName().equals(name)).findFirst().orElse(null);
   }
 
   public Skill getSkillByIndex(int index) {
-    if (index >= 0 && index < learnedSkills.size()) {
+    if (index >= BaseConstant.NUMBER_ZERO && index < learnedSkills.size()) {
       return learnedSkills.get(index);
     }
     return null;

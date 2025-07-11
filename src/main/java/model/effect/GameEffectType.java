@@ -6,29 +6,30 @@ package model.effect;
 public enum GameEffectType {
   //@formatter:off
   // 회복 효과
-  HEAL_HP("HP 회복", "체력을 회복합니다", "💚"),
-  HEAL_MP("MP 회복", "마나를 회복합니다", "💙"),
-  HEAL_HP_PERCENT("HP % 회복", "최대 체력의 %만큼 회복합니다", "💚"),
-  HEAL_MP_PERCENT("MP % 회복", "최대 마나의 %만큼 회복합니다", "💙"),
+  HEAL_HP("HP 회복", "체력을 회복합니다", "💚")
+, HEAL_MP("MP 회복", "마나를 회복합니다", "💙")
+, HEAL_HP_PERCENT("HP % 회복", "최대 체력의 %만큼 회복합니다", "💚")
+, HEAL_MP_PERCENT("MP % 회복", "최대 마나의 %만큼 회복합니다", "💙")
   
   // 성장 효과
-  GAIN_EXP("경험치 획득", "경험치를 획득합니다", "📈"),
+, GAIN_EXP("경험치 획득", "경험치를 획득합니다", "📈")
   
   // 버프 효과 (향후 구현)
-  BUFF_ATTACK("공격력 증가", "일시적으로 공격력이 증가합니다", "⚔️"),
-  BUFF_DEFENSE("방어력 증가", "일시적으로 방어력이 증가합니다", "🛡️"),
-  BUFF_SPEED("속도 증가", "일시적으로 속도가 증가합니다", "💨"),
+, BUFF_ATTACK("공격력 증가", "일시적으로 공격력이 증가합니다", "⚔️")
+, BUFF_DEFENSE("방어력 증가", "일시적으로 방어력이 증가합니다", "🛡️")
+, BUFF_SPEED("속도 증가", "일시적으로 속도가 증가합니다", "💨")
   
   // 치료 효과 (향후 구현)
-  CURE_POISON("독 치료", "독 상태를 치료합니다", "🟢"),
-  CURE_PARALYSIS("마비 치료", "마비 상태를 치료합니다", "⚡"),
-  CURE_SLEEP("수면 치료", "수면 상태를 치료합니다", "😴"),
-  CURE_ALL("전체 치료", "모든 상태이상을 치료합니다", "✨"),
+, CURE_POISON("독 치료", "독 상태를 치료합니다", "🟢")
+, CURE_PARALYSIS("마비 치료", "마비 상태를 치료합니다", "⚡")
+, CURE_SLEEP("수면 치료", "수면 상태를 치료합니다", "😴")
+, CURE_ALL("전체 치료", "모든 상태이상을 치료합니다", "✨")
   
   // 특수 효과 (향후 구현)
-  TELEPORT("순간이동", "다른 장소로 순간이동합니다", "🌀"),
-  REVIVE("부활", "사망 상태에서 부활합니다", "👼"),
-  FULL_RESTORE("완전 회복", "HP와 MP를 완전히 회복합니다", "🌟");
+, TELEPORT("순간이동", "다른 장소로 순간이동합니다", "🌀")
+, REVIVE("부활", "사망 상태에서 부활합니다", "👼")
+, FULL_RESTORE("완전 회복", "HP와 MP를 완전히 회복합니다", "🌟")
+;
   //@formatter:on
 
   private final String displayName;
@@ -162,7 +163,8 @@ public enum GameEffectType {
   public static void printStatistics() {
     System.out.println("\n=== 🎭 효과 타입 통계 ===");
 
-    java.util.Map<String, Long> categoryStats = java.util.Arrays.stream(values()).collect(java.util.stream.Collectors.groupingBy(GameEffectType::getCategory, java.util.stream.Collectors.counting()));
+    java.util.Map<String, Long> categoryStats = java.util.Arrays.stream(values())
+        .collect(java.util.stream.Collectors.groupingBy(GameEffectType::getCategory, java.util.stream.Collectors.counting()));
 
     long implementedCount = java.util.Arrays.stream(values()).mapToLong(type -> type.isImplemented() ? 1 : 0).sum();
 
@@ -171,7 +173,8 @@ public enum GameEffectType {
     System.out.println("미구현 효과: " + (values().length - implementedCount) + "개");
 
     System.out.println("\n📂 카테고리별:");
-    categoryStats.entrySet().stream().sorted(java.util.Map.Entry.<String, Long>comparingByValue().reversed()).forEach(entry -> System.out.printf("   %s: %d개%n", entry.getKey(), entry.getValue()));
+    categoryStats.entrySet().stream().sorted(java.util.Map.Entry.<String, Long>comparingByValue().reversed())
+        .forEach(entry -> System.out.printf("   %s: %d개%n", entry.getKey(), entry.getValue()));
 
     System.out.println("===================");
   }

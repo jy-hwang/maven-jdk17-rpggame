@@ -11,6 +11,7 @@ import java.util.Random;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import config.BaseConstant;
 import loader.GameDataLoader;
 import model.effect.GameEffect;
 import model.item.GameConsumable;
@@ -144,13 +145,7 @@ public class GameItemFactory {
         return null;
       }
 
-      return new GameConsumable(
-          data.getName(),
-          data.getDescription(), 
-          data.getValue(),
-          data.getRarity(),
-          effects,
-          0 // 기본 쿨다운 없음
+      return new GameConsumable(data.getName(), data.getDescription(), data.getValue(), data.getRarity(), effects, 0 // 기본 쿨다운 없음
       );
 
     } catch (Exception e) {
@@ -212,14 +207,16 @@ public class GameItemFactory {
    * 특정 타입의 아이템 ID 목록 반환
    */
   public List<String> getItemIdsByType(String itemType) {
-    return itemDatabase.entrySet().stream().filter(entry -> entry.getValue().getType().equalsIgnoreCase(itemType)).map(Map.Entry::getKey).collect(Collectors.toList());
+    return itemDatabase.entrySet().stream().filter(entry -> entry.getValue().getType().equalsIgnoreCase(itemType)).map(Map.Entry::getKey)
+        .collect(Collectors.toList());
   }
 
   /**
    * 특정 효과를 가진 아이템 검색
    */
   public List<String> findItemsByEffect(String effectType) {
-    return itemDatabase.entrySet().stream().filter(entry -> hasEffectType(entry.getValue(), effectType)).map(Map.Entry::getKey).collect(Collectors.toList());
+    return itemDatabase.entrySet().stream().filter(entry -> hasEffectType(entry.getValue(), effectType)).map(Map.Entry::getKey)
+        .collect(Collectors.toList());
   }
 
   /**
@@ -259,11 +256,11 @@ public class GameItemFactory {
       ItemRarity rarity = data.getRarity();
 
       boolean suitable = switch (rarity) {
-        case COMMON -> level >= 1;
-        case UNCOMMON -> level >= 3;
-        case RARE -> level >= 7;
-        case EPIC -> level >= 15;
-        case LEGENDARY -> level >= 25;
+        case COMMON -> level >= BaseConstant.NUMBER_ONE;
+        case UNCOMMON -> level >= BaseConstant.BEGINNER_LEVEL;
+        case RARE -> level >= BaseConstant.INTERMEDIATE_LEVEL;
+        case EPIC -> level >= BaseConstant.HIGH_LEVEL;
+        case LEGENDARY -> level >= BaseConstant.ULTRA_HIGH_LEVEL;
       };
 
       if (suitable) {
@@ -278,7 +275,8 @@ public class GameItemFactory {
    * 특정 등급의 아이템 목록 반환
    */
   public List<String> getItemsByRarity(ItemRarity rarity) {
-    return itemDatabase.entrySet().stream().filter(entry -> entry.getValue().getRarity() == rarity).map(Map.Entry::getKey).collect(Collectors.toList());
+    return itemDatabase.entrySet().stream().filter(entry -> entry.getValue().getRarity() == rarity).map(Map.Entry::getKey)
+        .collect(Collectors.toList());
   }
 
   /**
@@ -353,7 +351,8 @@ public class GameItemFactory {
     Map<String, Long> typeStats = itemDatabase.values().stream().collect(Collectors.groupingBy(GameItemData::getType, Collectors.counting()));
 
     System.out.println("📂 타입별:");
-    typeStats.entrySet().stream().sorted(Map.Entry.<String, Long>comparingByValue().reversed()).forEach(entry -> System.out.printf("   %s: %d개%n", entry.getKey(), entry.getValue()));
+    typeStats.entrySet().stream().sorted(Map.Entry.<String, Long>comparingByValue().reversed())
+        .forEach(entry -> System.out.printf("   %s: %d개%n", entry.getKey(), entry.getValue()));
 
     // 등급별 통계
     Map<ItemRarity, Long> rarityStats = itemDatabase.values().stream().collect(Collectors.groupingBy(GameItemData::getRarity, Collectors.counting()));
@@ -386,14 +385,17 @@ public class GameItemFactory {
     // 기본 HP 물약들
     addDefaultItem("HEALTH_POTION", "체력 물약", "HP를 50 회복합니다", "CONSUMABLE", 50, ItemRarity.COMMON, true, List.of(new GameEffectData("HEAL_HP", 50)));
 
-    addDefaultItem("LARGE_HEALTH_POTION", "큰 체력 물약", "HP를 100 회복합니다", "CONSUMABLE", 120, ItemRarity.UNCOMMON, true, List.of(new GameEffectData("HEAL_HP", 100)));
+    addDefaultItem("LARGE_HEALTH_POTION", "큰 체력 물약", "HP를 100 회복합니다", "CONSUMABLE", 120, ItemRarity.UNCOMMON, true,
+        List.of(new GameEffectData("HEAL_HP", 100)));
 
-    addDefaultItem("SUPER_HEALTH_POTION", "고급 체력 물약", "HP를 200 회복합니다", "CONSUMABLE", 250, ItemRarity.RARE, true, List.of(new GameEffectData("HEAL_HP", 200)));
+    addDefaultItem("SUPER_HEALTH_POTION", "고급 체력 물약", "HP를 200 회복합니다", "CONSUMABLE", 250, ItemRarity.RARE, true,
+        List.of(new GameEffectData("HEAL_HP", 200)));
 
     // 기본 MP 물약들
     addDefaultItem("MANA_POTION", "마나 물약", "MP를 40 회복합니다", "CONSUMABLE", 60, ItemRarity.COMMON, true, List.of(new GameEffectData("HEAL_MP", 40)));
 
-    addDefaultItem("LARGE_MANA_POTION", "큰 마나 물약", "MP를 80 회복합니다", "CONSUMABLE", 140, ItemRarity.UNCOMMON, true, List.of(new GameEffectData("HEAL_MP", 80)));
+    addDefaultItem("LARGE_MANA_POTION", "큰 마나 물약", "MP를 80 회복합니다", "CONSUMABLE", 140, ItemRarity.UNCOMMON, true,
+        List.of(new GameEffectData("HEAL_MP", 80)));
 
     logger.info("기본 아이템 생성 완료: {}개", itemDatabase.size());
   }
@@ -401,7 +403,8 @@ public class GameItemFactory {
   /**
    * 기본 아이템 추가 헬퍼 메서드
    */
-  private void addDefaultItem(String id, String name, String description, String type, int value, ItemRarity rarity, boolean stackable, List<GameEffectData> effects) {
+  private void addDefaultItem(String id, String name, String description, String type, int value, ItemRarity rarity, boolean stackable,
+      List<GameEffectData> effects) {
     GameItemData item = new GameItemData(id, name, description, type, value, rarity.name(), // ItemRarity enum을 String으로 변환
         stackable, effects);
     itemDatabase.put(id, item);
@@ -414,7 +417,8 @@ public class GameItemFactory {
   private void logLoadedItems() {
     logger.debug("=== 로드된 아이템 목록 ===");
     for (GameItemData item : itemDatabase.values()) {
-      logger.debug("아이템: {} (ID: {}, 타입: {}, 등급: {}, 효과: {}개)", item.getName(), item.getId(), item.getType(), item.getRarity(), item.getEffects().size());
+      logger.debug("아이템: {} (ID: {}, 타입: {}, 등급: {}, 효과: {}개)", item.getName(), item.getId(), item.getType(), item.getRarity(),
+          item.getEffects().size());
     }
     logger.debug("========================");
   }

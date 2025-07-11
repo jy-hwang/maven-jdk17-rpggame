@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.function.BiFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import config.BaseConstant;
 import model.effect.GainExpEffect;
 import model.effect.GameEffect;
 import model.effect.GameEffectType;
@@ -104,7 +105,7 @@ public class GameEffectFactory {
       return null;
     }
 
-    if (value < 0) {
+    if (value < BaseConstant.NUMBER_ZERO) {
       logger.warn("효과 값이 음수: {} (값: {})", typeStr, value);
       return null;
     }
@@ -149,7 +150,7 @@ public class GameEffectFactory {
       throw new IllegalArgumentException("효과 타입이 null입니다");
     }
 
-    if (value < 0) {
+    if (value < BaseConstant.NUMBER_ZERO) {
       throw new IllegalArgumentException("효과 값이 음수입니다: " + value);
     }
 
@@ -260,12 +261,12 @@ public class GameEffectFactory {
   public static GameEffect createRandomEffect() {
     List<GameEffectType> implementedTypes = new ArrayList<>(getImplementedEffectTypes());
     if (implementedTypes.isEmpty()) {
-      return createHealHpEffect(50); // 기본값
+      return createHealHpEffect(BaseConstant.NUMBER_FIFTY); // 기본값
     }
 
     Random random = new Random();
     GameEffectType randomType = implementedTypes.get(random.nextInt(implementedTypes.size()));
-    int randomValue = 20 + random.nextInt(81); // 20-100
+    int randomValue = BaseConstant.NUMBER_TWENTY + random.nextInt(BaseConstant.NUMBER_EIGHTY_ONE); // 20-100
 
     return createSimpleEffect(randomType, randomValue);
   }
@@ -274,10 +275,11 @@ public class GameEffectFactory {
    * 레벨에 맞는 랜덤 효과 생성
    */
   public static GameEffect createRandomEffectForLevel(int level) {
-    List<GameEffectType> availableTypes = getImplementedEffectTypes().stream().filter(type -> level >= type.getMinimumLevel()).collect(java.util.stream.Collectors.toList());
+    List<GameEffectType> availableTypes =
+        getImplementedEffectTypes().stream().filter(type -> level >= type.getMinimumLevel()).collect(java.util.stream.Collectors.toList());
 
     if (availableTypes.isEmpty()) {
-      return createHealHpEffect(level * 10); // 기본값
+      return createHealHpEffect(level * BaseConstant.NUMBER_TEN); // 기본값
     }
 
     Random random = new Random();
@@ -285,10 +287,10 @@ public class GameEffectFactory {
 
     // 레벨에 따른 효과 강도 조정
     int baseValue = switch (randomType) {
-      case HEAL_HP, HEAL_MP -> 30 + (level * 5);
-      case HEAL_HP_PERCENT, HEAL_MP_PERCENT -> Math.min(50, 10 + (level * 2));
-      case GAIN_EXP -> 50 + (level * 10);
-      default -> 50;
+      case HEAL_HP, HEAL_MP -> BaseConstant.NUMBER_THIRTY + (level * BaseConstant.NUMBER_FIVE);
+      case HEAL_HP_PERCENT, HEAL_MP_PERCENT -> Math.min(BaseConstant.NUMBER_FIFTY, BaseConstant.NUMBER_TEN + (level * BaseConstant.NUMBER_TWO));
+      case GAIN_EXP -> BaseConstant.NUMBER_FIFTY + (level * BaseConstant.NUMBER_TEN);
+      default -> BaseConstant.NUMBER_FIFTY;
     };
 
     return createSimpleEffect(randomType, baseValue);
@@ -307,7 +309,7 @@ public class GameEffectFactory {
     // 기본 검증
     if (typeStr == null || typeStr.trim().isEmpty())
       return false;
-    if (value < 0)
+    if (value < BaseConstant.NUMBER_ZERO)
       return false;
 
     GameEffectType effectType = GameEffectType.fromString(typeStr);
@@ -316,8 +318,8 @@ public class GameEffectFactory {
 
     // 타입별 특수 검증
     return switch (effectType) {
-      case HEAL_HP_PERCENT, HEAL_MP_PERCENT -> value > 0 && value <= 100;
-      default -> value >= 0;
+      case HEAL_HP_PERCENT, HEAL_MP_PERCENT -> value > BaseConstant.NUMBER_ZERO && value <= BaseConstant.NUMBER_HUNDRED;
+      default -> value >= BaseConstant.NUMBER_ZERO;
     };
   }
 
@@ -332,7 +334,7 @@ public class GameEffectFactory {
       return errors;
     }
 
-    for (int i = 0; i < effectDataList.size(); i++) {
+    for (int i = BaseConstant.NUMBER_ZERO; i < effectDataList.size(); i++) {
       GameEffectData effectData = effectDataList.get(i);
       if (!validateEffect(effectData)) {
         errors.add(String.format("효과 %d: 잘못된 데이터 (타입: %s, 값: %d)", i + 1, effectData.getType(), effectData.getValue()));
@@ -356,7 +358,8 @@ public class GameEffectFactory {
     System.out.println("미구현 효과: " + (allTypes.size() - implementedTypes.size()) + "개");
 
     System.out.println("\n✅ 구현된 효과:");
-    implementedTypes.stream().sorted(Comparator.comparing(GameEffectType::getCategory)).forEach(type -> System.out.printf("   %s %s%n", type.getEmoji(), type.getDisplayName()));
+    implementedTypes.stream().sorted(Comparator.comparing(GameEffectType::getCategory))
+        .forEach(type -> System.out.printf("   %s %s%n", type.getEmoji(), type.getDisplayName()));
 
     System.out.println("\n🚧 미구현 효과:");
     allTypes.stream().filter(type -> !implementedTypes.contains(type)).sorted(Comparator.comparing(GameEffectType::getCategory))
@@ -374,6 +377,7 @@ public class GameEffectFactory {
       return;
     }
 
-    System.out.printf("DEBUG: 효과 - 타입: %s, 값: %d, 퍼센트: %b, 설명: %s%n", effect.getType().getDisplayName(), effect.getValue(), effect.isPercentage(), effect.getDescription());
+    System.out.printf("DEBUG: 효과 - 타입: %s, 값: %d, 퍼센트: %b, 설명: %s%n", effect.getType().getDisplayName(), effect.getValue(), effect.isPercentage(),
+        effect.getDescription());
   }
 }

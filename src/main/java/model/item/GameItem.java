@@ -10,8 +10,12 @@ import model.GameCharacter;
  * 게임 아이템의 기본 클래스
  */
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
-@JsonSubTypes({@JsonSubTypes.Type(value = GameEquipment.class, name = "equipment")
-, @JsonSubTypes.Type(value = GameConsumable.class, name = "GameConsumable")})
+@JsonSubTypes({
+//@formatter:off
+  @JsonSubTypes.Type(value = GameEquipment.class, name = "equipment")
+, @JsonSubTypes.Type(value = GameConsumable.class, name = "GameConsumable"
+//@formatter:on
+    )})
 public abstract class GameItem {
   protected String name;
   protected String description;
@@ -20,7 +24,14 @@ public abstract class GameItem {
 
 
   @JsonCreator
-  public GameItem(@JsonProperty("name") String name, @JsonProperty("description") String description, @JsonProperty("value") int value, @JsonProperty("rarity") ItemRarity rarity) {
+  public GameItem(
+//@formatter:off
+  @JsonProperty("name") String name
+, @JsonProperty("description") String description
+, @JsonProperty("value") int value
+, @JsonProperty("rarity") ItemRarity rarity
+//@formatter:off
+      ) {
     this.name = name;
     this.description = description;
     this.value = value;

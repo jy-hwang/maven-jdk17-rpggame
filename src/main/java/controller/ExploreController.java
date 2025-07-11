@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Random;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import config.BaseConstant;
 import model.GameCharacter;
 import model.Monster;
 import model.item.GameConsumable;
@@ -26,11 +27,8 @@ public class ExploreController {
   private final InventoryController inventoryController;
   private final GameDataService.GameState gameState;
 
-  // 탐험 관련 상수
-  private static final int RANDOM_EVENT_CHANCE = 15; // 15% 확률로 특별 이벤트
-  private static final int ITEM_DROP_CHANCE = 20; // 20% 확률로 아이템 드롭
-
-  public ExploreController(BattleController battleController, QuestController questController, InventoryController inventoryController, GameDataService.GameState gameState) {
+  public ExploreController(BattleController battleController, QuestController questController, InventoryController inventoryController,
+      GameDataService.GameState gameState) {
     this.random = new Random();
     this.battleController = battleController;
     this.questController = questController;
@@ -71,7 +69,7 @@ public class ExploreController {
       updatePlayerLocation(player);
 
       // 랜덤 이벤트 또는 몬스터 조우
-      if (random.nextInt(100) < RANDOM_EVENT_CHANCE) {
+      if (random.nextInt(100) < BaseConstant.RANDOM_EVENT_CHANCE) {
         return handleRandomEvent(player);
       } else {
         return handleMonsterEncounter(player);
@@ -273,7 +271,7 @@ public class ExploreController {
         questController.updateKillProgress(monster.getName());
 
         // 아이템 드롭 처리
-        if (random.nextInt(100) < ITEM_DROP_CHANCE) {
+        if (random.nextInt(100) < BaseConstant.ITEM_DROP_CHANCE) {
           GameItem droppedItem = generateRandomDropItem();
           if (inventoryController.addItem(player, droppedItem, 1)) {
             System.out.println("🎁 " + droppedItem.getName() + "을(를) 획득했습니다!");
@@ -355,7 +353,8 @@ public class ExploreController {
    * 랜덤 드롭 아이템을 생성합니다.
    */
   private GameItem generateRandomDropItem() {
-    GameItem[] dropItems = {new GameConsumable("체력 물약", "HP를 50 회복합니다", 20, ItemRarity.COMMON, 50, 0, 0, true), new GameConsumable("마나 물약", "마나를 30 회복합니다", 25, ItemRarity.COMMON, 0, 30, 0, true),
+    GameItem[] dropItems = {new GameConsumable("체력 물약", "HP를 50 회복합니다", 20, ItemRarity.COMMON, 50, 0, 0, true),
+        new GameConsumable("마나 물약", "마나를 30 회복합니다", 25, ItemRarity.COMMON, 0, 30, 0, true),
         new GameEquipment("낡은 검", "사용감이 있지만 쓸만한 검", 40, ItemRarity.COMMON, GameEquipment.EquipmentType.WEAPON, 5, 0, 0),
         new GameEquipment("가죽 갑옷", "기본적인 가죽 갑옷", 60, ItemRarity.COMMON, GameEquipment.EquipmentType.ARMOR, 0, 4, 5)};
 

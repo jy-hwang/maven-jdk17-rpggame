@@ -108,7 +108,8 @@ public class QuestManager {
     goblinObjectives.put("kill_고블린", 3);
 
     // 철검 보상 (GameEffectFactory 기반 또는 직접 생성)
-    GameEquipment ironSword = createSpecialEquipment("마법 철검", "슬라임을 처치하며 단련된 마법의 철검", 100, ItemRarity.UNCOMMON, GameEquipment.EquipmentType.WEAPON, 15, 0, 0);
+    GameEquipment ironSword =
+        createSpecialEquipment("마법 철검", "슬라임을 처치하며 단련된 마법의 철검", 100, ItemRarity.UNCOMMON, GameEquipment.EquipmentType.WEAPON, 15, 0, 0);
 
     QuestReward goblinReward = new QuestReward(100, 200, ironSword, 1);
 
@@ -125,7 +126,8 @@ public class QuestManager {
     orcObjectives.put("kill_오크", 2);
 
     // 판금 갑옷 보상
-    GameEquipment plateArmor = createSpecialEquipment("용사의 판금 갑옷", "오크와 싸우기 위해 특별히 제작된 갑옷", 200, ItemRarity.RARE, GameEquipment.EquipmentType.ARMOR, 0, 20, 50);
+    GameEquipment plateArmor =
+        createSpecialEquipment("용사의 판금 갑옷", "오크와 싸우기 위해 특별히 제작된 갑옷", 200, ItemRarity.RARE, GameEquipment.EquipmentType.ARMOR, 0, 20, 50);
 
     QuestReward orcReward = new QuestReward(200, 500, plateArmor, 1);
 
@@ -142,7 +144,8 @@ public class QuestManager {
     dragonObjectives.put("kill_드래곤", 1);
 
     // 전설의 드래곤 반지
-    GameEquipment legendaryRing = createSpecialEquipment("드래곤 하트 링", "드래곤의 심장으로 만든 전설적인 반지", 1000, ItemRarity.LEGENDARY, GameEquipment.EquipmentType.ACCESSORY, 30, 15, 100);
+    GameEquipment legendaryRing =
+        createSpecialEquipment("드래곤 하트 링", "드래곤의 심장으로 만든 전설적인 반지", 1000, ItemRarity.LEGENDARY, GameEquipment.EquipmentType.ACCESSORY, 30, 15, 100);
 
     QuestReward dragonReward = new QuestReward(1000, 2000, legendaryRing, 1);
 
@@ -206,13 +209,15 @@ public class QuestManager {
   /**
    * 특별한 장비 생성
    */
-  private GameEquipment createSpecialEquipment(String name, String description, int value, ItemRarity rarity, GameEquipment.EquipmentType type, int attackBonus, int defenseBonus, int hpBonus) {
+  private GameEquipment createSpecialEquipment(String name, String description, int value, ItemRarity rarity, GameEquipment.EquipmentType type,
+      int attackBonus, int defenseBonus, int hpBonus) {
     try {
       return new GameEquipment(name, description, value, rarity, type, attackBonus, defenseBonus, hpBonus);
     } catch (Exception e) {
       logger.error("특별 장비 생성 실패: {}", name, e);
       // 기본 장비 반환
-      return new GameEquipment("기본 " + name, "기본 장비", value / 2, ItemRarity.COMMON, type, Math.max(1, attackBonus / 2), Math.max(1, defenseBonus / 2), Math.max(1, hpBonus / 2));
+      return new GameEquipment("기본 " + name, "기본 장비", value / 2, ItemRarity.COMMON, type, Math.max(1, attackBonus / 2), Math.max(1, defenseBonus / 2),
+          Math.max(1, hpBonus / 2));
     }
   }
 
@@ -293,7 +298,8 @@ public class QuestManager {
    * 캐릭터가 수락할 수 있는 퀘스트 목록을 반환합니다.
    */
   public List<Quest> getAvailableQuests(GameCharacter character) {
-    return availableQuests.stream().filter(quest -> quest.getRequiredLevel() <= character.getLevel()).filter(quest -> quest.getStatus() == Quest.QuestStatus.AVAILABLE).toList();
+    return availableQuests.stream().filter(quest -> quest.getRequiredLevel() <= character.getLevel())
+        .filter(quest -> quest.getStatus() == Quest.QuestStatus.AVAILABLE).toList();
   }
 
   /**
@@ -414,7 +420,8 @@ public class QuestManager {
 
     QuestReward reward = new QuestReward(300, 200, expPotion, 2);
 
-    Quest advancedQuest = new Quest("quest_advanced_collection", "고급 연금술사", "다양한 물약을 수집하여 연금술 실력을 증명하세요.", Quest.QuestType.COLLECT, 10, objectives, reward);
+    Quest advancedQuest =
+        new Quest("quest_advanced_collection", "고급 연금술사", "다양한 물약을 수집하여 연금술 실력을 증명하세요.", Quest.QuestType.COLLECT, 10, objectives, reward);
 
     availableQuests.add(advancedQuest);
     logger.info("고급 수집 퀘스트 생성: {}", advancedQuest.getTitle());
@@ -428,7 +435,8 @@ public class QuestManager {
     objectives.put("kill_트롤", 1);
     objectives.put("kill_스켈레톤", 3);
 
-    GameEquipment eliteWeapon = createSpecialEquipment("엘리트 킬러", "엘리트 몬스터를 사냥하기 위한 특수 무기", 400, ItemRarity.EPIC, GameEquipment.EquipmentType.WEAPON, 25, 5, 20);
+    GameEquipment eliteWeapon =
+        createSpecialEquipment("엘리트 킬러", "엘리트 몬스터를 사냥하기 위한 특수 무기", 400, ItemRarity.EPIC, GameEquipment.EquipmentType.WEAPON, 25, 5, 20);
 
     QuestReward reward = new QuestReward(500, 800, eliteWeapon, 1);
 
@@ -450,7 +458,8 @@ public class QuestManager {
     QuestReward reward = new QuestReward(1000, 2000);
 
     // 여러 아이템 보상
-    GameEquipment ultimateWeapon = createSpecialEquipment("드래곤 슬레이어", "궁극의 드래곤 처치용 무기", 2000, ItemRarity.LEGENDARY, GameEquipment.EquipmentType.WEAPON, 50, 10, 50);
+    GameEquipment ultimateWeapon =
+        createSpecialEquipment("드래곤 슬레이어", "궁극의 드래곤 처치용 무기", 2000, ItemRarity.LEGENDARY, GameEquipment.EquipmentType.WEAPON, 50, 10, 50);
 
     reward.addItemReward(ultimateWeapon, 1);
 
@@ -677,7 +686,8 @@ public class QuestManager {
 
     QuestReward reward = new QuestReward(100, 150, dailyPotion, 1);
 
-    Quest dailyCollectionQuest = new Quest("daily_collection_" + System.currentTimeMillis(), "일일 수집 - 물약", "체력 물약 3개를 수집하세요.", Quest.QuestType.COLLECT, 10, objectives, reward);
+    Quest dailyCollectionQuest = new Quest("daily_collection_" + System.currentTimeMillis(), "일일 수집 - 물약", "체력 물약 3개를 수집하세요.",
+        Quest.QuestType.COLLECT, 10, objectives, reward);
 
     availableQuests.add(dailyCollectionQuest);
     logger.info("일일 수집 퀘스트 생성: {}", dailyCollectionQuest.getTitle());
@@ -827,7 +837,8 @@ public class QuestManager {
 
     @Override
     public String toString() {
-      return String.format("QuestStatistics{available=%d, active=%d, claimable=%d, claimed=%d, completion=%.1f%%}", availableCount, activeCount, claimableCount, claimedCount, getCompletionRate());
+      return String.format("QuestStatistics{available=%d, active=%d, claimable=%d, claimed=%d, completion=%.1f%%}", availableCount, activeCount,
+          claimableCount, claimedCount, getCompletionRate());
     }
   }
 }

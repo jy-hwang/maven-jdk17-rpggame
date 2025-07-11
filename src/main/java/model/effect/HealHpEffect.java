@@ -2,6 +2,7 @@ package model.effect;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import config.BaseConstant;
 import model.GameCharacter;
 
 /**
@@ -14,7 +15,7 @@ public class HealHpEffect implements GameEffect {
   private final boolean isPercentage;
 
   public HealHpEffect(int value, boolean isPercentage) {
-    this.value = Math.max(0, value);
+    this.value = Math.max(BaseConstant.NUMBER_ZERO, value);
     this.isPercentage = isPercentage;
     logger.debug("HealHpEffect 생성: {} {}", value, isPercentage ? "%" : "고정값");
   }
@@ -38,7 +39,7 @@ public class HealHpEffect implements GameEffect {
     target.heal(healAmount);
     int actualHealed = target.getHp() - oldHp;
 
-    if (actualHealed > 0) {
+    if (actualHealed > BaseConstant.NUMBER_ZERO) {
       System.out.println(getApplyMessage(target, true));
       logger.info("{} HP 회복 적용: {} -> {} (+{})", target.getName(), oldHp, target.getHp(), actualHealed);
       return true;

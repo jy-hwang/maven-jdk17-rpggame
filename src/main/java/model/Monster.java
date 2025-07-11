@@ -2,6 +2,7 @@ package model;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import config.BaseConstant;
 
 /**
  * 게임 몬스터를 표현하는 클래스
@@ -32,24 +33,24 @@ public class Monster {
       throw new IllegalArgumentException("몬스터 이름은 비어있을 수 없습니다.");
     }
 
-    if (hp < 1) {
+    if (hp < BaseConstant.NUMBER_ONE) {
       logger.error("몬스터 HP가 유효하지 않음: {}", hp);
-      throw new IllegalArgumentException("몬스터 HP는 1 이상이어야 합니다.");
+      throw new IllegalArgumentException("몬스터 HP는 " + BaseConstant.NUMBER_ONE + " 이상이어야 합니다.");
     }
 
-    if (attack < 0) {
+    if (attack < BaseConstant.NUMBER_ZERO) {
       logger.error("몬스터 공격력이 유효하지 않음: {}", attack);
-      throw new IllegalArgumentException("몬스터 공격력은 0 이상이어야 합니다.");
+      throw new IllegalArgumentException("몬스터 공격력은 " + BaseConstant.NUMBER_ZERO + " 이상이어야 합니다.");
     }
 
-    if (expReward < 0) {
+    if (expReward < BaseConstant.NUMBER_ZERO) {
       logger.error("몬스터 경험치 보상이 유효하지 않음: {}", expReward);
-      throw new IllegalArgumentException("경험치 보상은 0 이상이어야 합니다.");
+      throw new IllegalArgumentException("경험치 보상은 " + BaseConstant.NUMBER_ZERO + " 이상이어야 합니다.");
     }
 
-    if (goldReward < 0) {
+    if (goldReward < BaseConstant.NUMBER_ZERO) {
       logger.error("몬스터 골드 보상이 유효하지 않음: {}", goldReward);
-      throw new IllegalArgumentException("골드 보상은 0 이상이어야 합니다.");
+      throw new IllegalArgumentException("골드 보상은 " + BaseConstant.NUMBER_ZERO + " 이상이어야 합니다.");
     }
 
     this.name = name.trim();
@@ -59,8 +60,7 @@ public class Monster {
     this.expReward = expReward;
     this.goldReward = goldReward;
 
-    logger.debug("몬스터 생성: {} (HP: {}, 공격력: {}, 경험치: {}, 골드: {})", this.name, hp, attack, expReward,
-        goldReward);
+    logger.debug("몬스터 생성: {} (HP: {}, 공격력: {}, 경험치: {}, 골드: {})", this.name, hp, attack, expReward, goldReward);
   }
 
   /**
@@ -70,15 +70,15 @@ public class Monster {
    * @throws IllegalArgumentException 음수 데미지인 경우
    */
   public void takeDamage(int damage) {
-    if (damage < 0) {
+    if (damage < BaseConstant.NUMBER_ZERO) {
       logger.warn("음수 데미지 시도: {}", damage);
-      throw new IllegalArgumentException("데미지는 0 이상이어야 합니다.");
+      throw new IllegalArgumentException("데미지는 " + BaseConstant.NUMBER_ZERO + " 이상이어야 합니다.");
     }
 
     int oldHp = this.hp;
     this.hp -= damage;
-    if (this.hp < 0) {
-      this.hp = 0;
+    if (this.hp < BaseConstant.NUMBER_ZERO) {
+      this.hp = BaseConstant.NUMBER_ZERO;
     }
 
     logger.debug("{} 데미지 받음: {} -> {} (-{})", name, oldHp, this.hp, damage);
@@ -94,7 +94,7 @@ public class Monster {
    * @return 생존 시 true
    */
   public boolean isAlive() {
-    return hp > 0;
+    return hp > BaseConstant.NUMBER_ZERO;
   }
 
   /**
@@ -118,8 +118,8 @@ public class Monster {
    * @return 체력 비율 (0.0 ~ 1.0)
    */
   public double getHealthRatio() {
-    if (maxHp <= 0)
-      return 0.0;
+    if (maxHp <= BaseConstant.NUMBER_ZERO)
+      return BaseConstant.NUMBER_ZERO_DOT_ZERO;
     return (double) hp / maxHp;
   }
 
@@ -129,7 +129,7 @@ public class Monster {
    * @return 체력이 30% 이하일 때 true
    */
   public boolean isCriticallyWounded() {
-    return getHealthRatio() <= 0.3 && isAlive();
+    return getHealthRatio() <= BaseConstant.MONSTER_CRITICAL && isAlive();
   }
 
   /**
@@ -137,8 +137,7 @@ public class Monster {
    */
   @Override
   public String toString() {
-    return String.format("Monster{name='%s', hp=%d/%d, attack=%d, expReward=%d, goldReward=%d}",
-        name, hp, maxHp, attack, expReward, goldReward);
+    return String.format("Monster{name='%s', hp=%d/%d, attack=%d, expReward=%d, goldReward=%d}", name, hp, maxHp, attack, expReward, goldReward);
   }
 
   /**
@@ -152,8 +151,8 @@ public class Monster {
       return false;
 
     Monster monster = (Monster) obj;
-    return maxHp == monster.maxHp && attack == monster.attack && expReward == monster.expReward
-        && goldReward == monster.goldReward && name.equals(monster.name);
+    return maxHp == monster.maxHp && attack == monster.attack && expReward == monster.expReward && goldReward == monster.goldReward
+        && name.equals(monster.name);
   }
 
   /**
@@ -162,10 +161,10 @@ public class Monster {
   @Override
   public int hashCode() {
     int result = name.hashCode();
-    result = 31 * result + maxHp;
-    result = 31 * result + attack;
-    result = 31 * result + expReward;
-    result = 31 * result + goldReward;
+    result = BaseConstant.NUMBER_THIRTY_ONE * result + maxHp;
+    result = BaseConstant.NUMBER_THIRTY_ONE * result + attack;
+    result = BaseConstant.NUMBER_THIRTY_ONE * result + expReward;
+    result = BaseConstant.NUMBER_THIRTY_ONE * result + goldReward;
     return result;
   }
 

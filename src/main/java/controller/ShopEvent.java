@@ -1,12 +1,21 @@
 package controller;
 
+import config.BaseConstant;
+
 /**
  * 상점 이벤트 타입을 정의하는 열거형
  */
 public enum ShopEvent {
-  DISCOUNT_SALE("할인 세일", "🏷️", "모든 아이템 20% 할인!", 0.8, 1.0), BONUS_SELL("고가 매입", "💰", "판매 시 30% 보너스!", 1.0, 1.3), FREE_POTION("무료 증정", "🎁", "체력 물약 구매 시 1개 추가 증정!", 1.0, 1.0), RARE_ITEMS("희귀 아이템",
-      "⭐", "특별한 아이템들이 입고되었습니다!", 1.0, 1.0), DOUBLE_DISCOUNT("대폭 할인", "💥", "모든 아이템 40% 할인!", 0.6,
-          1.0), LUCKY_DRAW("행운의 뽑기", "🎰", "구매 시 50% 확률로 골드 환급!", 1.0, 1.0), BULK_DISCOUNT("대량 할인", "📦", "3개 이상 구매 시 추가 10% 할인!", 1.0, 1.0), VIP_BONUS("VIP 혜택", "👑", "모든 거래에서 특별 혜택!", 0.85, 1.4);
+  //@formatter:off
+  DISCOUNT_SALE("할인 세일", "🏷️", "모든 아이템 20% 할인!", 0.8, 1.0),
+  BONUS_SELL("고가 매입", "💰", "판매 시 30% 보너스!", 1.0, 1.3),
+  FREE_POTION("무료 증정", "🎁", "체력 물약 구매 시 1개 추가 증정!", 1.0, 1.0),
+  RARE_ITEMS("희귀 아이템","⭐", "특별한 아이템들이 입고되었습니다!", 1.0, 1.0),
+  DOUBLE_DISCOUNT("대폭 할인", "💥", "모든 아이템 40% 할인!", 0.6, 1.0),
+  LUCKY_DRAW("행운의 뽑기", "🎰", "구매 시 50% 확률로 골드 환급!", 1.0, 1.0),
+  BULK_DISCOUNT("대량 할인", "📦", "3개 이상 구매 시 추가 10% 할인!", 1.0, 1.0),
+  VIP_BONUS("VIP 혜택", "👑", "모든 거래에서 특별 혜택!", 0.85, 1.4);
+  //@formatter:on
 
   private final String name;
   private final String icon;
@@ -197,11 +206,11 @@ public enum ShopEvent {
    * 플레이어 레벨에 따른 이벤트를 선택합니다.
    */
   public static ShopEvent getEventForLevel(int playerLevel) {
-    if (playerLevel <= 3) {
+    if (playerLevel <= BaseConstant.BEGINNER_LEVEL) {
       // 초보자용 이벤트
       ShopEvent[] beginnerEvents = {DISCOUNT_SALE, FREE_POTION, BULK_DISCOUNT};
       return beginnerEvents[(int) (Math.random() * beginnerEvents.length)];
-    } else if (playerLevel <= 7) {
+    } else if (playerLevel <= BaseConstant.INTERMEDIATE_LEVEL) {
       // 중급자용 이벤트
       ShopEvent[] intermediateEvents = {DISCOUNT_SALE, BONUS_SELL, LUCKY_DRAW, RARE_ITEMS};
       return intermediateEvents[(int) (Math.random() * intermediateEvents.length)];

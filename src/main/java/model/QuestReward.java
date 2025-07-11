@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import config.BaseConstant;
 import model.item.GameItem;
 
 /**
@@ -16,13 +17,19 @@ public class QuestReward {
 
   // 기본 생성자
   public QuestReward() {
-    this.expReward = 0;
-    this.goldReward = 0;
+    this.expReward = BaseConstant.NUMBER_ZERO;
+    this.goldReward = BaseConstant.NUMBER_ZERO;
     this.itemRewards = new HashMap<>();
   }
 
   @JsonCreator
-  public QuestReward(@JsonProperty("expReward") int expReward, @JsonProperty("goldReward") int goldReward, @JsonProperty("itemRewards") Map<GameItem, Integer> itemRewards) {
+  public QuestReward(
+//@formatter:off
+  @JsonProperty("expReward") int expReward
+, @JsonProperty("goldReward") int goldReward
+, @JsonProperty("itemRewards") Map<GameItem, Integer> itemRewards
+//@formatter:on
+  ) {
     this.expReward = expReward;
     this.goldReward = goldReward;
     this.itemRewards = itemRewards != null ? new HashMap<>(itemRewards) : new HashMap<>();
@@ -37,7 +44,7 @@ public class QuestReward {
     this.expReward = expReward;
     this.goldReward = goldReward;
     this.itemRewards = new HashMap<>();
-    if (item != null && itemQuantity > 0) {
+    if (item != null && itemQuantity > BaseConstant.NUMBER_ZERO) {
       this.itemRewards.put(item, itemQuantity);
     }
   }
@@ -46,8 +53,8 @@ public class QuestReward {
    * 아이템 보상을 추가합니다.
    */
   public void addItemReward(GameItem item, int quantity) {
-    if (item != null && quantity > 0) {
-      itemRewards.put(item, itemRewards.getOrDefault(item, 0) + quantity);
+    if (item != null && quantity > BaseConstant.NUMBER_ZERO) {
+      itemRewards.put(item, itemRewards.getOrDefault(item, BaseConstant.NUMBER_ZERO) + quantity);
     }
   }
 
@@ -55,7 +62,7 @@ public class QuestReward {
    * 보상이 비어있는지 확인합니다.
    */
   public boolean isEmpty() {
-    return expReward <= 0 && goldReward <= 0 && itemRewards.isEmpty();
+    return expReward <= BaseConstant.NUMBER_ZERO && goldReward <= BaseConstant.NUMBER_ZERO && itemRewards.isEmpty();
   }
 
   /**
@@ -64,25 +71,25 @@ public class QuestReward {
   public String getRewardDescription() {
     StringBuilder desc = new StringBuilder();
 
-    if (expReward > 0) {
+    if (expReward > BaseConstant.NUMBER_ZERO) {
       desc.append("경험치 ").append(expReward);
     }
 
-    if (goldReward > 0) {
-      if (desc.length() > 0)
+    if (goldReward > BaseConstant.NUMBER_ZERO) {
+      if (desc.length() > BaseConstant.NUMBER_ZERO)
         desc.append(", ");
       desc.append("골드 ").append(goldReward);
     }
 
     if (!itemRewards.isEmpty()) {
       for (Map.Entry<GameItem, Integer> entry : itemRewards.entrySet()) {
-        if (desc.length() > 0)
+        if (desc.length() > BaseConstant.NUMBER_ZERO)
           desc.append(", ");
         desc.append(entry.getKey().getName()).append(" x").append(entry.getValue());
       }
     }
 
-    return desc.length() > 0 ? desc.toString() : "보상 없음";
+    return desc.length() > BaseConstant.NUMBER_ZERO ? desc.toString() : "보상 없음";
   }
 
   // Getters and Setters
@@ -114,7 +121,7 @@ public class QuestReward {
    * 특정 아이템의 보상 수량을 반환합니다.
    */
   public int getItemQuantity(GameItem item) {
-    return itemRewards.getOrDefault(item, 0);
+    return itemRewards.getOrDefault(item, BaseConstant.NUMBER_ZERO);
   }
 
   /**
@@ -129,6 +136,6 @@ public class QuestReward {
    */
   public int getFirstItemQuantity() {
     GameItem firstItem = getFirstItem();
-    return firstItem != null ? itemRewards.get(firstItem) : 0;
+    return firstItem != null ? itemRewards.get(firstItem) : BaseConstant.NUMBER_ZERO;
   }
 }

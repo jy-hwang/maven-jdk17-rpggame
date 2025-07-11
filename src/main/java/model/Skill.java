@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import config.BaseConstant;
 
 /**
  * 캐릭터 스킬을 나타내는 클래스
@@ -36,11 +37,19 @@ public class Skill {
   }
 
   @JsonCreator
-  public Skill(@JsonProperty("name") String name, @JsonProperty("description") String description,
-      @JsonProperty("type") SkillType type, @JsonProperty("requiredLevel") int requiredLevel,
-      @JsonProperty("manaCost") int manaCost, @JsonProperty("cooldown") int cooldown,
-      @JsonProperty("damageMultiplier") double damageMultiplier,
-      @JsonProperty("healAmount") int healAmount, @JsonProperty("buffDuration") int buffDuration) {
+  public Skill(
+//@formatter:off
+  @JsonProperty("name") String name
+, @JsonProperty("description") String description
+, @JsonProperty("type") SkillType type
+, @JsonProperty("requiredLevel") int requiredLevel
+, @JsonProperty("manaCost") int manaCost
+, @JsonProperty("cooldown") int cooldown
+, @JsonProperty("damageMultiplier") double damageMultiplier
+, @JsonProperty("healAmount") int healAmount
+, @JsonProperty("buffDuration") int buffDuration
+//@formatter:off
+      ) {
     this.name = name;
     this.description = description;
     this.type = type;
@@ -76,7 +85,7 @@ public class Skill {
       case DEBUFF:
         return useDebuffSkill(target);
       default:
-        return new SkillResult(false, "알 수 없는 스킬 타입입니다.", 0);
+        return new SkillResult(false, "알 수 없는 스킬 타입입니다.", BaseConstant.NUMBER_ZERO);
     }
   }
 
@@ -84,8 +93,7 @@ public class Skill {
     int damage = (int) (caster.getAttack() * damageMultiplier);
     target.takeDamage(damage);
 
-    String message = String.format("%s이(가) %s을(를) 사용하여 %s에게 %d의 데미지를 입혔습니다!", caster.getName(),
-        name, target.getName(), damage);
+    String message = String.format("%s이(가) %s을(를) 사용하여 %s에게 %d의 데미지를 입혔습니다!", caster.getName(), name, target.getName(), damage);
 
     logger.debug("공격 스킬 사용: {} -> {} (데미지: {})", name, target.getName(), damage);
     return new SkillResult(true, message, damage);
@@ -96,8 +104,7 @@ public class Skill {
     caster.heal(healAmount);
     int actualHeal = caster.getHp() - oldHp;
 
-    String message =
-        String.format("%s이(가) %s을(를) 사용하여 %d HP를 회복했습니다!", caster.getName(), name, actualHeal);
+    String message = String.format("%s이(가) %s을(를) 사용하여 %d HP를 회복했습니다!", caster.getName(), name, actualHeal);
 
     logger.debug("힐 스킬 사용: {} (회복량: {})", name, actualHeal);
     return new SkillResult(true, message, actualHeal);
@@ -108,14 +115,14 @@ public class Skill {
     String message = String.format("%s이(가) %s을(를) 사용했습니다!", caster.getName(), name);
 
     logger.debug("버프 스킬 사용: {}", name);
-    return new SkillResult(true, message, 0);
+    return new SkillResult(true, message, BaseConstant.NUMBER_ZERO);
   }
 
   private SkillResult useDebuffSkill(Monster target) {
     String message = String.format("%s이(가) %s의 영향을 받았습니다!", target.getName(), name);
 
     logger.debug("디버프 스킬 사용: {} -> {}", name, target.getName());
-    return new SkillResult(true, message, 0);
+    return new SkillResult(true, message, BaseConstant.NUMBER_ZERO);
   }
 
   public String getSkillInfo() {
