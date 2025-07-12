@@ -57,8 +57,8 @@ public class InputValidator {
         }
 
         // 특수문자 제한 (선택사항)
-        if (!input.matches("^[가-힣a-zA-Z0-9\\s]+$")) {
-          System.out.println("한글, 영문, 숫자, 공백만 사용 가능합니다.");
+        if (!input.matches("^[가-힣a-zA-Z0-9\\s_-]+$")) {
+          System.out.println("한글, 영문, 숫자, 공백, 언더스코어(_), 하이픈(-)만 사용 가능합니다.");
           logger.debug("유효하지 않은 문자 포함: {}", input);
           continue;
         }
