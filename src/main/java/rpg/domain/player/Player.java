@@ -69,7 +69,7 @@ public class Player {
   @JsonCreator
   public Player(
 //@formatter:off
-@JsonProperty("name") String name
+  @JsonProperty("name") String name
 , @JsonProperty("level") int level
 , @JsonProperty("hp") int hp
 , @JsonProperty("maxHp") int maxHp

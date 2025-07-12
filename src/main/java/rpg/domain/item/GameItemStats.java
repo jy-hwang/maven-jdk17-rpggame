@@ -14,7 +14,7 @@ public class GameItemStats {
   private final int cooldown;
   private final boolean combatUsable;
 
-  @JsonCreator  
+  @JsonCreator
   public GameItemStats(
 //@formatter:off
   @JsonProperty("attackBonus") Integer attackBonus

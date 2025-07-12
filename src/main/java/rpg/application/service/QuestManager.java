@@ -91,22 +91,22 @@ public class QuestManager {
    * 기본 퀘스트만 초기화 (중복 방지용)
    */
   private void initializeDefaultQuestsOnly() {
-      logger.info("기본 퀘스트만 초기화 중...");
-      
-      try {
-          // 최소한의 기본 퀘스트만 생성
-          createSlimeQuest();
-          createLevelQuest();
-          
-          logger.info("기본 퀘스트 초기화 완료: {}개 퀘스트", availableQuests.size());
-          
-      } catch (Exception e) {
-          logger.error("기본 퀘스트 초기화 실패", e);
-          createFallbackQuests();
-      }
+    logger.info("기본 퀘스트만 초기화 중...");
+
+    try {
+      // 최소한의 기본 퀘스트만 생성
+      createSlimeQuest();
+      createLevelQuest();
+
+      logger.info("기본 퀘스트 초기화 완료: {}개 퀘스트", availableQuests.size());
+
+    } catch (Exception e) {
+      logger.error("기본 퀘스트 초기화 실패", e);
+      createFallbackQuests();
+    }
   }
 
-  
+
   /**
    * 슬라임 사냥 퀘스트 생성
    */
@@ -877,6 +877,36 @@ public class QuestManager {
     logger.debug("퀘스트 데이터 교체 완료: 사용가능 {}개, 활성 {}개, 완료 {}개", availableQuests.size(), activeQuests.size(), completedQuests.size());
   }
 
+  /**
+   * 로드용 퀘스트 추가 메서드들
+   */
+  public void addToActiveQuests(Quest quest) {
+    if (quest != null && !activeQuests.contains(quest)) {
+      activeQuests.add(quest);
+    }
+  }
+
+  public void addToCompletedQuests(Quest quest) {
+    if (quest != null && !completedQuests.contains(quest)) {
+      completedQuests.add(quest);
+    }
+  }
+
+  public void clearAllQuests() {
+    availableQuests.clear();
+    activeQuests.clear();
+    completedQuests.clear();
+  }
+
+  /**
+   * 퀘스트 상태 설정 (로드용)
+   */
+  public void setQuestProgress(String questId, Map<String, Integer> progress) {
+    Quest quest = findQuestById(questId, activeQuests);
+    if (quest != null) {
+      quest.setCurrentProgress(progress);
+    }
+  }
 
   // ==================== Getters ====================
 

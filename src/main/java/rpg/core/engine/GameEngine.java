@@ -18,6 +18,7 @@ import rpg.domain.skill.Skill;
 import rpg.infrastructure.data.loader.ItemDataLoader;
 import rpg.infrastructure.data.loader.MonsterDataLoader;
 import rpg.infrastructure.persistence.GameDataRepository;
+import rpg.infrastructure.persistence.SaveSlotInfo;
 import rpg.presentation.controller.InventoryController;
 import rpg.presentation.controller.QuestController;
 import rpg.presentation.controller.ShopController;
@@ -31,7 +32,7 @@ public class GameEngine {
 
   // 게임 상태
   private Player player;
-  private GameDataRepository.GameState gameState;
+  private GameState gameState;
   private boolean gameRunning;
   private boolean inGameLoop;
   private long gameStartTime;
@@ -47,7 +48,7 @@ public class GameEngine {
   public GameEngine() {
     this.gameRunning = true;
     this.inGameLoop = false;
-    this.gameState = new GameDataRepository.GameState();
+    this.gameState = new GameState();
     this.gameStartTime = System.currentTimeMillis();
     this.currentSaveSlot = 0;
 
@@ -142,7 +143,7 @@ public class GameEngine {
    */
   private void showSaveFileInfo() {
     var saveSlots = GameDataRepository.getAllSaveSlots();
-    long occupiedSlots = saveSlots.stream().filter(GameDataRepository.SaveSlotInfo::isOccupied).count();
+    long occupiedSlots = saveSlots.stream().filter(SaveSlotInfo::isOccupied).count();
 
     if (occupiedSlots > 0) {
       System.out.println("💾 저장된 게임: " + occupiedSlots + "개");
@@ -160,7 +161,7 @@ public class GameEngine {
       player = new Player(name);
 
       // 게임 상태 초기화
-      gameState = new GameDataRepository.GameState();
+      gameState = new GameState();
       gameStartTime = System.currentTimeMillis();
       currentSaveSlot = 0;
 

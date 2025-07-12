@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rpg.application.service.QuestManager;
 import rpg.application.validator.InputValidator;
+import rpg.core.engine.GameState;
 import rpg.domain.item.GameConsumable;
 import rpg.domain.item.GameEquipment;
 import rpg.domain.item.GameItem;
@@ -12,8 +13,6 @@ import rpg.domain.item.ItemRarity;
 import rpg.domain.monster.Monster;
 import rpg.domain.player.Player;
 import rpg.domain.skill.Skill;
-import rpg.infrastructure.persistence.GameDataRepository;
-import rpg.shared.constant.BaseConstant;
 import rpg.shared.constant.BattleConstants;
 
 /**
@@ -24,9 +23,9 @@ public class BattleEngine {
 
   private final Random random;
   private final QuestManager questManager;
-  private final GameDataRepository.GameState gameState;
+  private final GameState gameState;
 
-  public BattleEngine(QuestManager questManager, GameDataRepository.GameState gameState) {
+  public BattleEngine(QuestManager questManager, GameState gameState) {
     this.random = new Random();
     this.questManager = questManager;
     this.gameState = gameState;

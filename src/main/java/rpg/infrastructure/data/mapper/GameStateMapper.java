@@ -1,10 +1,10 @@
 package rpg.infrastructure.data.mapper;
 
-import rpg.infrastructure.persistence.GameDataRepository;
+import rpg.core.engine.GameState;
 import rpg.shared.dto.save.GameStateDto;
 
 public class GameStateMapper {
-  public static GameStateDto toDto(GameDataRepository.GameState gameState) {
+  public static GameStateDto toDto(GameState gameState) {
     GameStateDto dto = new GameStateDto();
 
     // setter 사용으로 변경
@@ -16,8 +16,8 @@ public class GameStateMapper {
     return dto;
   }
 
-  public static GameDataRepository.GameState fromDto(GameStateDto dto) {
-    GameDataRepository.GameState gameState = new GameDataRepository.GameState();
+  public static GameState fromDto(GameStateDto dto) {
+    GameState gameState = new GameState();
     gameState.setTotalPlayTime(dto.getTotalPlayTime());
     gameState.setMonstersKilled(dto.getMonstersKilled());
     gameState.setQuestsCompleted(dto.getQuestsCompleted());

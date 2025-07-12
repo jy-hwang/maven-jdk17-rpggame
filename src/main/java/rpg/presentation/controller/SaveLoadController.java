@@ -3,6 +3,7 @@ package rpg.presentation.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rpg.application.validator.InputValidator;
+import rpg.core.engine.GameState;
 import rpg.domain.player.Player;
 import rpg.infrastructure.persistence.GameDataRepository;
 
@@ -14,7 +15,7 @@ public class SaveLoadController {
   /**
    * 게임을 저장합니다.
    */
-  public void saveGame(Player player, GameDataRepository.GameState gameState) {
+  public void saveGame(Player player, GameState gameState) {
     try {
       // 현재 슬롯이 있으면 그 슬롯에 저장, 없으면 슬롯 선택
       if (currentSaveSlot > 0) {
@@ -39,7 +40,7 @@ public class SaveLoadController {
   /**
    * 슬롯을 선택해서 저장합니다.
    */
-  public void chooseSlotAndSave(Player player, GameDataRepository.GameState gameState) {
+  public void chooseSlotAndSave(Player player, GameState gameState) {
     try {
       // 저장 슬롯 목록 표시
       GameDataRepository.displaySaveSlots();
@@ -114,7 +115,7 @@ public class SaveLoadController {
   /**
    * 저장 슬롯을 관리합니다.
    */
-  public void manageSaveSlots(Player currentPlayer, GameDataRepository.GameState currentGameState) {
+  public void manageSaveSlots(Player currentPlayer, GameState currentGameState) {
     while (true) {
       System.out.println("\n=== 저장 관리 ===");
       GameDataRepository.displaySaveSlots();
@@ -232,36 +233,4 @@ public class SaveLoadController {
     this.currentSaveSlot = currentSaveSlot;
   }
 
-  /**
-   * 로드 결과를 담는 클래스
-   */
-  public static class LoadResult {
-    private final boolean success;
-    private final Player character;
-    private final GameDataRepository.GameState gameState;
-    private final int slotNumber;
-
-    public LoadResult(boolean success, Player character, GameDataRepository.GameState gameState, int slotNumber) {
-      this.success = success;
-      this.character = character;
-      this.gameState = gameState;
-      this.slotNumber = slotNumber;
-    }
-
-    public boolean isSuccess() {
-      return success;
-    }
-
-    public Player getCharacter() {
-      return character;
-    }
-
-    public GameDataRepository.GameState getGameState() {
-      return gameState;
-    }
-
-    public int getSlotNumber() {
-      return slotNumber;
-    }
-  }
 }

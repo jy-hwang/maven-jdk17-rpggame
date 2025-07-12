@@ -215,14 +215,14 @@ public class Quest {
 
     System.out.println("=".repeat(GameConstants.NUMBER_TWENTY));
   }
-  
+
   /**
    * 진행도를 직접 설정합니다 (로드용)
    */
   public void setProgress(String objectiveKey, int progress) {
-      if (currentProgress != null) {
-          currentProgress.put(objectiveKey, progress);
-      }
+    if (currentProgress != null) {
+      currentProgress.put(objectiveKey, progress);
+    }
   }
 
   /**

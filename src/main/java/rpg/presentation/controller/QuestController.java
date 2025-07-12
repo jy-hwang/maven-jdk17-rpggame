@@ -5,11 +5,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rpg.application.service.QuestManager;
 import rpg.application.validator.InputValidator;
+import rpg.core.engine.GameState;
 import rpg.domain.item.GameItem;
 import rpg.domain.player.Player;
 import rpg.domain.quest.Quest;
 import rpg.domain.quest.QuestReward;
-import rpg.infrastructure.persistence.GameDataRepository;
 import rpg.shared.constant.GameConstants;
 import rpg.shared.constant.ItemConstants;
 
@@ -20,9 +20,9 @@ public class QuestController {
   private static final Logger logger = LoggerFactory.getLogger(QuestController.class);
 
   private final QuestManager questManager;
-  private final GameDataRepository.GameState gameState;
+  private final GameState gameState;
 
-  public QuestController(QuestManager questManager, GameDataRepository.GameState gameState) {
+  public QuestController(QuestManager questManager, GameState gameState) {
     this.questManager = questManager;
     this.gameState = gameState;
     logger.debug("QuestController 초기화 완료");

@@ -23,7 +23,7 @@ public class GameConstants {
   public static final int DEFAULT_INVENTORY = 20;
   public static final double INVENTORY_DANGER_ALERT = 0.9;
   public static final double INVENTORY_WARNING_ALERT = 0.4;
-  
+
   // === 몬스터 관련 상수 ===
   public static final double NUMBER_ZERO_DOT_ZERO = 0.0;
   public static final double MONSTER_CRITICAL = 0.3;
@@ -66,7 +66,7 @@ public class GameConstants {
   public static final double PLAYER_LEVEL_BONUS = 0.1; // 플레이어 레벨당 보너스
   public static final double LOCATION_DIFFICULTY_MULTIPLIER = 1.0; // 지역별 난이도 배율
   public static final int MONSTER_SCALING_THRESHOLD = 10; // 몬스터 스케일링 임계점
-  
+
   // 기타 숫자 관련
   public static final int NUMBER_ZERO = 0;
   public static final int NUMBER_ONE = 1;

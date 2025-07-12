@@ -5,6 +5,7 @@ import java.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rpg.application.factory.GameItemFactory;
+import rpg.core.engine.GameState;
 import rpg.domain.player.Player;
 import rpg.infrastructure.persistence.GameDataRepository;
 import rpg.shared.constant.SystemConstants;
@@ -18,7 +19,7 @@ public class SaveGameMapper {
   /**
    * 도메인 모델을 DTO로 변환 (저장용)
    */
-  public static SaveGameDto toDto(Player character, GameDataRepository.GameState gameState, int slotNumber) {
+  public static SaveGameDto toDto(Player character, GameState gameState, int slotNumber) {
     SaveGameDto dto = new SaveGameDto();
 
     // setter 사용
@@ -37,7 +38,7 @@ public class SaveGameMapper {
    */
   public static GameDataRepository.SaveData fromDto(SaveGameDto dto) {
     Player character = PlayerMapper.fromDto(dto.getCharacter());
-    GameDataRepository.GameState gameState = GameStateMapper.fromDto(dto.getGameState());
+    GameState gameState = GameStateMapper.fromDto(dto.getGameState());
 
     // GameDataService.SaveData 생성
     GameDataRepository.SaveData saveData = new GameDataRepository.SaveData(character, gameState, dto.getSlotNumber());

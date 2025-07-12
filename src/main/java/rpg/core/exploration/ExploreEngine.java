@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import rpg.application.factory.GameEffectFactory;
 import rpg.application.factory.GameItemFactory;
 import rpg.core.battle.BattleEngine;
+import rpg.core.engine.GameState;
 import rpg.domain.item.GameConsumable;
 import rpg.domain.item.GameEquipment;
 import rpg.domain.item.GameItem;
@@ -19,7 +20,6 @@ import rpg.domain.player.Player;
 import rpg.infrastructure.data.loader.ConfigDataLoader;
 import rpg.infrastructure.data.loader.ItemDataLoader;
 import rpg.infrastructure.data.loader.MonsterDataLoader;
-import rpg.infrastructure.persistence.GameDataRepository;
 import rpg.presentation.controller.InventoryController;
 import rpg.presentation.controller.QuestController;
 import rpg.shared.constant.BattleConstants;
@@ -36,10 +36,9 @@ public class ExploreEngine {
   private final BattleEngine battleController;
   private final QuestController questController;
   private final InventoryController inventoryController;
-  private final GameDataRepository.GameState gameState;
+  private final GameState gameState;
 
-  public ExploreEngine(BattleEngine battleController, QuestController questController, InventoryController inventoryController,
-      GameDataRepository.GameState gameState) {
+  public ExploreEngine(BattleEngine battleController, QuestController questController, InventoryController inventoryController, GameState gameState) {
     this.random = new Random();
     this.battleController = battleController;
     this.questController = questController;

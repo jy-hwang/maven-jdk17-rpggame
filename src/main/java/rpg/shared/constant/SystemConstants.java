@@ -31,7 +31,7 @@ public class SystemConstants {
   public static final String RUINS_MONSTERS_CONFIG = "/config/ruins_monsters.json";
   public static final String LAVA_MONSTERS_CONFIG = "/config/lava_monsters.json";
 
-  
+
   // === JSON 파일 검증 관련 ===
   public static final boolean ENABLE_JSON_VALIDATION = true; // JSON 데이터 검증 활성화
   public static final boolean STRICT_VALIDATION = false; // 엄격한 검증 모드
