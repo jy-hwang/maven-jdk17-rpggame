@@ -19,7 +19,6 @@ import rpg.domain.item.GameItemData;
 import rpg.domain.item.ItemRarity;
 import rpg.domain.item.effect.GameEffect;
 import rpg.infrastructure.data.loader.ConfigDataLoader;
-import rpg.shared.constant.BaseConstant;
 import rpg.shared.constant.GameConstants;
 import rpg.shared.constant.ItemConstants;
 
@@ -28,7 +27,7 @@ import rpg.shared.constant.ItemConstants;
  */
 public class GameItemFactory {
   private static final Logger logger = LoggerFactory.getLogger(GameItemFactory.class);
-
+  private static final Random random = new Random();
   // 싱글톤 인스턴스
   private static GameItemFactory instance;
 
@@ -160,8 +159,8 @@ public class GameItemFactory {
     try {
       GameEquipment.EquipmentType equipType = GameEquipment.EquipmentType.WEAPON;
 
-      return new GameEquipment(data.getId(), data.getName(), data.getDescription(), data.getValue(), data.getRarity(), equipType, data.getAttackBonus(),
-          data.getDefenseBonus(), data.getHpBonus());
+      return new GameEquipment(data.getId(), data.getName(), data.getDescription(), data.getValue(), data.getRarity(), equipType,
+          data.getAttackBonus(), data.getDefenseBonus(), data.getHpBonus());
 
     } catch (Exception e) {
       logger.error("무기 아이템 생성 실패: {}", data.getName(), e);
@@ -176,8 +175,8 @@ public class GameItemFactory {
     try {
       GameEquipment.EquipmentType equipType = GameEquipment.EquipmentType.ARMOR;
 
-      return new GameEquipment(data.getId(), data.getName(), data.getDescription(), data.getValue(), data.getRarity(), equipType, data.getAttackBonus(),
-          data.getDefenseBonus(), data.getHpBonus());
+      return new GameEquipment(data.getId(), data.getName(), data.getDescription(), data.getValue(), data.getRarity(), equipType,
+          data.getAttackBonus(), data.getDefenseBonus(), data.getHpBonus());
 
     } catch (Exception e) {
       logger.error("방어구 아이템 생성 실패: {}", data.getName(), e);
@@ -192,8 +191,8 @@ public class GameItemFactory {
     try {
       GameEquipment.EquipmentType equipType = GameEquipment.EquipmentType.ACCESSORY;
 
-      return new GameEquipment(data.getId(), data.getName(), data.getDescription(), data.getValue(), data.getRarity(), equipType, data.getAttackBonus(),
-          data.getDefenseBonus(), data.getHpBonus());
+      return new GameEquipment(data.getId(), data.getName(), data.getDescription(), data.getValue(), data.getRarity(), equipType,
+          data.getAttackBonus(), data.getDefenseBonus(), data.getHpBonus());
 
     } catch (Exception e) {
       logger.error("액세서리 아이템 생성 실패: {}", data.getName(), e);
@@ -244,24 +243,6 @@ public class GameItemFactory {
    */
   private boolean hasEffectType(GameItemData data, String effectType) {
     return data.getEffects().stream().anyMatch(effect -> effect.getType().equalsIgnoreCase(effectType));
-  }
-
-  /**
-   * 레벨에 맞는 랜덤 아이템 생성
-   */
-  public GameItem createRandomItemForLevel(int level) {
-    List<String> availableItems = getItemsForLevel(level);
-
-    if (availableItems.isEmpty()) {
-      logger.warn("레벨 {}에 맞는 아이템이 없음", level);
-      return null;
-    }
-
-    Random random = new Random();
-    String randomItemId = availableItems.get(random.nextInt(availableItems.size()));
-
-    logger.debug("레벨 {} 랜덤 아이템 선택: {}", level, randomItemId);
-    return createItem(randomItemId);
   }
 
   /**
@@ -474,4 +455,489 @@ public class GameItemFactory {
     return itemDatabase.size();
   }
 
+  // ==================== 랜덤 생성 메서드들 (클래스 하단에 추가) ====================
+
+  /**
+   * 특정 희귀도의 랜덤 아이템 생성 - QuestFactory에서 요청한 메서드
+   */
+  public GameItem createRandomItemByRarity(ItemRarity rarity) {
+    List<GameItemData> itemsOfRarity = getItemDataByRarity(rarity);
+
+    if (itemsOfRarity.isEmpty()) {
+      logger.warn("희귀도 {}에 해당하는 아이템이 없음", rarity);
+      return createFallbackItemByRarity(rarity);
+    }
+
+    GameItemData selectedData = itemsOfRarity.get(random.nextInt(itemsOfRarity.size()));
+    GameItem item = createItem(selectedData.getId());
+
+    if (item != null) {
+      logger.debug("희귀도 {} 랜덤 아이템 생성: {}", rarity, item.getName());
+    }
+    return item;
+  }
+
+  /**
+   * 희귀도별 아이템 데이터 목록 반환 (내부 헬퍼 메서드)
+   */
+  private List<GameItemData> getItemDataByRarity(ItemRarity rarity) {
+    return itemDatabase.values().stream().filter(data -> rarity.name().equalsIgnoreCase(data.getRarity().getDisplayName())).collect(Collectors.toList());
+  }
+
+  /**
+   * 희귀도별 폴백 아이템 생성
+   */
+  private GameItem createFallbackItemByRarity(ItemRarity rarity) {
+    logger.info("희귀도 {} 폴백 아이템 생성", rarity);
+
+    String id = "fallback_" + rarity.name().toLowerCase();
+    String name = rarity.getDisplayName() + " 아이템";
+    String description = "자동 생성된 " + rarity.getDisplayName() + " 등급 아이템";
+    int value = getFallbackValueByRarity(rarity);
+
+    switch (rarity) {
+      case COMMON:
+        return new GameConsumable(id, name, description, value, rarity, List.of(GameEffectFactory.createHealHpEffect(30)), 0);
+      case UNCOMMON:
+        return new GameConsumable(id, name, description, value, rarity, List.of(GameEffectFactory.createHealHpEffect(60)), 0);
+      case RARE:
+        return new GameEquipment(id, name, description, value, rarity, GameEquipment.EquipmentType.ACCESSORY, 5, 5, 20);
+      case EPIC:
+        return new GameEquipment(id, name, description, value, rarity, GameEquipment.EquipmentType.ACCESSORY, 10, 10, 50);
+      case LEGENDARY:
+        return new GameEquipment(id, name, description, value, rarity, GameEquipment.EquipmentType.ACCESSORY, 20, 20, 100);
+      default:
+        return new GameConsumable(id, name, description, value, rarity, List.of(GameEffectFactory.createHealHpEffect(25)), 0);
+    }
+  }
+
+  /**
+   * 희귀도별 기본 가치 반환
+   */
+  private int getFallbackValueByRarity(ItemRarity rarity) {
+    return switch (rarity) {
+      case COMMON -> 25;
+      case UNCOMMON -> 75;
+      case RARE -> 200;
+      case EPIC -> 500;
+      case LEGENDARY -> 1200;
+      default -> 50;
+    };
+  }
+
+  /**
+   * 특정 타입의 랜덤 아이템 생성
+   */
+  public GameItem createRandomItemByType(String itemType) {
+    List<GameItemData> itemsOfType = getItemDataByType(itemType);
+
+    if (itemsOfType.isEmpty()) {
+      logger.warn("타입 {}에 해당하는 아이템이 없음", itemType);
+      return null;
+    }
+
+    GameItemData selectedData = itemsOfType.get(random.nextInt(itemsOfType.size()));
+    GameItem item = createItem(selectedData.getId());
+
+    if (item != null) {
+      logger.debug("타입 {} 랜덤 아이템 생성: {}", itemType, item.getName());
+    }
+    return item;
+  }
+
+  /**
+   * 타입별 아이템 데이터 목록 반환 (내부 헬퍼 메서드)
+   */
+  private List<GameItemData> getItemDataByType(String itemType) {
+    return itemDatabase.values().stream().filter(data -> itemType.equalsIgnoreCase(data.getType())).collect(Collectors.toList());
+  }
+
+  /**
+   * 희귀도 가중치를 적용한 랜덤 아이템 생성
+   */
+  public GameItem createWeightedRandomItem() {
+    ItemRarity selectedRarity = selectRarityByWeight();
+    return createRandomItemByRarity(selectedRarity);
+  }
+
+  /**
+   * 희귀도 가중치 선택
+   */
+  private ItemRarity selectRarityByWeight() {
+    // 희귀도별 가중치 (낮을수록 더 흔함)
+    Map<ItemRarity, Integer> weights =
+        Map.of(ItemRarity.COMMON, 50, ItemRarity.UNCOMMON, 25, ItemRarity.RARE, 15, ItemRarity.EPIC, 7, ItemRarity.LEGENDARY, 3);
+
+    int totalWeight = weights.values().stream().mapToInt(Integer::intValue).sum();
+    int randomValue = random.nextInt(totalWeight);
+
+    int currentWeight = 0;
+    for (Map.Entry<ItemRarity, Integer> entry : weights.entrySet()) {
+      currentWeight += entry.getValue();
+      if (randomValue < currentWeight) {
+        return entry.getKey();
+      }
+    }
+
+    return ItemRarity.COMMON; // 폴백
+  }
+
+  /**
+   * 플레이어 레벨에 맞는 랜덤 아이템 생성 (기존 메서드 개선)
+   */
+  public GameItem createRandomItemForLevel(int playerLevel) {
+    // 레벨에 따른 희귀도 확률 조정
+    ItemRarity maxRarity = getMaxRarityForLevel(playerLevel);
+    List<ItemRarity> availableRarities = getAvailableRarities(maxRarity);
+
+    ItemRarity selectedRarity = availableRarities.get(random.nextInt(availableRarities.size()));
+    GameItem item = createRandomItemByRarity(selectedRarity);
+
+    if (item != null) {
+      logger.debug("레벨 {} 적합 아이템 생성: {} ({})", playerLevel, item.getName(), selectedRarity);
+    }
+    return item;
+  }
+
+  /**
+   * 레벨에 따른 최대 희귀도 결정
+   */
+  private ItemRarity getMaxRarityForLevel(int level) {
+    if (level <= 2) {
+      return ItemRarity.COMMON;
+    } else if (level <= 5) {
+      return ItemRarity.UNCOMMON;
+    } else if (level <= 10) {
+      return ItemRarity.RARE;
+    } else if (level <= 15) {
+      return ItemRarity.EPIC;
+    } else {
+      return ItemRarity.LEGENDARY;
+    }
+  }
+
+  /**
+   * 최대 희귀도까지의 사용 가능한 희귀도 목록
+   */
+  private List<ItemRarity> getAvailableRarities(ItemRarity maxRarity) {
+    List<ItemRarity> available = new ArrayList<>();
+    ItemRarity[] allRarities = ItemRarity.values();
+
+    for (ItemRarity rarity : allRarities) {
+      available.add(rarity);
+      if (rarity == maxRarity) {
+        break;
+      }
+    }
+
+    return available;
+  }
+
+  /**
+   * 보물 상자용 랜덤 아이템 생성
+   */
+  public GameItem createTreasureChestItem() {
+    // 보물 상자는 좀 더 좋은 아이템이 나올 확률 높음
+    ItemRarity rarity;
+    int roll = random.nextInt(100);
+
+    if (roll < 5) { // 5% - 전설
+      rarity = ItemRarity.LEGENDARY;
+    } else if (roll < 15) { // 10% - 에픽
+      rarity = ItemRarity.EPIC;
+    } else if (roll < 35) { // 20% - 레어
+      rarity = ItemRarity.RARE;
+    } else if (roll < 65) { // 30% - 언커먼
+      rarity = ItemRarity.UNCOMMON;
+    } else { // 35% - 커먼
+      rarity = ItemRarity.COMMON;
+    }
+
+    GameItem item = createRandomItemByRarity(rarity);
+    if (item != null) {
+      logger.info("보물 상자에서 {} 등급 아이템 획득: {}", rarity, item.getName());
+    }
+    return item;
+  }
+
+  /**
+   * 몬스터 드롭용 랜덤 아이템 생성
+   */
+  public GameItem createMonsterDropItem(int monsterLevel) {
+    // 몬스터 레벨에 따른 드롭률 조정
+    ItemRarity rarity;
+    int roll = random.nextInt(100);
+    int rareBuff = Math.min(monsterLevel * 2, 20); // 몬스터 레벨당 2%씩, 최대 20%
+
+    if (roll < (2 + rareBuff)) { // 기본 2% + 몬스터 레벨 보너스
+      rarity = ItemRarity.RARE;
+    } else if (roll < (15 + rareBuff)) { // 기본 13% + 보너스
+      rarity = ItemRarity.UNCOMMON;
+    } else {
+      rarity = ItemRarity.COMMON;
+    }
+
+    // 소비 아이템 위주로 드롭
+    List<GameItemData> consumables = getItemDataByType("CONSUMABLE");
+    List<GameItemData> targetItems =
+        consumables.stream().filter(data -> rarity.name().equalsIgnoreCase(data.getRarity().getDisplayName())).collect(Collectors.toList());
+
+    if (!targetItems.isEmpty()) {
+      GameItemData selectedData = targetItems.get(random.nextInt(targetItems.size()));
+      GameItem item = createItem(selectedData.getId());
+      if (item != null) {
+        logger.debug("몬스터 드롭 아이템: {} (레벨 {})", item.getName(), monsterLevel);
+      }
+      return item;
+    }
+
+    // 폴백: 희귀도 기반 랜덤 아이템
+    return createRandomItemByRarity(rarity);
+  }
+
+  /**
+   * 상점용 랜덤 아이템 생성
+   */
+  public GameItem createShopItem(int shopLevel) {
+    // 상점 레벨에 따른 아이템 품질 조정
+    ItemRarity maxRarity = getMaxRarityForLevel(shopLevel);
+
+    // 상점은 장비류를 많이 팜
+    String[] shopTypes = {"WEAPON", "ARMOR", "ACCESSORY", "CONSUMABLE"};
+    String selectedType = shopTypes[random.nextInt(shopTypes.length)];
+
+    List<GameItemData> typeItems = getItemDataByType(selectedType);
+    List<GameItemData> availableItems = typeItems.stream().filter(data -> {
+      try {
+        ItemRarity itemRarity = ItemRarity.valueOf(data.getRarity().getDisplayName().toUpperCase());
+        return itemRarity.ordinal() <= maxRarity.ordinal();
+      } catch (IllegalArgumentException e) {
+        return false;
+      }
+    }).collect(Collectors.toList());
+
+    if (!availableItems.isEmpty()) {
+      GameItemData selectedData = availableItems.get(random.nextInt(availableItems.size()));
+      GameItem item = createItem(selectedData.getId());
+      if (item != null) {
+        logger.debug("상점 아이템 생성: {} (상점 레벨 {})", item.getName(), shopLevel);
+      }
+      return item;
+    }
+
+    // 폴백: 기본 아이템
+    return createItem("HEALTH_POTION");
+  }
+
+  /**
+   * 퀘스트 보상용 랜덤 아이템 생성
+   */
+  public GameItem createQuestRewardItem(int questLevel, ItemRarity minRarity) {
+    // 퀘스트 레벨과 최소 희귀도를 고려한 보상 아이템
+    ItemRarity maxRarity = getMaxRarityForLevel(questLevel);
+
+    // 최소 희귀도보다 낮으면 최소 희귀도로 조정
+    List<ItemRarity> availableRarities = new ArrayList<>();
+    for (ItemRarity rarity : ItemRarity.values()) {
+      if (rarity.ordinal() >= minRarity.ordinal() && rarity.ordinal() <= maxRarity.ordinal()) {
+        availableRarities.add(rarity);
+      }
+    }
+
+    if (availableRarities.isEmpty()) {
+      availableRarities.add(minRarity);
+    }
+
+    ItemRarity selectedRarity = availableRarities.get(random.nextInt(availableRarities.size()));
+    GameItem item = createRandomItemByRarity(selectedRarity);
+
+    if (item != null) {
+      logger.debug("퀘스트 보상 아이템: {} (레벨 {}, 희귀도 {})", item.getName(), questLevel, selectedRarity);
+    }
+    return item;
+  }
+
+  /**
+   * 여러 개의 랜덤 아이템을 한 번에 생성
+   */
+  public List<GameItem> createMultipleRandomItems(int count, ItemRarity maxRarity) {
+    List<GameItem> items = new ArrayList<>();
+
+    for (int i = 0; i < count; i++) {
+      List<ItemRarity> availableRarities = getAvailableRarities(maxRarity);
+      ItemRarity selectedRarity = availableRarities.get(random.nextInt(availableRarities.size()));
+
+      GameItem item = createRandomItemByRarity(selectedRarity);
+      if (item != null) {
+        items.add(item);
+      }
+    }
+
+    logger.debug("다중 랜덤 아이템 생성: {}개 (최대 희귀도: {})", items.size(), maxRarity);
+    return items;
+  }
+
+  /**
+   * 세트 아이템 생성 (같은 타입으로 구성)
+   */
+  public List<GameItem> createItemSet(String itemType, int count) {
+    List<GameItem> itemSet = new ArrayList<>();
+    List<GameItemData> typeItems = getItemDataByType(itemType);
+
+    if (typeItems.isEmpty()) {
+      logger.warn("타입 {}에 해당하는 아이템이 없어서 세트 생성 불가", itemType);
+      return itemSet;
+    }
+
+    for (int i = 0; i < count; i++) {
+      GameItemData selectedData = typeItems.get(random.nextInt(typeItems.size()));
+      GameItem item = createItem(selectedData.getId());
+      if (item != null) {
+        itemSet.add(item);
+      }
+    }
+
+    logger.debug("{} 타입 아이템 세트 생성: {}개", itemType, itemSet.size());
+    return itemSet;
+  }
+
+  /**
+   * 희귀도별 아이템 개수 반환
+   */
+  public Map<ItemRarity, Integer> getRarityDistribution() {
+    Map<ItemRarity, Integer> distribution = new HashMap<>();
+
+    for (ItemRarity rarity : ItemRarity.values()) {
+      int count = getItemDataByRarity(rarity).size();
+      distribution.put(rarity, count);
+    }
+
+    return distribution;
+  }
+
+  /**
+   * 타입별 아이템 개수 반환
+   */
+  public Map<String, Integer> getTypeDistribution() {
+    Map<String, Integer> distribution = new HashMap<>();
+
+    for (GameItemData data : itemDatabase.values()) {
+      String type = data.getType();
+      distribution.merge(type, 1, Integer::sum);
+    }
+
+    return distribution;
+  }
+
+  /**
+   * 특정 희귀도의 아이템 이름 목록 반환
+   */
+  public List<String> getItemNamesByRarity(ItemRarity rarity) {
+    return getItemDataByRarity(rarity).stream().map(GameItemData::getName).sorted().collect(Collectors.toList());
+  }
+
+  /**
+   * 랜덤 생성 통계 출력
+   */
+  public void printRandomGenerationStats() {
+    System.out.println("\n=== 🎲 랜덤 아이템 생성 통계 ===");
+
+    // 희귀도별 분포
+    System.out.println("💎 희귀도별 아이템 분포:");
+    Map<ItemRarity, Integer> rarityDist = getRarityDistribution();
+    for (Map.Entry<ItemRarity, Integer> entry : rarityDist.entrySet()) {
+      if (entry.getValue() > 0) {
+        System.out.printf("   %s: %d개%n", entry.getKey().getDisplayName(), entry.getValue());
+      }
+    }
+
+    // 타입별 분포
+    System.out.println("\n🔧 타입별 아이템 분포:");
+    Map<String, Integer> typeDist = getTypeDistribution();
+    for (Map.Entry<String, Integer> entry : typeDist.entrySet()) {
+      System.out.printf("   %s: %d개%n", entry.getKey(), entry.getValue());
+    }
+
+    // 가중치 시뮬레이션
+    System.out.println("\n⚖️ 가중치 기반 생성 시뮬레이션 (100회):");
+    Map<ItemRarity, Integer> simulationResults = new HashMap<>();
+    for (int i = 0; i < 100; i++) {
+      ItemRarity rarity = selectRarityByWeight();
+      simulationResults.merge(rarity, 1, Integer::sum);
+    }
+
+    for (Map.Entry<ItemRarity, Integer> entry : simulationResults.entrySet()) {
+      System.out.printf("   %s: %d회 (%.1f%%)%n", entry.getKey().getDisplayName(), entry.getValue(), entry.getValue() / 100.0 * 100);
+    }
+
+    System.out.printf("\n📊 총 랜덤 생성 가능 아이템: %d개%n", getItemCount());
+    System.out.println("================================");
+  }
+
+  /**
+   * 랜덤 아이템 생성 테스트
+   */
+  public void testRandomGeneration() {
+    System.out.println("\n=== 🧪 랜덤 아이템 생성 테스트 ===");
+
+    // 각 희귀도별 생성 테스트
+    System.out.println("💎 희귀도별 생성 테스트:");
+    for (ItemRarity rarity : ItemRarity.values()) {
+      GameItem item = createRandomItemByRarity(rarity);
+      if (item != null) {
+        System.out.printf("   ✅ %s: %s%n", rarity.getDisplayName(), item.getName());
+      } else {
+        System.out.printf("   ❌ %s: 생성 실패%n", rarity.getDisplayName());
+      }
+    }
+
+    // 특수 생성 테스트
+    System.out.println("\n🎁 특수 생성 테스트:");
+    GameItem treasureItem = createTreasureChestItem();
+    if (treasureItem != null) {
+      System.out.printf("   보물 상자: %s (%s)%n", treasureItem.getName(), treasureItem.getRarity().getDisplayName());
+    }
+
+    GameItem dropItem = createMonsterDropItem(5);
+    if (dropItem != null) {
+      System.out.printf("   몬스터 드롭: %s (%s)%n", dropItem.getName(), dropItem.getRarity().getDisplayName());
+    }
+
+    GameItem shopItem = createShopItem(3);
+    if (shopItem != null) {
+      System.out.printf("   상점 아이템: %s (%s)%n", shopItem.getName(), shopItem.getRarity().getDisplayName());
+    }
+
+    // 레벨별 생성 테스트
+    System.out.println("\n📈 레벨별 생성 테스트:");
+    int[] testLevels = {1, 5, 10, 15, 20};
+    for (int level : testLevels) {
+      GameItem levelItem = createRandomItemForLevel(level);
+      if (levelItem != null) {
+        System.out.printf("   레벨 %d: %s (%s)%n", level, levelItem.getName(), levelItem.getRarity().getDisplayName());
+      }
+    }
+
+    System.out.println("===============================");
+  }
+
+  /**
+   * 특정 희귀도의 아이템 목록 출력
+   */
+  public void printItemsByRarity(ItemRarity rarity) {
+    List<String> itemNames = getItemNamesByRarity(rarity);
+
+    System.out.printf("\n=== %s 등급 아이템 목록 ===\n", rarity.getDisplayName());
+    if (itemNames.isEmpty()) {
+      System.out.println("해당 등급의 아이템이 없습니다.");
+    } else {
+      for (int i = 0; i < itemNames.size(); i++) {
+        System.out.printf("%d. %s%n", i + 1, itemNames.get(i));
+      }
+    }
+    System.out.printf("총 %d개%n", itemNames.size());
+    System.out.println("========================");
+  }
 }
+
+

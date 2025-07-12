@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import rpg.application.factory.GameEffectFactory;
 import rpg.application.factory.GameItemFactory;
+import rpg.application.factory.GameQuestFactory;
 import rpg.domain.item.GameConsumable;
 import rpg.domain.item.GameEquipment;
 import rpg.domain.item.GameItem;
@@ -18,9 +19,12 @@ import rpg.domain.player.Player;
 import rpg.domain.quest.Quest;
 import rpg.domain.quest.QuestReward;
 
-/**
- * 퀘스트를 관리하는 서비스 클래스 (GameItemFactory 통합 버전) - GameItemFactory를 사용하여 보상 아이템 생성 - GameEffectFactory를
- * 사용하여 특별 아이템 효과 생성 - 동적 퀘스트 보상 시스템
+/**@formatter:off
+ * 퀘스트를 관리하는 서비스 클래스 (QuestFactory 패턴 적용)
+ * - QuestFactory를 사용하여 퀘스트 생성
+ * - 템플릿 기반 퀘스트 관리
+ * - 동적 퀘스트 생성 시스템
+ * @formatter:on
  */
 public class QuestManager {
   private static final Logger logger = LoggerFactory.getLogger(QuestManager.class);
@@ -32,8 +36,10 @@ public class QuestManager {
   // 팩토리 인스턴스
   private final GameItemFactory itemFactory;
 
+  private final GameQuestFactory gameQuestFactory;
   @JsonCreator
   public QuestManager() {
+    this.gameQuestFactory = GameQuestFactory.getInstance();
     this.itemFactory = GameItemFactory.getInstance();
     this.availableQuests = new ArrayList<>();
     this.activeQuests = new ArrayList<>();
@@ -61,23 +67,28 @@ public class QuestManager {
     logger.info("퀘스트 초기화 중... (팩토리 기반 보상 시스템)");
 
     try {
-      // 1. 초보자 퀘스트 - 슬라임 사냥
-      createSlimeQuest();
+      // 기본 퀘스트들을 팩토리에서 생성
+      List<String> basicQuestIds = List.of(
+          "quest_001", // 슬라임 사냥꾼
+          "quest_002", // 고블린 소탕
+          "quest_003", // 오크 토벌
+          "quest_004", // 드래곤 슬레이어
+          "quest_005", // 성장하는 모험가
+          "quest_006"  // 물약 수집가
+      );
 
-      // 2. 중급 퀘스트 - 고블린 소탕
-      createGoblinQuest();
+      for (String questId : basicQuestIds) {
+          Quest quest = gameQuestFactory.createQuest(questId);
+          if (quest != null) {
+              availableQuests.add(quest);
+              logger.debug("퀘스트 생성 완료: {} - {}", questId, quest.getTitle());
+          } else {
+              logger.warn("퀘스트 생성 실패: {}", questId);
+          }
+      }
 
-      // 3. 고급 퀘스트 - 오크 토벌
-      createOrcQuest();
-
-      // 4. 최종 퀘스트 - 드래곤 슬레이어
-      createDragonQuest();
-
-      // 5. 레벨업 퀘스트
-      createLevelQuest();
-
-      // 6. 수집 퀘스트
-      createCollectionQuest();
+      // 일일 퀘스트 몇 개 추가
+      addDailyQuests();
 
       logger.info("퀘스트 초기화 완료: {}개 퀘스트 생성", availableQuests.size());
 
@@ -86,7 +97,53 @@ public class QuestManager {
       createFallbackQuests();
     }
   }
+  /**
+   * 일일 퀘스트 추가
+   */
+  private void addDailyQuests() {
+      try {
+          // 일일 사냥 퀘스트
+          Quest dailyKillQuest = gameQuestFactory.createDailyQuest(Quest.QuestType.KILL);
+          if (dailyKillQuest != null) {
+              availableQuests.add(dailyKillQuest);
+              logger.debug("일일 사냥 퀘스트 생성: {}", dailyKillQuest.getTitle());
+          }
 
+          // 일일 수집 퀘스트
+          Quest dailyCollectQuest = gameQuestFactory.createDailyQuest(Quest.QuestType.COLLECT);
+          if (dailyCollectQuest != null) {
+              availableQuests.add(dailyCollectQuest);
+              logger.debug("일일 수집 퀘스트 생성: {}", dailyCollectQuest.getTitle());
+          }
+
+      } catch (Exception e) {
+          logger.warn("일일 퀘스트 생성 실패", e);
+      }
+  }
+
+  /**
+   * 플레이어 레벨에 맞는 동적 퀘스트 생성
+   */
+  public void generateLevelAppropriateQuests(Player player) {
+      logger.info("플레이어 레벨 {}에 맞는 동적 퀘스트 생성 중...", player.getLevel());
+
+      try {
+          // 현재 레벨에 맞는 퀘스트가 부족한 경우에만 생성
+          List<Quest> availableForPlayer = getAvailableQuests(player);
+          
+          if (availableForPlayer.size() < 3) { // 최소 3개의 퀘스트 유지
+              Quest dynamicQuest = gameQuestFactory.createLevelAppropriateQuest(player.getLevel());
+              if (dynamicQuest != null) {
+                  availableQuests.add(dynamicQuest);
+                  logger.info("동적 퀘스트 생성: {} (레벨 {})", dynamicQuest.getTitle(), player.getLevel());
+              }
+          }
+
+      } catch (Exception e) {
+          logger.error("동적 퀘스트 생성 실패", e);
+      }
+  }
+  
   /**
    * 기본 퀘스트만 초기화 (중복 방지용)
    */
@@ -140,8 +197,8 @@ public class QuestManager {
     goblinObjectives.put("kill_고블린", 3);
 
     // 철검 보상 (GameEffectFactory 기반 또는 직접 생성)
-    GameEquipment ironSword =
-        createSpecialEquipment("MAGIC_IRON_SWORD","마법 철검", "슬라임을 처치하며 단련된 마법의 철검", 100, ItemRarity.UNCOMMON, GameEquipment.EquipmentType.WEAPON, 15, 0, 0);
+    GameEquipment ironSword = createSpecialEquipment("MAGIC_IRON_SWORD", "마법 철검", "슬라임을 처치하며 단련된 마법의 철검", 100, ItemRarity.UNCOMMON,
+        GameEquipment.EquipmentType.WEAPON, 15, 0, 0);
 
     QuestReward goblinReward = new QuestReward(100, 200, ironSword, 1);
 
@@ -158,8 +215,8 @@ public class QuestManager {
     orcObjectives.put("kill_오크", 2);
 
     // 판금 갑옷 보상
-    GameEquipment plateArmor =
-        createSpecialEquipment("RARE_PLATE_ARMOR","용사의 판금 갑옷", "오크와 싸우기 위해 특별히 제작된 갑옷", 200, ItemRarity.RARE, GameEquipment.EquipmentType.ARMOR, 0, 20, 50);
+    GameEquipment plateArmor = createSpecialEquipment("RARE_PLATE_ARMOR", "용사의 판금 갑옷", "오크와 싸우기 위해 특별히 제작된 갑옷", 200, ItemRarity.RARE,
+        GameEquipment.EquipmentType.ARMOR, 0, 20, 50);
 
     QuestReward orcReward = new QuestReward(200, 500, plateArmor, 1);
 
@@ -176,8 +233,8 @@ public class QuestManager {
     dragonObjectives.put("kill_드래곤", 1);
 
     // 전설의 드래곤 반지
-    GameEquipment legendaryRing =
-        createSpecialEquipment("DRAGON_HEART_RING","드래곤 하트 링", "드래곤의 심장으로 만든 전설적인 반지", 1000, ItemRarity.LEGENDARY, GameEquipment.EquipmentType.ACCESSORY, 30, 15, 100);
+    GameEquipment legendaryRing = createSpecialEquipment("DRAGON_HEART_RING", "드래곤 하트 링", "드래곤의 심장으로 만든 전설적인 반지", 1000, ItemRarity.LEGENDARY,
+        GameEquipment.EquipmentType.ACCESSORY, 30, 15, 100);
 
     QuestReward dragonReward = new QuestReward(1000, 2000, legendaryRing, 1);
 
@@ -228,7 +285,7 @@ public class QuestManager {
     collectionObjectives.put("collect_체력 물약", 5);
 
     // 특별 보상: 복합 효과 물약
-    GameConsumable specialPotion = createSpecialPotion("ADVENTURER_POTION","모험가의 물약", "HP와 MP를 동시에 회복하고 약간의 경험치를 얻는 특별한 물약", 150, ItemRarity.RARE,
+    GameConsumable specialPotion = createSpecialPotion("ADVENTURER_POTION", "모험가의 물약", "HP와 MP를 동시에 회복하고 약간의 경험치를 얻는 특별한 물약", 150, ItemRarity.RARE,
         List.of(GameEffectFactory.createHealHpEffect(100), GameEffectFactory.createHealMpEffect(100), GameEffectFactory.createGainExpEffect(200)));
 
     QuestReward collectionReward = new QuestReward(150, 100, specialPotion, 1);
@@ -241,15 +298,15 @@ public class QuestManager {
   /**
    * 특별한 장비 생성
    */
-  private GameEquipment createSpecialEquipment(String id, String name, String description, int value, ItemRarity rarity, GameEquipment.EquipmentType type,
-      int attackBonus, int defenseBonus, int hpBonus) {
+  private GameEquipment createSpecialEquipment(String id, String name, String description, int value, ItemRarity rarity,
+      GameEquipment.EquipmentType type, int attackBonus, int defenseBonus, int hpBonus) {
     try {
       return new GameEquipment(id, name, description, value, rarity, type, attackBonus, defenseBonus, hpBonus);
     } catch (Exception e) {
       logger.error("특별 장비 생성 실패: {}", name, e);
       // 기본 장비 반환
-      return new GameEquipment(id, "기본 " + name, "기본 장비", value / 2, ItemRarity.COMMON, type, Math.max(1, attackBonus / 2), Math.max(1, defenseBonus / 2),
-          Math.max(1, hpBonus / 2));
+      return new GameEquipment(id, "기본 " + name, "기본 장비", value / 2, ItemRarity.COMMON, type, Math.max(1, attackBonus / 2),
+          Math.max(1, defenseBonus / 2), Math.max(1, hpBonus / 2));
     }
   }
 
@@ -448,7 +505,7 @@ public class QuestManager {
     // 특별 보상: 경험치 증가 물약
     List<GameEffect> expPotionEffects = List.of(GameEffectFactory.createGainExpEffect(100), GameEffectFactory.createHealHpEffect(50));
 
-    GameConsumable expPotion = createSpecialPotion("EXPERIENCE_POTION","경험의 영약", "경험치를 대량으로 획득하는 특별한 물약", 200, ItemRarity.EPIC, expPotionEffects);
+    GameConsumable expPotion = createSpecialPotion("EXPERIENCE_POTION", "경험의 영약", "경험치를 대량으로 획득하는 특별한 물약", 200, ItemRarity.EPIC, expPotionEffects);
 
     QuestReward reward = new QuestReward(300, 200, expPotion, 2);
 
@@ -467,8 +524,8 @@ public class QuestManager {
     objectives.put("kill_트롤", 1);
     objectives.put("kill_스켈레톤", 3);
 
-    GameEquipment eliteWeapon =
-        createSpecialEquipment("ELITE_KILLER", "엘리트 킬러", "엘리트 몬스터를 사냥하기 위한 특수 무기", 400, ItemRarity.EPIC, GameEquipment.EquipmentType.WEAPON, 25, 5, 20);
+    GameEquipment eliteWeapon = createSpecialEquipment("ELITE_KILLER", "엘리트 킬러", "엘리트 몬스터를 사냥하기 위한 특수 무기", 400, ItemRarity.EPIC,
+        GameEquipment.EquipmentType.WEAPON, 25, 5, 20);
 
     QuestReward reward = new QuestReward(500, 800, eliteWeapon, 1);
 
@@ -490,8 +547,8 @@ public class QuestManager {
     QuestReward reward = new QuestReward(1000, 2000);
 
     // 여러 아이템 보상
-    GameEquipment ultimateWeapon =
-        createSpecialEquipment("DRAGON_SLAYER", "드래곤 슬레이어", "궁극의 드래곤 처치용 무기", 2000, ItemRarity.LEGENDARY, GameEquipment.EquipmentType.WEAPON, 50, 10, 50);
+    GameEquipment ultimateWeapon = createSpecialEquipment("DRAGON_SLAYER", "드래곤 슬레이어", "궁극의 드래곤 처치용 무기", 2000, ItemRarity.LEGENDARY,
+        GameEquipment.EquipmentType.WEAPON, 50, 10, 50);
 
     reward.addItemReward(ultimateWeapon, 1);
 
@@ -714,7 +771,8 @@ public class QuestManager {
     // 특별 일일 보상
     List<GameEffect> dailyEffects = List.of(GameEffectFactory.createHealHpEffect(60), GameEffectFactory.createGainExpEffect(30));
 
-    GameConsumable dailyPotion = createSpecialPotion("DAILY_SPECIAL_POTION", "일일 특제 물약", "하루 한 번 받을 수 있는 특별한 물약", 100, ItemRarity.UNCOMMON, dailyEffects);
+    GameConsumable dailyPotion =
+        createSpecialPotion("DAILY_SPECIAL_POTION", "일일 특제 물약", "하루 한 번 받을 수 있는 특별한 물약", 100, ItemRarity.UNCOMMON, dailyEffects);
 
     QuestReward reward = new QuestReward(100, 150, dailyPotion, 1);
 

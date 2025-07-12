@@ -1,0 +1,61 @@
+[
+  {
+    "id": "weekly_boss_hunt",
+    "title": "주간 보스 사냥",
+    "description": "이번 주의 강력한 보스 몬스터를 처치하세요.",
+    "type": "KILL",
+    "requiredLevel": 5,
+    "category": "WEEKLY",
+    "objectives": {
+      "kill_weekly_boss": 1
+    },
+    "reward": {
+      "experience": 500,
+      "gold": 1000,
+      "items": [
+        {
+          "itemId": "BOSS_CHEST",
+          "quantity": 1,
+          "rarity": "RARE"
+        }
+      ]
+    },
+    "prerequisites": [],
+    "unlocks": [],
+    "isRepeatable": true,
+    "timeLimit": 604800,
+    "tags": ["weekly", "boss", "challenging"],
+    "variableTargets": [
+      "거대한 오크", "고대 드래곤", "어둠의 마법사", "얼음 거인", "화염 정령"
+    ]
+  },
+  {
+    "id": "weekly_collection_master",
+    "title": "주간 수집 마스터",
+    "description": "다양한 귀중한 아이템들을 수집하세요.",
+    "type": "COLLECT",
+    "requiredLevel": 3,
+    "category": "WEEKLY",
+    "objectives": {
+      "collect_rare_materials": 10,
+      "collect_magic_crystals": 5,
+      "collect_ancient_artifacts": 2
+    },
+    "reward": {
+      "experience": 400,
+      "gold": 800,
+      "items": [
+        {
+          "itemId": "MASTER_COLLECTION_CHEST",
+          "quantity": 1,
+          "rarity": "EPIC"
+        }
+      ]
+    },
+    "prerequisites": [],
+    "unlocks": [],
+    "isRepeatable": true,
+    "timeLimit": 604800,
+    "tags": ["weekly", "collection", "rare"]
+  }
+]

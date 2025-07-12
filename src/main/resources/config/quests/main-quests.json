@@ -1,0 +1,110 @@
+[
+  {
+    "id": "quest_001",
+    "title": "슬라임 사냥꾼",
+    "description": "마을 근처의 슬라임 5마리를 처치하세요.",
+    "type": "KILL",
+    "requiredLevel": 1,
+    "category": "MAIN",
+    "objectives": {
+      "kill_슬라임": 5
+    },
+    "reward": {
+      "experience": 50,
+      "gold": 100,
+      "items": [
+        {
+          "itemId": "HEALTH_POTION",
+          "quantity": 2,
+          "rarity": "COMMON"
+        }
+      ]
+    },
+    "prerequisites": [],
+    "unlocks": ["quest_002"],
+    "isRepeatable": false,
+    "timeLimit": 0,
+    "tags": ["beginner", "combat"]
+  },
+  {
+    "id": "quest_002",
+    "title": "고블린 소탕",
+    "description": "위험한 고블린 3마리를 처치하세요.",
+    "type": "KILL",
+    "requiredLevel": 3,
+    "category": "MAIN",
+    "objectives": {
+      "kill_고블린": 3
+    },
+    "reward": {
+      "experience": 100,
+      "gold": 200,
+      "items": [
+        {
+          "itemId": "IRON_SWORD",
+          "quantity": 1,
+          "rarity": "UNCOMMON"
+        }
+      ]
+    },
+    "prerequisites": ["quest_001"],
+    "unlocks": ["quest_003"],
+    "isRepeatable": false,
+    "timeLimit": 0,
+    "tags": ["combat", "progression"]
+  },
+  {
+    "id": "quest_003",
+    "title": "오크 토벌",
+    "description": "강력한 오크 2마리를 처치하세요.",
+    "type": "KILL",
+    "requiredLevel": 5,
+    "category": "MAIN",
+    "objectives": {
+      "kill_오크": 2
+    },
+    "reward": {
+      "experience": 200,
+      "gold": 500,
+      "items": [
+        {
+          "itemId": "PLATE_ARMOR",
+          "quantity": 1,
+          "rarity": "RARE"
+        }
+      ]
+    },
+    "prerequisites": ["quest_002"],
+    "unlocks": ["quest_004"],
+    "isRepeatable": false,
+    "timeLimit": 0,
+    "tags": ["combat", "challenging"]
+  },
+  {
+    "id": "quest_004",
+    "title": "드래곤 슬레이어",
+    "description": "전설의 드래곤을 처치하고 영웅이 되세요!",
+    "type": "KILL",
+    "requiredLevel": 8,
+    "category": "MAIN",
+    "objectives": {
+      "kill_드래곤": 1
+    },
+    "reward": {
+      "experience": 1000,
+      "gold": 2000,
+      "items": [
+        {
+          "itemId": "DRAGON_RING",
+          "quantity": 1,
+          "rarity": "LEGENDARY"
+        }
+      ]
+    },
+    "prerequisites": ["quest_003"],
+    "unlocks": [],
+    "isRepeatable": false,
+    "timeLimit": 0,
+    "tags": ["boss", "legendary", "endgame"]
+  }
+]

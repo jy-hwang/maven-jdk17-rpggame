@@ -1,0 +1,117 @@
+[
+  {
+    "id": "quest_005",
+    "title": "성장하는 모험가",
+    "description": "레벨 5에 도달하세요.",
+    "type": "LEVEL",
+    "requiredLevel": 1,
+    "category": "SIDE",
+    "objectives": {
+      "reach_level": 5
+    },
+    "reward": {
+      "experience": 100,
+      "gold": 150,
+      "items": [
+        {
+          "itemId": "HEALTH_POTION",
+          "quantity": 3,
+          "rarity": "COMMON"
+        },
+        {
+          "itemId": "MANA_POTION",
+          "quantity": 2,
+          "rarity": "COMMON"
+        }
+      ]
+    },
+    "prerequisites": [],
+    "unlocks": ["quest_006"],
+    "isRepeatable": false,
+    "timeLimit": 0,
+    "tags": ["progression", "reward"]
+  },
+  {
+    "id": "quest_006",
+    "title": "물약 수집가",
+    "description": "체력 물약 5개를 수집하세요.",
+    "type": "COLLECT",
+    "requiredLevel": 3,
+    "category": "SIDE",
+    "objectives": {
+      "collect_체력 물약": 5
+    },
+    "reward": {
+      "experience": 150,
+      "gold": 100,
+      "items": [
+        {
+          "itemId": "SPECIAL_POTION",
+          "quantity": 1,
+          "rarity": "RARE"
+        }
+      ]
+    },
+    "prerequisites": ["quest_005"],
+    "unlocks": [],
+    "isRepeatable": true,
+    "timeLimit": 0,
+    "tags": ["collection", "crafting"]
+  },
+  {
+    "id": "quest_007",
+    "title": "보물 사냥꾼",
+    "description": "탐험을 통해 보물 상자 3개를 발견하세요.",
+    "type": "COLLECT",
+    "requiredLevel": 4,
+    "category": "SIDE",
+    "objectives": {
+      "find_treasure_chest": 3
+    },
+    "reward": {
+      "experience": 200,
+      "gold": 300,
+      "items": [
+        {
+          "itemId": "TREASURE_MAP",
+          "quantity": 1,
+          "rarity": "UNCOMMON"
+        }
+      ]
+    },
+    "prerequisites": [],
+    "unlocks": ["quest_008"],
+    "isRepeatable": false,
+    "timeLimit": 0,
+    "tags": ["exploration", "treasure"]
+  },
+  {
+    "id": "quest_008",
+    "title": "던전 마스터",
+    "description": "다양한 지역에서 몬스터를 처치하세요.",
+    "type": "KILL",
+    "requiredLevel": 6,
+    "category": "SIDE",
+    "objectives": {
+      "kill_forest_monster": 5,
+      "kill_cave_monster": 3,
+      "kill_mountain_monster": 2
+    },
+    "reward": {
+      "experience": 400,
+      "gold": 600,
+      "items": [
+        {
+          "itemId": "DUNGEON_KEY",
+          "quantity": 1,
+          "rarity": "RARE"
+        }
+      ]
+    },
+    "prerequisites": ["quest_007"],
+    "unlocks": [],
+    "isRepeatable": false,
+    "timeLimit": 0,
+    "tags": ["exploration", "combat", "challenging"]
+  }
+]

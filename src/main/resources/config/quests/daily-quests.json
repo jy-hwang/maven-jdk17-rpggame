@@ -1,0 +1,98 @@
+[
+  {
+    "id": "daily_kill_template",
+    "title": "일일 사냥 임무",
+    "description": "오늘의 목표 몬스터를 처치하세요.",
+    "type": "KILL",
+    "requiredLevel": 1,
+    "category": "DAILY",
+    "objectives": {
+      "kill_daily_target": 8
+    },
+    "reward": {
+      "experience": 80,
+      "gold": 120,
+      "items": []
+    },
+    "prerequisites": [],
+    "unlocks": [],
+    "isRepeatable": true,
+    "timeLimit": 86400,
+    "tags": ["daily", "combat"],
+    "variableTargets": [
+      "슬라임", "고블린", "오크", "스켈레톤", "거미", "늑대"
+    ],
+    "variableQuantity": {
+      "min": 5,
+      "max": 12
+    }
+  },
+  {
+    "id": "daily_collect_template",
+    "title": "일일 수집 임무",
+    "description": "오늘의 목표 아이템을 수집하세요.",
+    "type": "COLLECT",
+    "requiredLevel": 1,
+    "category": "DAILY",
+    "objectives": {
+      "collect_daily_item": 5
+    },
+    "reward": {
+      "experience": 60,
+      "gold": 80,
+      "items": [
+        {
+          "itemId": "DAILY_REWARD_BOX",
+          "quantity": 1,
+          "rarity": "UNCOMMON"
+        }
+      ]
+    },
+    "prerequisites": [],
+    "unlocks": [],
+    "isRepeatable": true,
+    "timeLimit": 86400,
+    "tags": ["daily", "collection"],
+    "variableTargets": [
+      "체력 물약", "마나 물약", "철광석", "허브", "가죽", "뼈"
+    ],
+    "variableQuantity": {
+      "min": 3,
+      "max": 8
+    }
+  },
+  {
+    "id": "daily_exploration_template",
+    "title": "일일 탐험 임무",
+    "description": "오늘의 목표 지역을 탐험하세요.",
+    "type": "EXPLORE",
+    "requiredLevel": 2,
+    "category": "DAILY",
+    "objectives": {
+      "explore_daily_location": 3
+    },
+    "reward": {
+      "experience": 100,
+      "gold": 150,
+      "items": [
+        {
+          "itemId": "EXPLORATION_COMPASS",
+          "quantity": 1,
+          "rarity": "COMMON"
+        }
+      ]
+    },
+    "prerequisites": [],
+    "unlocks": [],
+    "isRepeatable": true,
+    "timeLimit": 86400,
+    "tags": ["daily", "exploration"],
+    "variableTargets": [
+      "숲속 깊은 곳", "어두운 동굴", "높은 산", "신비한 유적", "용암 지대"
+    ],
+    "variableQuantity": {
+      "min": 2,
+      "max": 5
+    }
+  }
+]
