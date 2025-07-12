@@ -481,7 +481,8 @@ public class GameItemFactory {
    * 희귀도별 아이템 데이터 목록 반환 (내부 헬퍼 메서드)
    */
   private List<GameItemData> getItemDataByRarity(ItemRarity rarity) {
-    return itemDatabase.values().stream().filter(data -> rarity.name().equalsIgnoreCase(data.getRarity().getDisplayName())).collect(Collectors.toList());
+    return itemDatabase.values().stream().filter(data -> data.getRarity() == rarity) // 직접 enum 비교
+        .collect(Collectors.toList());
   }
 
   /**
@@ -679,8 +680,7 @@ public class GameItemFactory {
 
     // 소비 아이템 위주로 드롭
     List<GameItemData> consumables = getItemDataByType("CONSUMABLE");
-    List<GameItemData> targetItems =
-        consumables.stream().filter(data -> rarity.name().equalsIgnoreCase(data.getRarity().getDisplayName())).collect(Collectors.toList());
+    List<GameItemData> targetItems = consumables.stream().filter(data -> data.getRarity() == rarity).collect(Collectors.toList());
 
     if (!targetItems.isEmpty()) {
       GameItemData selectedData = targetItems.get(random.nextInt(targetItems.size()));
@@ -708,12 +708,7 @@ public class GameItemFactory {
 
     List<GameItemData> typeItems = getItemDataByType(selectedType);
     List<GameItemData> availableItems = typeItems.stream().filter(data -> {
-      try {
-        ItemRarity itemRarity = ItemRarity.valueOf(data.getRarity().getDisplayName().toUpperCase());
-        return itemRarity.ordinal() <= maxRarity.ordinal();
-      } catch (IllegalArgumentException e) {
-        return false;
-      }
+      return data.getRarity().ordinal() <= maxRarity.ordinal();
     }).collect(Collectors.toList());
 
     if (!availableItems.isEmpty()) {
