@@ -1,0 +1,127 @@
+[
+  {
+    "id": "SILVER_SWORD",
+    "name": "은검",
+    "description": "은으로 만든 아름다운 검",
+    "type": "EQUIPMENT",
+    "value": 150,
+    "rarity": "UNCOMMON",
+    "stackable": false,
+    "equipmentType": "WEAPON",
+    "stats": {
+      "attack": 12,
+      "defense": 0,
+      "magic": 0
+    },
+    "category": "treasure",
+    "properties": {
+      "source": "treasure_chest",
+      "material": "silver",
+      "blessed": true
+    }
+  },
+  {
+    "id": "MAGE_ROBE",
+    "name": "마법사의 로브",
+    "description": "마법사가 입던 로브",
+    "type": "EQUIPMENT", 
+    "value": 120,
+    "rarity": "RARE",
+    "stackable": false,
+    "equipmentType": "ARMOR",
+    "stats": {
+      "attack": 0,
+      "defense": 8,
+      "magic": 20
+    },
+    "category": "treasure",
+    "properties": {
+      "source": "ancient_mage",
+      "magical": true,
+      "enchanted": true
+    }
+  },
+  {
+    "id": "TRAVELER_BOOTS",
+    "name": "여행자의 부츠",
+    "description": "이동 속도를 증가시키는 부츠",
+    "type": "EQUIPMENT",
+    "value": 75,
+    "rarity": "RARE",
+    "stackable": false,
+    "equipmentType": "ACCESSORY",
+    "stats": {
+      "attack": 0,
+      "defense": 3,
+      "magic": 15
+    },
+    "category": "merchant",
+    "properties": {
+      "source": "special_merchant",
+      "speed_boost": 2,
+      "comfortable": true
+    }
+  },
+  {
+    "id": "ANCIENT_NECKLACE",
+    "name": "고대의 목걸이",
+    "description": "경험치 획득량을 증가시킴",
+    "type": "EQUIPMENT",
+    "value": 100,
+    "rarity": "EPIC",
+    "stackable": false,
+    "equipmentType": "ACCESSORY",
+    "stats": {
+      "attack": 0,
+      "defense": 0,
+      "magic": 25
+    },
+    "category": "merchant",
+    "properties": {
+      "source": "ancient_ruins",
+      "exp_bonus": 0.15,
+      "cursed": false
+    }
+  },
+  {
+    "id": "RUSTY_SWORD",
+    "name": "낡은 검",
+    "description": "사용감이 있지만 쓸만한 검",
+    "type": "EQUIPMENT",
+    "value": 40,
+    "rarity": "COMMON",
+    "stackable": false,
+    "equipmentType": "WEAPON",
+    "stats": {
+      "attack": 5,
+      "defense": 0,
+      "magic": 0
+    },
+    "category": "drop",
+    "properties": {
+      "source": "monster_drop",
+      "condition": "worn"
+    }
+  },
+  {
+    "id": "LEATHER_ARMOR",
+    "name": "가죽 갑옷",
+    "description": "기본적인 가죽 갑옷",
+    "type": "EQUIPMENT",
+    "value": 60,
+    "rarity": "COMMON",
+    "stackable": false,
+    "equipmentType": "ARMOR",
+    "stats": {
+      "attack": 0,
+      "defense": 4,
+      "magic": 5
+    },
+    "category": "drop",
+    "properties": {
+      "source": "monster_drop",
+      "material": "leather",
+      "basic": true
+    }
+  }
+]

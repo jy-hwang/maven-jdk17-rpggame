@@ -1,13 +1,18 @@
 package controller;
 
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import config.BaseConstant;
+import loader.ItemDataLoader;
+import loader.MonsterDataLoader;
 import model.GameCharacter;
 import model.Skill;
 import model.factory.GameItemFactory;
 import model.item.GameConsumable;
 import model.item.GameItem;
+import model.monster.Monster;
+import model.monster.MonsterData;
 import service.GameDataService;
 import service.QuestManager;
 import util.InputValidator;
@@ -109,7 +114,7 @@ public class Game {
     System.out.println("새로운 기능:");
     System.out.println("• 📦 다중 저장 슬롯 시스템 (5개)");
     System.out.println("• 🏗️ 개선된 아키텍처 (Controller 분리)");
-    System.out.println("• 🌟 향상된 탐험 시스템");
+    System.out.println("• 🌟 향상된 탐험 시스템(탐험지역별 몬스터추가)");
     System.out.println("• 🛍️ 확장된 상점 시스템(구매 / 판매)");
     System.out.println("• 📋 고도화된 퀘스트 관리");
     System.out.println("====================================");
@@ -291,7 +296,7 @@ public class Game {
     while (inGameLoop && player.isAlive()) {
       try {
         showInGameMenu();
-        int choice = InputValidator.getIntInput("선택: ", 1, 10);
+        int choice = InputValidator.getIntInput("선택: ", 1, 12);
 
         switch (choice) {
           case 1:
@@ -313,25 +318,28 @@ public class Game {
             shopController.openShop(player);
             break;
           case 7:
-            saveGame();
+            showLocationInfo();
             break;
           case 8:
-            manageSaveSlots();
+            showMonsterEncyclopedia();
             break;
           case 9:
-            returnToMainMenu();
+            saveGame();
             break;
           case 10:
+            manageSaveSlots();
+            break;
+          case 11:
+            returnToMainMenu();
+            break;
+          case 12:
             showHelp();
             break;
           default:
             System.out.println("잘못된 선택입니다.");
         }
 
-        if (inGameLoop && choice != 2 && choice != 10) {
-          InputValidator.waitForAnyKey("\n계속하려면 Enter를 누르세요...");
-        }
-
+       
       } catch (Exception e) {
         logger.error("게임 루프 중 오류", e);
         System.out.println("게임 진행 중 오류가 발생했습니다. 계속 진행합니다.");
@@ -347,7 +355,7 @@ public class Game {
   }
 
   /**
-   * 메인 메뉴를 표시합니다.
+   * 확장된 메인 메뉴를 표시합니다.
    */
   private void showInGameMenu() {
     System.out.println("\n=== 메인 메뉴 ===");
@@ -357,14 +365,449 @@ public class Game {
     System.out.println("4. ⚡ 스킬 관리");
     System.out.println("5. 📋 퀘스트");
     System.out.println("6. 🏪 상점");
-    System.out.println("7. 💾 게임 저장");
-    System.out.println("8. 📁 저장 관리");
-    System.out.println("9. 🚪 게임 종료");
-    System.out.println("10. ❓ 도움말");
+    System.out.println("7. 🗺️ 지역 정보"); // 새로운 기능
+    System.out.println("8. 📚 몬스터 도감"); // 새로운 기능
+    System.out.println("9. 💾 게임 저장");
+    System.out.println("10. 📁 저장 관리");
+    System.out.println("11. 🚪 게임 종료");
+    System.out.println("12. ❓ 도움말");
+
+    // 개발자 모드 메뉴 (디버그용)
+    if (BaseConstant.DEBUG_MODE) {
+      System.out.println("\n=== 개발자 메뉴 ===");
+      System.out.println("90. 🔧 전체 데이터 리로드");
+      System.out.println("91. 📈 몬스터 통계");
+      System.out.println("92. 🎁 아이템 통계");
+      System.out.println("93. 🧪 테스트 몬스터 생성");
+      System.out.println("94. 🎒 테스트 아이템 생성");
+    }
 
     // 알림 표시
     showNotifications();
   }
+
+  /**
+   * 지역 정보를 표시합니다.
+   */
+  private void showLocationInfo() {
+    while (true) {
+      System.out.println("\n🗺️ === 지역 정보 ===");
+      System.out.println("1. 현재 위치 몬스터 정보");
+      System.out.println("2. 모든 지역 개요");
+      System.out.println("3. 지역별 추천 레벨");
+      System.out.println("4. 나가기");
+
+      int choice = InputValidator.getIntInput("선택: ", 1, 4);
+
+      switch (choice) {
+        case 1:
+          showCurrentLocationDetail();
+          break;
+        case 2:
+          showAllLocationsOverview();
+          break;
+        case 3:
+          showLocationRecommendations();
+          break;
+        case 4:
+          return;
+      }
+    }
+  }
+
+  /**
+   * 개발자 전용 - 전체 데이터 리로드
+   */
+  private void reloadAllGameData() {
+    if (!BaseConstant.DEBUG_MODE) {
+      System.out.println("개발자 모드가 활성화되지 않았습니다.");
+      return;
+    }
+
+    System.out.println("전체 게임 데이터를 다시 로드합니다...");
+    exploreController.reloadAllData();
+    System.out.println("완료!");
+  }
+
+  /**
+   * 개발자 전용 - 아이템 통계 표시
+   */
+  private void showItemStatistics() {
+    if (!BaseConstant.DEBUG_MODE) {
+      System.out.println("개발자 모드가 활성화되지 않았습니다.");
+      return;
+    }
+
+    ItemDataLoader.printItemStatistics();
+  }
+
+
+  /**
+   * 현재 위치의 상세 정보를 표시합니다.
+   */
+  private void showCurrentLocationDetail() {
+    String currentLocation = gameState.getCurrentLocation();
+
+    System.out.println("\n📍 현재 위치: " + currentLocation);
+
+    // 지역 설명
+    showLocationDescription(currentLocation);
+
+    // 현재 위치의 몬스터 정보
+    exploreController.showCurrentLocationMonsters(player.getLevel());
+
+    // 지역 통계
+    showLocationStatistics(currentLocation);
+  }
+
+  /**
+   * 모든 지역의 개요를 표시합니다.
+   */
+  private void showAllLocationsOverview() {
+    String[] locations = {"숲속 깊은 곳", "고대 유적", "어두운 동굴", "험준한 산길", "신비한 호수", "폐허가 된 성", "마법의 숲", "용암 동굴"};
+
+    System.out.println("\n🌍 === 모든 지역 개요 ===");
+
+    for (String location : locations) {
+      System.out.println("\n📍 " + location);
+
+      // 지역별 몬스터 수
+      var locationMonsters = MonsterDataLoader.getMonstersByLocation(location);
+      System.out.println("   몬스터 종류: " + locationMonsters.size() + "종");
+
+      // 추천 레벨 범위
+      if (!locationMonsters.isEmpty()) {
+        int minLevel = locationMonsters.stream().mapToInt(MonsterData::getMinLevel).min().orElse(1);
+        int maxLevel = locationMonsters.stream().mapToInt(MonsterData::getMaxLevel).max().orElse(99);
+        System.out.println("   추천 레벨: " + minLevel + " ~ " + maxLevel);
+      }
+
+      // 위험도
+      String dangerLevel = getDangerLevel(location);
+      System.out.println("   위험도: " + dangerLevel);
+    }
+  }
+
+  /**
+   * 지역별 추천 정보를 표시합니다.
+   */
+  private void showLocationRecommendations() {
+    int playerLevel = player.getLevel();
+
+    System.out.println("\n🎯 === 레벨 " + playerLevel + " 추천 지역 ===");
+
+    String[] locations = {"숲속 깊은 곳", "고대 유적", "어두운 동굴", "험준한 산길", "신비한 호수", "폐허가 된 성", "마법의 숲", "용암 동굴"};
+
+    for (String location : locations) {
+      var suitableMonsters = MonsterDataLoader.getMonstersByLocationAndLevel(location, playerLevel);
+
+      if (!suitableMonsters.isEmpty()) {
+        String recommendation = getLocationRecommendation(location, playerLevel, suitableMonsters.size());
+        System.out.println("✅ " + location + " - " + recommendation);
+      } else {
+        String reason = getUnsuitableReason(location, playerLevel);
+        System.out.println("❌ " + location + " - " + reason);
+      }
+    }
+  }
+
+  /**
+   * 몬스터 도감을 표시합니다.
+   */
+  private void showMonsterEncyclopedia() {
+    while (true) {
+      System.out.println("\n📚 === 몬스터 도감 ===");
+      System.out.println("1. 조우한 몬스터 목록");
+      System.out.println("2. 지역별 몬스터");
+      System.out.println("3. 등급별 몬스터");
+      System.out.println("4. 몬스터 검색");
+      System.out.println("5. 몬스터 통계");
+      System.out.println("6. 나가기");
+
+      int choice = InputValidator.getIntInput("선택: ", 1, 6);
+
+      switch (choice) {
+        case 1:
+          showEncounteredMonsters();
+          break;
+        case 2:
+          showMonstersByLocation();
+          break;
+        case 3:
+          showMonstersByRarity();
+          break;
+        case 4:
+          searchMonster();
+          break;
+        case 5:
+          MonsterDataLoader.printMonsterStatistics();
+          break;
+        case 6:
+          return;
+      }
+    }
+  }
+
+  /**
+   * 조우한 몬스터 목록을 표시합니다.
+   */
+  private void showEncounteredMonsters() {
+    // 실제 구현에서는 GameState에 조우한 몬스터 목록을 저장
+    var allMonsters = MonsterDataLoader.loadAllMonsters();
+
+    System.out.println("\n👹 === 조우한 몬스터 ===");
+    System.out.println("총 " + allMonsters.size() + "종의 몬스터가 발견되었습니다.");
+
+    // 몬스터를 레벨 순으로 정렬하여 표시
+    allMonsters.values().stream().sorted((m1, m2) -> Integer.compare(m1.getMinLevel(), m2.getMinLevel())).forEach(monster -> {
+      String rarity = getRarityIcon(monster.getRarity());
+      int level = estimateMonsterLevel(monster);
+
+      System.out.printf("%s %s (레벨 %d) - %s%n", rarity, monster.getName(), level, monster.getDescription());
+    });
+  }
+
+  /**
+   * 지역별 몬스터를 표시합니다.
+   */
+  private void showMonstersByLocation() {
+    String location = InputValidator.getStringInput("지역명을 입력하세요: ", 1, 20);
+
+    var monsters = MonsterDataLoader.getMonstersByLocation(location);
+
+    if (monsters.isEmpty()) {
+      System.out.println("해당 지역에는 몬스터가 없거나 존재하지 않는 지역입니다.");
+      return;
+    }
+
+    System.out.println("\n🏞️ " + location + "의 몬스터들:");
+
+    monsters.forEach(monster -> {
+      String rarity = getRarityIcon(monster.getRarity());
+      int level = estimateMonsterLevel(monster);
+
+      System.out.printf("%s %s (레벨 %d, 출현율 %.0f%%)%n", rarity, monster.getName(), level, monster.getSpawnRate() * 100);
+
+      System.out.printf("   📝 %s%n", monster.getDescription());
+
+      if (!monster.getAbilities().isEmpty()) {
+        System.out.printf("   💫 특수능력: %s%n", String.join(", ", monster.getAbilities()));
+      }
+
+      System.out.printf("   💎 보상: 경험치 %d, 골드 %d%n", monster.getRewards().getExp(), monster.getRewards().getGold());
+      System.out.println();
+    });
+  }
+
+  /**
+   * 등급별 몬스터를 표시합니다.
+   */
+  private void showMonstersByRarity() {
+    System.out.println("\n⭐ === 등급별 몬스터 ===");
+
+    var allMonsters = MonsterDataLoader.loadAllMonsters();
+
+    // 등급별로 그룹화
+    var monstersByRarity = allMonsters.values().stream().collect(Collectors.groupingBy(MonsterData::getRarity));
+
+    String[] rarities = {"COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY"};
+
+    for (String rarity : rarities) {
+      var monsters = monstersByRarity.get(rarity);
+      if (monsters == null || monsters.isEmpty())
+        continue;
+
+      String icon = getRarityIcon(rarity);
+      System.out.println("\n" + icon + " " + rarity + " (" + monsters.size() + "종)");
+
+      monsters.stream().sorted((m1, m2) -> Integer.compare(m1.getMinLevel(), m2.getMinLevel())).forEach(monster -> {
+        int level = estimateMonsterLevel(monster);
+        System.out.printf("   • %s (레벨 %d)%n", monster.getName(), level);
+      });
+    }
+  }
+
+  /**
+   * 몬스터를 검색합니다.
+   */
+  private void searchMonster() {
+    String keyword = InputValidator.getStringInput("몬스터 이름을 입력하세요: ", 1, 20);
+
+    var allMonsters = MonsterDataLoader.loadAllMonsters();
+
+    var searchResults =
+        allMonsters.values().stream().filter(monster -> monster.getName().toLowerCase().contains(keyword.toLowerCase())).collect(Collectors.toList());
+
+    if (searchResults.isEmpty()) {
+      System.out.println("'" + keyword + "'와 일치하는 몬스터를 찾을 수 없습니다.");
+      return;
+    }
+
+    System.out.println("\n🔍 검색 결과: " + searchResults.size() + "종");
+
+    for (MonsterData monster : searchResults) {
+      showDetailedMonsterInfo(monster);
+    }
+  }
+
+  /**
+   * 몬스터의 상세 정보를 표시합니다.
+   */
+  private void showDetailedMonsterInfo(MonsterData monster) {
+    String rarity = getRarityIcon(monster.getRarity());
+    int level = estimateMonsterLevel(monster);
+
+    System.out.println("\n" + "=".repeat(50));
+    System.out.printf("%s %s (레벨 %d)%n", rarity, monster.getName(), level);
+    System.out.println("📝 " + monster.getDescription());
+    System.out.println("🏷️ 등급: " + monster.getRarity());
+
+    // 능력치
+    var stats = monster.getStats();
+    System.out.printf("⚔️ 능력치: HP %d, 공격 %d, 방어 %d, 속도 %d%n", stats.getHp(), stats.getAttack(), stats.getDefense(), stats.getSpeed());
+
+    // 보상
+    var rewards = monster.getRewards();
+    System.out.printf("💎 보상: 경험치 %d, 골드 %d%n", rewards.getExp(), rewards.getGold());
+
+    // 출현 지역
+    if (!monster.getLocations().isEmpty()) {
+      System.out.println("🗺️ 출현 지역: " + String.join(", ", monster.getLocations()));
+    }
+
+    // 출현 레벨 범위
+    System.out.printf("📊 출현 레벨: %d ~ %d (확률 %.0f%%)%n", monster.getMinLevel(), monster.getMaxLevel(), monster.getSpawnRate() * 100);
+
+    // 특수 능력
+    if (!monster.getAbilities().isEmpty()) {
+      System.out.println("💫 특수능력: " + String.join(", ", monster.getAbilities()));
+    }
+
+    // 드롭 아이템
+    if (!rewards.getDropItems().isEmpty()) {
+      System.out.println("🎁 드롭 아이템:");
+      for (var dropItem : rewards.getDropItems()) {
+        System.out.printf("   • %s (확률 %.1f%%, 수량 %d~%d)%n", dropItem.getItemId(), dropItem.getDropRate() * 100, dropItem.getMinQuantity(),
+            dropItem.getMaxQuantity());
+      }
+    }
+
+    System.out.println("=".repeat(50));
+  }
+
+  /**
+   * 개발자 전용 - 몬스터 데이터 리로드
+   */
+  private void reloadMonsterData() {
+    if (!BaseConstant.DEBUG_MODE) {
+      System.out.println("개발자 모드가 활성화되지 않았습니다.");
+      return;
+    }
+
+    System.out.println("몬스터 데이터를 다시 로드합니다...");
+    exploreController.reloadMonsterData();
+    System.out.println("완료!");
+  }
+
+  /**
+   * 개발자 전용 - 테스트 몬스터 생성
+   */
+  private void createTestMonster() {
+    if (!BaseConstant.DEBUG_MODE) {
+      System.out.println("개발자 모드가 활성화되지 않았습니다.");
+      return;
+    }
+
+    System.out.println("테스트 몬스터를 생성합니다...");
+    Monster testMonster = exploreController.getRandomMonster(player.getLevel());
+
+    System.out.println("생성된 몬스터: " + testMonster.getName());
+    System.out.printf("능력치: HP %d, 공격 %d%n", testMonster.getHp(), testMonster.getAttack());
+    System.out.printf("보상: 경험치 %d, 골드 %d%n", testMonster.getExpReward(), testMonster.getGoldReward());
+  }
+
+  // === 헬퍼 메서드들 ===
+
+  private String getDangerLevel(String location) {
+    return switch (location) {
+      case "숲속 깊은 곳" -> "🟢 낮음";
+      case "어두운 동굴", "험준한 산길" -> "🟡 보통";
+      case "마법의 숲", "신비한 호수" -> "🟠 높음";
+      case "폐허가 된 성", "고대 유적" -> "🔴 매우 높음";
+      case "용암 동굴" -> "💀 극도로 높음";
+      default -> "❓ 알 수 없음";
+    };
+  }
+
+  private String getLocationRecommendation(String location, int playerLevel, int monsterCount) {
+    return monsterCount + "종의 몬스터 (레벨 " + playerLevel + " 적합)";
+  }
+
+  private String getUnsuitableReason(String location, int playerLevel) {
+    var allLocationMonsters = MonsterDataLoader.getMonstersByLocation(location);
+
+    if (allLocationMonsters.isEmpty()) {
+      return "몬스터 정보 없음";
+    }
+
+    int minLevel = allLocationMonsters.stream().mapToInt(MonsterData::getMinLevel).min().orElse(1);
+    int maxLevel = allLocationMonsters.stream().mapToInt(MonsterData::getMaxLevel).max().orElse(99);
+
+    if (playerLevel < minLevel) {
+      return "레벨이 너무 낮음 (최소 " + minLevel + " 필요)";
+    } else {
+      return "레벨이 너무 높음 (최대 " + maxLevel + " 권장)";
+    }
+  }
+
+  private String getRarityIcon(String rarity) {
+    return switch (rarity.toUpperCase()) {
+      case "COMMON" -> "⚪";
+      case "UNCOMMON" -> "🟢";
+      case "RARE" -> "🔵";
+      case "EPIC" -> "🟣";
+      case "LEGENDARY" -> "🟡";
+      default -> "❓";
+    };
+  }
+
+  private int estimateMonsterLevel(MonsterData monsterData) {
+    return Math.max(1, (monsterData.getStats().getHp() + monsterData.getStats().getAttack() * 2) / 15);
+  }
+
+  private void showLocationDescription(String location) {
+    String description = switch (location) {
+      case "숲속 깊은 곳" -> "🌲 울창한 숲에서 작은 소리들이 들려옵니다. 초보자에게 적합한 곳입니다.";
+      case "어두운 동굴" -> "🕳️ 어둠이 깊게 드리워진 동굴입니다. 위험하지만 보물이 있을 수 있습니다.";
+      case "험준한 산길" -> "⛰️ 험준한 산길이 이어집니다. 강한 몬스터들이 서식하고 있습니다.";
+      case "신비한 호수" -> "🏞️ 신비로운 기운이 감도는 호수입니다. 물속에서 무언가가 움직입니다.";
+      case "폐허가 된 성" -> "🏰 오래된 성의 폐허입니다. 망령들의 기운이 느껴집니다.";
+      case "마법의 숲" -> "🌟 마법의 기운이 흐르는 숲입니다. 신비한 존재들이 살고 있습니다.";
+      case "용암 동굴" -> "🌋 뜨거운 용암이 흐르는 위험한 동굴입니다. 최고 수준의 위험 지역입니다.";
+      case "고대 유적" -> "🏛️ 고대 문명의 유적입니다. 시간을 초월한 강력한 존재들이 지키고 있습니다.";
+      default -> "🗺️ 알 수 없는 지역입니다.";
+    };
+    System.out.println(description);
+  }
+
+  private void showLocationStatistics(String location) {
+    var monsters = MonsterDataLoader.getMonstersByLocation(location);
+
+    if (monsters.isEmpty())
+      return;
+
+    System.out.println("\n📊 지역 통계:");
+    System.out.println("   총 몬스터 종류: " + monsters.size() + "종");
+
+    int minLevel = monsters.stream().mapToInt(MonsterData::getMinLevel).min().orElse(1);
+    int maxLevel = monsters.stream().mapToInt(MonsterData::getMaxLevel).max().orElse(99);
+    System.out.println("   레벨 범위: " + minLevel + " ~ " + maxLevel);
+
+    double avgSpawnRate = monsters.stream().mapToDouble(MonsterData::getSpawnRate).average().orElse(0.0);
+    System.out.printf("   평균 출현율: %.1f%%%n", avgSpawnRate * 100);
+  }
+
+
 
   /**
    * 게임 알림을 표시합니다.
@@ -674,21 +1117,19 @@ public class Game {
    * 도움말을 표시합니다.
    */
   private void showHelp() {
-    System.out.println("\n📖 === 게임 도움말 ===");
-    System.out.println("🗡️ 탐험하기: 몬스터와 싸우고 다양한 이벤트를 경험하세요");
-    System.out.println("📊 상태 확인: 캐릭터의 현재 상태와 게임 진행도를 확인하세요");
-    System.out.println("🎒 인벤토리: 아이템을 관리하고 장비를 착용하세요");
-    System.out.println("⚡ 스킬 관리: 학습한 스킬을 확인하고 전투에서 사용하세요");
-    System.out.println("📋 퀘스트: 퀘스트를 수락하고 완료하여 보상을 받으세요");
-    System.out.println("🏪 상점: 골드로 유용한 아이템과 장비를 구매하세요");
-    System.out.println("💾 게임 저장: 현재 진행 상황을 저장하세요 (5개 슬롯 지원)");
-    System.out.println("📁 저장 관리: 다중 저장 슬롯을 관리하세요");
-    System.out.println("\n💡 새로운 기능:");
-    System.out.println("• 탐험 중 다양한 랜덤 이벤트 (보물, 치유의 샘, 상인 등)");
-    System.out.println("• 향상된 전투 시스템 (스킬과 아이템 활용)");
-    System.out.println("• 확장된 상점 시스템 (카테고리별 아이템 구매와 판매)");
-    System.out.println("• 고도화된 퀘스트 관리 (진행도 추적 및 보상 시스템)");
-    System.out.println("• 다중 저장 슬롯 (최대 5개 캐릭터 동시 관리)");
+    System.out.println("\n📖 === 게임 도움말 (v" + BaseConstant.GAME_VERSION + ") ===");
+    System.out.println("🗡️ 탐험하기: JSON 기반 지역별 몬스터와 다양한 랜덤 이벤트 경험");
+    System.out.println("📊 상태 확인: 캐릭터 스탯, 장비, 현재 위치 정보 확인");
+    System.out.println("🎒 인벤토리: 통합 아이템 관리 및 장비 착용/해제 시스템");
+    System.out.println("⚡ 스킬 관리: 레벨업으로 학습한 스킬 확인 및 전투 활용");
+    System.out.println("📋 퀘스트: JSON 기반 퀘스트 시스템으로 목표 달성 및 보상 획득");
+    System.out.println("🏪 상점: 카테고리별 아이템 구매/판매 및 특별 상점 이벤트");
+    System.out.println("💾 게임 저장: 다중 슬롯 지원 (최대 5개 캐릭터 동시 관리)");
+    System.out.println("\n🆕 v" + BaseConstant.GAME_VERSION + " 주요 업데이트:");
+    System.out.println("• 🔧 GameDataLoader 기본 아이템 생성 시스템 개선 (JSON 연동)");
+    System.out.println("• 🎯 ExploreController 아이템 생성 로직 통합 및 안정성 강화");
+    System.out.println("• 📦 ItemDataLoader와 GameItemFactory 연동으로 일관된 아이템 관리");
     System.out.println("====================");
   }
+
 }

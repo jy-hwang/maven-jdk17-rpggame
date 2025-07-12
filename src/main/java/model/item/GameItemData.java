@@ -1,7 +1,9 @@
 package model.item;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -21,6 +23,8 @@ public class GameItemData {
   private final Integer defenseBonus; // null이면 0으로 처리
   private final Integer hpBonus; // null이면 0으로 처리
 
+  private final Map<String, Object> properties;
+
   @JsonCreator
   public GameItemData(
 //@formatter:off
@@ -37,6 +41,7 @@ public class GameItemData {
 , @JsonProperty("attackBonus") Integer attackBonus
 , @JsonProperty("defenseBonus") Integer defenseBonus
 , @JsonProperty("hpBonus") Integer hpBonus
+, @JsonProperty("properties") Map<String, Object> properties
 //@formatter:on
   ) {
     this.id = id;
@@ -51,6 +56,7 @@ public class GameItemData {
     this.attackBonus = attackBonus;
     this.defenseBonus = defenseBonus;
     this.hpBonus = hpBonus;
+    this.properties = properties != null ? new HashMap<>(properties) : new HashMap<>();
   }
 
   // Getters
@@ -101,4 +107,9 @@ public class GameItemData {
   public int getHpBonus() {
     return hpBonus != null ? hpBonus : 0;
   }
+
+  public Map<String, Object> getProperties() {
+    return new HashMap<>(properties);
+  }
+
 }

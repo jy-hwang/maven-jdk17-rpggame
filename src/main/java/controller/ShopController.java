@@ -528,7 +528,6 @@ public class ShopController {
    */
   private void displayCategoryItems(GameCharacter player, ShopItemCategory category, List<ShopItem> items) {
     System.out.println("\n🏪 === " + getCategoryKorean(category) + " ===");
-   
 
     for (int i = 0; i < items.size(); i++) {
       ShopItem shopItem = items.get(i);

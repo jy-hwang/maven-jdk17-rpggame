@@ -424,7 +424,7 @@ public class GameItemFactory {
   private void addDefaultItem(String id, String name, String description, String type, int value, ItemRarity rarity, boolean stackable,
       List<GameEffectData> effects) {
     GameItemData item = new GameItemData(id, name, description, type, value, rarity.name(), // ItemRarity enum을 String으로 변환
-        stackable, effects, null, null, null, null);
+        stackable, effects, null, null, null, null, null);
     itemDatabase.put(id, item);
     logger.debug("기본 아이템 추가: {}", name);
   }

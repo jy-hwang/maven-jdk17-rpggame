@@ -446,6 +446,49 @@ public class GameCharacter {
     int manaRegenAmount = (int) Math.max(BaseConstant.NUMBER_ONE, Math.round(maxMana * this.restoreMana / 100.0));
     restoreMana(manaRegenAmount);
 
-    logger.debug("{} 전투 후 체력 회복량 : {}, 마나 회복량 : {}", name,hpRegenAmount, manaRegenAmount);
+    logger.debug("{} 전투 후 체력 회복량 : {}, 마나 회복량 : {}", name, hpRegenAmount, manaRegenAmount);
+  }
+
+  /**
+   * 스킬 매니저의 중복 스킬을 정리합니다. (데이터 로드 후 호출)
+   */
+  public void cleanupDuplicateSkills() {
+    if (skillManager != null) {
+      skillManager.removeDuplicateSkills();
+      logger.info("{} 스킬 중복 정리 완료", name);
+    }
+  }
+
+  /**
+   * 스킬 시스템 상태를 검증합니다.
+   */
+  public void validateSkillSystem() {
+    if (skillManager == null) {
+      logger.error("{} 스킬 매니저가 null", name);
+      skillManager = new SkillManager(); // 새로 생성
+      return;
+    }
+
+    // 중복 스킬 정리
+    cleanupDuplicateSkills();
+
+    // 디버그 모드에서 스킬 정보 출력
+    if (logger.isDebugEnabled()) {
+      skillManager.debugPrintSkills();
+    }
+  }
+
+  /**
+   * 캐릭터 로드 후 호출되는 초기화 메서드
+   */
+  public void postLoadInitialization() {
+    logger.info("캐릭터 로드 후 초기화: {}", name);
+
+    // 스킬 시스템 검증 및 정리
+    validateSkillSystem();
+
+    // 기타 필요한 초기화 작업들...
+
+    logger.debug("{} 로드 후 초기화 완료", name);
   }
 }

@@ -163,20 +163,17 @@ public class GameDataLoader {
 
     try {
       // HP 회복 물약
-      List<GameEffectData> hpEffect = List.of(new GameEffectData("HEAL_HP", 50));
+      List<GameEffectData> hpEffect = List.of(new GameEffectData("HEAL_HP", 30));
 
       // MP 회복 물약
-      List<GameEffectData> mpEffect = List.of(new GameEffectData("HEAL_MP", 40));
+      List<GameEffectData> mpEffect = List.of(new GameEffectData("HEAL_MP", 20));
 
-      // 큰 HP 회복 물약
-      List<GameEffectData> largeHpEffect = List.of(new GameEffectData("HEAL_HP", 100));
-
-      Map<String, GameItemData> defaultPotions = Map.of("HEALTH_POTION",
-          new GameItemData("HEALTH_POTION", "체력 물약", "HP를 50 회복합니다", "CONSUMABLE", 50, "COMMON", true, hpEffect, null, null, null, null),
-          "MANA_POTION", new GameItemData("MANA_POTION", "마나 물약", "MP를 40 회복합니다", "CONSUMABLE", 60, "COMMON", true, mpEffect, null, null, null, null),
-          "LARGE_HEALTH_POTION", new GameItemData("LARGE_HEALTH_POTION", "큰 체력 물약", "HP를 100 회복합니다", "CONSUMABLE", 120, "UNCOMMON", true,
-              largeHpEffect, null, null, null, null));
-
+      //@formatter:off
+      Map<String, GameItemData> defaultPotions = Map.of(
+          "SMALL_HEALTH_POTION", new GameItemData("HEALTH_POTION", "체력 물약", "HP를 30 회복합니다", "CONSUMABLE", 25, "COMMON", true, hpEffect, null, null, null, null, null),
+          "SMALL_MANA_POTION", new GameItemData("MANA_POTION", "마나 물약", "MP를 20 회복합니다", "CONSUMABLE", 30, "COMMON", true, mpEffect, null, null, null, null, null)
+          );
+      //@formatter:on
       logger.info("기본 물약 생성 완료: {}개", defaultPotions.size());
 
       // 생성된 기본 데이터도 검증
@@ -283,13 +280,15 @@ public class GameDataLoader {
   private static Map<String, GameItemData> createDefaultWeapons() {
     logger.info("기본 무기 데이터를 코드로 생성 중...");
 
+    //@formatter:off
     Map<String, GameItemData> defaultWeapons =
-        Map.of("WOODEN_SWORD", new GameItemData("WOODEN_SWORD", "나무 검", "기본적인 나무 검", "WEAPON", 30, "COMMON", false, null, "WEAPON", 5, 0, 0),
-            "IRON_SWORD", new GameItemData("IRON_SWORD", "철 검", "날카로운 철 검", "WEAPON", 100, "UNCOMMON", false, null, "WEAPON", 12, 0, 0),
-            "STEEL_SWORD", new GameItemData("STEEL_SWORD", "강철 검", "단단한 강철 검", "WEAPON", 250, "RARE", false, null, "WEAPON", 20, 0, 0), "WOODEN_BOW",
-            new GameItemData("WOODEN_BOW", "나무 활", "기본적인 나무 활", "WEAPON", 40, "COMMON", false, null, "WEAPON", 7, 0, 0), "MAGIC_STAFF",
-            new GameItemData("MAGIC_STAFF", "마법 지팡이", "마법력을 증폭시키는 지팡이", "WEAPON", 120, "UNCOMMON", false, null, "WEAPON", 8, 0, 10));
-
+        Map.of(
+            "WOODEN_SWORD", new GameItemData("WOODEN_SWORD", "나무 검", "초보자용 나무 검입니다", "WEAPON", 30, "COMMON", false, null, "WEAPON", 5, 0, 0, null),
+            "IRON_SWORD", new GameItemData("IRON_SWORD", "철 검", "날카로운 철로 만든 검입니다", "WEAPON", 100, "UNCOMMON", false, null, "WEAPON", 12, 0, 0, null),
+            "STEEL_SWORD", new GameItemData("STEEL_SWORD", "강철 검", "단단한 강철로 제련한 고급 검입니다", "WEAPON", 250, "RARE", false, null, "WEAPON", 20, 0, 0, null)
+            );
+    //@formatter:on
+    
     logger.info("기본 무기 생성 완료: {}개", defaultWeapons.size());
     return defaultWeapons;
   }
@@ -300,12 +299,14 @@ public class GameDataLoader {
   private static Map<String, GameItemData> createDefaultArmors() {
     logger.info("기본 방어구 데이터를 코드로 생성 중...");
 
+    //@formatter:off
     Map<String, GameItemData> defaultArmors =
-        Map.of("LEATHER_ARMOR", new GameItemData("LEATHER_ARMOR", "가죽 갑옷", "질긴 가죽으로 만든 갑옷", "ARMOR", 60, "COMMON", false, null, "ARMOR", 0, 8, 15),
-            "CHAIN_MAIL", new GameItemData("CHAIN_MAIL", "사슬 갑옷", "쇠사슬로 엮은 갑옷", "ARMOR", 150, "UNCOMMON", false, null, "ARMOR", 0, 15, 25),
-            "PLATE_ARMOR", new GameItemData("PLATE_ARMOR", "판금 갑옷", "두꺼운 강철 판으로 만든 갑옷", "ARMOR", 400, "RARE", false, null, "ARMOR", 0, 25, 50),
-            "ROBE", new GameItemData("ROBE", "마법사 로브", "마나 흐름을 돕는 로브", "ARMOR", 80, "COMMON", false, null, "ARMOR", 0, 3, 20));
-
+        Map.of(
+            "LEATHER_ARMOR", new GameItemData("LEATHER_ARMOR", "가죽 갑옷", "질긴 가죽으로 만든 갑옷입니다", "ARMOR", 60, "COMMON", false, null, "ARMOR", 0, 8, 20, null),
+            "CHAIN_MAIL", new GameItemData("CHAIN_MAIL", "사슬 갑옷", "쇠사슬로 엮어 만든 갑옷입니다", "ARMOR", 150, "UNCOMMON", false, null, "ARMOR", 0, 15, 25, null)
+            );
+    //@formatter:on
+    
     logger.info("기본 방어구 생성 완료: {}개", defaultArmors.size());
     return defaultArmors;
   }
@@ -316,11 +317,13 @@ public class GameDataLoader {
   private static Map<String, GameItemData> createDefaultAccessories() {
     logger.info("기본 액세서리 데이터를 코드로 생성 중...");
 
-    Map<String, GameItemData> defaultAccessories = Map.of("POWER_RING",
-        new GameItemData("POWER_RING", "힘의 반지", "공격력을 높여주는 반지", "ACCESSORY", 200, "UNCOMMON", false, null, "ACCESSORY", 5, 0, 0), "DEFENSE_RING",
-        new GameItemData("DEFENSE_RING", "수호의 반지", "방어력을 높여주는 반지", "ACCESSORY", 180, "UNCOMMON", false, null, "ACCESSORY", 0, 5, 0), "HEALTH_AMULET",
-        new GameItemData("HEALTH_AMULET", "생명의 목걸이", "최대 체력을 증가시키는 목걸이", "ACCESSORY", 300, "RARE", false, null, "ACCESSORY", 0, 0, 30));
-
+    //@formatter:off
+    Map<String, GameItemData> defaultAccessories =
+        Map.of(
+            "POWER_RING", new GameItemData("POWER_RING", "힘의 반지", "착용자의 공격력을 높여주는 마법의 반지입니다", "ACCESSORY", 200, "UNCOMMON", false, null, "ACCESSORY", 5, 0, 0, null)
+            );
+    //@formatter:on
+    
     logger.info("기본 액세서리 생성 완료: {}개", defaultAccessories.size());
     return defaultAccessories;
   }
