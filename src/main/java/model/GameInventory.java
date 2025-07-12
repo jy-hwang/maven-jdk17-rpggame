@@ -482,4 +482,41 @@ public class GameInventory {
       return hpBonus;
     }
   }
+
+  /**
+   * 착용 장비 상태를 검증합니다.
+   */
+  public void validateEquippedItems() {
+    logger.debug("착용 장비 검증 시작");
+
+    if (equippedWeapon != null) {
+      logger.debug("착용 무기: {}", equippedWeapon.getName());
+    }
+    if (equippedArmor != null) {
+      logger.debug("착용 방어구: {}", equippedArmor.getName());
+    }
+    if (equippedAccessory != null) {
+      logger.debug("착용 장신구: {}", equippedAccessory.getName());
+    }
+
+    logger.debug("착용 장비 검증 완료");
+  }
+
+  /**
+   * 착용 장비를 강제로 설정합니다 (로드용)
+   */
+  public void forceSetEquippedWeapon(GameEquipment weapon) {
+    this.equippedWeapon = weapon;
+    logger.debug("무기 강제 설정: {}", weapon != null ? weapon.getName() : "없음");
+  }
+
+  public void forceSetEquippedArmor(GameEquipment armor) {
+    this.equippedArmor = armor;
+    logger.debug("방어구 강제 설정: {}", armor != null ? armor.getName() : "없음");
+  }
+
+  public void forceSetEquippedAccessory(GameEquipment accessory) {
+    this.equippedAccessory = accessory;
+    logger.debug("장신구 강제 설정: {}", accessory != null ? accessory.getName() : "없음");
+  }
 }

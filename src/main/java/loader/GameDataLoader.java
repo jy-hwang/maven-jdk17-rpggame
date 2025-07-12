@@ -53,22 +53,22 @@ public class GameDataLoader {
    * 설정 파일 존재 여부 확인 (범용)
    */
   public static boolean isConfigFileExists(String configPath) {
-      InputStream inputStream = GameDataLoader.class.getResourceAsStream(configPath);
-      boolean exists = inputStream != null;
-      
-      if (exists) {
-          try {
-              inputStream.close();
-          } catch (Exception e) {
-              logger.debug("InputStream 닫기 실패", e);
-          }
+    InputStream inputStream = GameDataLoader.class.getResourceAsStream(configPath);
+    boolean exists = inputStream != null;
+
+    if (exists) {
+      try {
+        inputStream.close();
+      } catch (Exception e) {
+        logger.debug("InputStream 닫기 실패", e);
       }
-      
-      logger.debug("설정 파일 존재 여부: {} ({})", exists, configPath);
-      return exists;
+    }
+
+    logger.debug("설정 파일 존재 여부: {} ({})", exists, configPath);
+    return exists;
   }
-  
-  
+
+
   /**
    * 기본 물약 데이터 로드
    */
@@ -78,8 +78,8 @@ public class GameDataLoader {
 
       // 설정 파일 존재 여부 확인 (범용 메서드 사용)
       if (!isConfigFileExists(BaseConstant.BASIC_POTIONS_CONFIG)) {
-          logger.warn("물약 설정 파일을 찾을 수 없습니다: {}", BaseConstant.BASIC_POTIONS_CONFIG);
-          return createDefaultPotions();
+        logger.warn("물약 설정 파일을 찾을 수 없습니다: {}", BaseConstant.BASIC_POTIONS_CONFIG);
+        return createDefaultPotions();
       }
 
       // JSON 파일 로드
@@ -196,13 +196,13 @@ public class GameDataLoader {
 
       // 설정 파일 존재 여부 확인 (범용 메서드 사용)
       if (!isConfigFileExists(BaseConstant.BASIC_WEAPONS_CONFIG)) {
-          logger.warn("무기 설정 파일을 찾을 수 없습니다: {}", BaseConstant.BASIC_WEAPONS_CONFIG);
-          return createDefaultWeapons();
+        logger.warn("무기 설정 파일을 찾을 수 없습니다: {}", BaseConstant.BASIC_WEAPONS_CONFIG);
+        return createDefaultWeapons();
       }
 
       // JSON 파일 로드
       InputStream inputStream = GameDataLoader.class.getResourceAsStream(BaseConstant.BASIC_WEAPONS_CONFIG);
-      
+
       List<GameItemData> weaponList = objectMapper.readValue(inputStream, new TypeReference<List<GameItemData>>() {});
       Map<String, GameItemData> weaponMap = weaponList.stream().collect(Collectors.toMap(GameItemData::getId, item -> item));
 
@@ -226,8 +226,8 @@ public class GameDataLoader {
 
       // 설정 파일 존재 여부 확인 (범용 메서드 사용)
       if (!isConfigFileExists(BaseConstant.BASIC_ARMORS_CONFIG)) {
-          logger.warn("방어구 설정 파일을 찾을 수 없습니다: {}", BaseConstant.BASIC_ARMORS_CONFIG);
-          return createDefaultArmors();
+        logger.warn("방어구 설정 파일을 찾을 수 없습니다: {}", BaseConstant.BASIC_ARMORS_CONFIG);
+        return createDefaultArmors();
       }
 
       InputStream inputStream = GameDataLoader.class.getResourceAsStream(BaseConstant.BASIC_ARMORS_CONFIG);
@@ -255,11 +255,11 @@ public class GameDataLoader {
 
       // 설정 파일 존재 여부 확인 (범용 메서드 사용)
       if (!isConfigFileExists(BaseConstant.BASIC_ACCESSORIES_CONFIG)) {
-          logger.warn("액세서리 설정 파일을 찾을 수 없습니다: {}", BaseConstant.BASIC_ACCESSORIES_CONFIG);
-          return createDefaultAccessories();
+        logger.warn("액세서리 설정 파일을 찾을 수 없습니다: {}", BaseConstant.BASIC_ACCESSORIES_CONFIG);
+        return createDefaultAccessories();
       }
       InputStream inputStream = GameDataLoader.class.getResourceAsStream(BaseConstant.BASIC_ACCESSORIES_CONFIG);
-      
+
       List<GameItemData> accessoryList = objectMapper.readValue(inputStream, new TypeReference<List<GameItemData>>() {});
       Map<String, GameItemData> accessoryMap = accessoryList.stream().collect(Collectors.toMap(GameItemData::getId, item -> item));
 
@@ -288,7 +288,7 @@ public class GameDataLoader {
             "STEEL_SWORD", new GameItemData("STEEL_SWORD", "강철 검", "단단한 강철로 제련한 고급 검입니다", "WEAPON", 250, "RARE", false, null, "WEAPON", 20, 0, 0, null)
             );
     //@formatter:on
-    
+
     logger.info("기본 무기 생성 완료: {}개", defaultWeapons.size());
     return defaultWeapons;
   }
@@ -306,7 +306,7 @@ public class GameDataLoader {
             "CHAIN_MAIL", new GameItemData("CHAIN_MAIL", "사슬 갑옷", "쇠사슬로 엮어 만든 갑옷입니다", "ARMOR", 150, "UNCOMMON", false, null, "ARMOR", 0, 15, 25, null)
             );
     //@formatter:on
-    
+
     logger.info("기본 방어구 생성 완료: {}개", defaultArmors.size());
     return defaultArmors;
   }
@@ -323,7 +323,7 @@ public class GameDataLoader {
             "POWER_RING", new GameItemData("POWER_RING", "힘의 반지", "착용자의 공격력을 높여주는 마법의 반지입니다", "ACCESSORY", 200, "UNCOMMON", false, null, "ACCESSORY", 5, 0, 0, null)
             );
     //@formatter:on
-    
+
     logger.info("기본 액세서리 생성 완료: {}개", defaultAccessories.size());
     return defaultAccessories;
   }

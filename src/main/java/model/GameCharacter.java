@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import config.BaseConstant;
 import model.effect.GameStatusCondition;
+import service.QuestManager;
 
 /**
  * 향상된 게임 캐릭터 클래스 (인벤토리, 스킬, 마나 시스템 포함)
@@ -28,6 +29,7 @@ public class GameCharacter {
   private GameInventory inventory;
   private SkillManager skillManager;
   private GameStatusCondition playerStatusCondition;
+  private QuestManager questManager;
 
   /**
    * 새 캐릭터 생성자
@@ -53,6 +55,7 @@ public class GameCharacter {
     this.restoreMana = BaseConstant.RESTORE_MANA;
     this.skillManager = new SkillManager();
     this.playerStatusCondition = GameStatusCondition.NORMAL;
+    this.questManager = new QuestManager();
 
     logger.info("새 캐릭터 생성: {}", this.name);
   }
@@ -62,23 +65,24 @@ public class GameCharacter {
    */
   @JsonCreator
   public GameCharacter(
-  //@formatter:off
-      @JsonProperty("name") String name,
-      @JsonProperty("level") int level,
-      @JsonProperty("hp") int hp,
-      @JsonProperty("maxHp") int maxHp,
-      @JsonProperty("mana") int mana,
-      @JsonProperty("maxMana") int maxMana,
-      @JsonProperty("restoreHp") double restoreHp,
-      @JsonProperty("restoreMana") double restoreMana,
-      @JsonProperty("exp") int exp,
-      @JsonProperty("baseAttack") int baseAttack,
-      @JsonProperty("baseDefense") int baseDefense,
-      @JsonProperty("gold") int gold,
-      @JsonProperty("inventory") GameInventory inventory,
-      @JsonProperty("skillManager") SkillManager skillManager,
-      @JsonProperty("playerStatusCondition") GameStatusCondition playerStatusCondition
-      //@formatter:on
+//@formatter:off
+@JsonProperty("name") String name
+, @JsonProperty("level") int level
+, @JsonProperty("hp") int hp
+, @JsonProperty("maxHp") int maxHp
+, @JsonProperty("mana") int mana
+, @JsonProperty("maxMana") int maxMana
+, @JsonProperty("restoreHp") double restoreHp
+, @JsonProperty("restoreMana") double restoreMana
+, @JsonProperty("exp") int exp
+, @JsonProperty("baseAttack") int baseAttack
+, @JsonProperty("baseDefense") int baseDefense
+, @JsonProperty("gold") int gold
+, @JsonProperty("inventory") GameInventory inventory
+, @JsonProperty("skillManager") SkillManager skillManager
+, @JsonProperty("playerStatusCondition") GameStatusCondition playerStatusCondition
+, @JsonProperty("questManager") QuestManager questManager
+//@formatter:on
   ) {
     if (name == null || name.trim().isEmpty()) {
       logger.error("저장된 캐릭터 이름이 유효하지 않음: {}", name);
@@ -102,6 +106,8 @@ public class GameCharacter {
     this.inventory = inventory != null ? inventory : new GameInventory(BaseConstant.DEFAULT_INVENTORY);
     this.skillManager = skillManager != null ? skillManager : new SkillManager();
     this.playerStatusCondition = playerStatusCondition != null ? playerStatusCondition : GameStatusCondition.NORMAL;
+    this.questManager = questManager != null ? questManager : new QuestManager();
+
     logger.info("저장된 캐릭터 로드: {} (레벨: {})", this.name, this.level);
   }
 
@@ -423,6 +429,14 @@ public class GameCharacter {
     return playerStatusCondition;
   }
 
+  public QuestManager getQuestManager() {
+    return questManager;
+  }
+
+  public void setQuestManager(QuestManager questManager) {
+    this.questManager = questManager != null ? questManager : new QuestManager();
+  }
+
   /**
    * 골드를 설정합니다.
    */
@@ -462,7 +476,7 @@ public class GameCharacter {
   /**
    * 스킬 시스템 상태를 검증합니다.
    */
-  public void validateSkillSystem() {
+  public void validateLoadedData() {
     if (skillManager == null) {
       logger.error("{} 스킬 매니저가 null", name);
       skillManager = new SkillManager(); // 새로 생성
@@ -471,6 +485,15 @@ public class GameCharacter {
 
     // 중복 스킬 정리
     cleanupDuplicateSkills();
+
+    // 인벤토리 착용 장비 검증
+    if (inventory != null) {
+      inventory.validateEquippedItems();
+    }
+    if (questManager != null) {
+      questManager.validateQuestData();
+      logger.info("퀘스트 데이터 검증 완료: 활성 {}개, 완료 {}개", questManager.getActiveQuests().size(), questManager.getCompletedQuests().size());
+    }
 
     // 디버그 모드에서 스킬 정보 출력
     if (logger.isDebugEnabled()) {
@@ -485,10 +508,12 @@ public class GameCharacter {
     logger.info("캐릭터 로드 후 초기화: {}", name);
 
     // 스킬 시스템 검증 및 정리
-    validateSkillSystem();
+    validateLoadedData();
 
     // 기타 필요한 초기화 작업들...
 
     logger.debug("{} 로드 후 초기화 완료", name);
   }
+
+
 }

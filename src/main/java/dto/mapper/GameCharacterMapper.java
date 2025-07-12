@@ -28,6 +28,7 @@ public class GameCharacterMapper {
     dto.setInventory(GameInventoryMapper.toDto(character.getInventory()));
     dto.setSkillManager(SkillManagerMapper.toDto(character.getSkillManager()));
     dto.setPlayerStatusCondition(character.getPlayerStatusCondition().name());
+    dto.setQuestManager(QuestManagerMapper.toDto(character.getQuestManager()));
 
     logger.debug("GameCharacterDto 변환 완료: {}", character.getName());
     return dto;
@@ -38,7 +39,7 @@ public class GameCharacterMapper {
     GameCharacter character = new GameCharacter(dto.getName(), dto.getLevel(), dto.getHp(), dto.getMaxHp(), dto.getMana(), dto.getMaxMana(),
         dto.getRestoreHp(), dto.getRestoreMana(), dto.getExp(), dto.getBaseAttack(), dto.getBaseDefense(), dto.getGold(),
         GameInventoryMapper.fromDto(dto.getInventory()), SkillManagerMapper.fromDto(dto.getSkillManager()),
-        GameStatusCondition.valueOf(dto.getPlayerStatusCondition()));
+        GameStatusCondition.valueOf(dto.getPlayerStatusCondition()), QuestManagerMapper.fromDto(dto.getQuestManager()));
 
     logger.debug("GameCharacter 변환 완료: {}", dto.getName());
     return character;

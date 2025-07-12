@@ -7,6 +7,7 @@ import config.BaseConstant;
 import loader.ItemDataLoader;
 import loader.MonsterDataLoader;
 import model.GameCharacter;
+import model.GameInventory;
 import model.Skill;
 import model.factory.GameItemFactory;
 import model.item.GameConsumable;
@@ -25,7 +26,6 @@ public class Game {
 
   // 게임 상태
   private GameCharacter player;
-  private QuestManager questManager;
   private GameDataService.GameState gameState;
   private boolean gameRunning;
   private boolean inGameLoop;
@@ -42,7 +42,6 @@ public class Game {
   public Game() {
     this.gameRunning = true;
     this.inGameLoop = false;
-    this.questManager = new QuestManager();
     this.gameState = new GameDataService.GameState();
     this.gameStartTime = System.currentTimeMillis();
     this.currentSaveSlot = 0;
@@ -58,10 +57,9 @@ public class Game {
     try {
       // 순서 중요: 의존성이 있는 컨트롤러들을 순서대로 초기화
       inventoryController = new InventoryController();
-      questController = new QuestController(questManager, gameState);
-      battleController = new BattleController(questManager, gameState);
+      battleController = new BattleController(null, gameState); // 임시로 null
       shopController = new ShopController(inventoryController);
-      exploreController = new ExploreController(battleController, questController, inventoryController, gameState);
+      exploreController = new ExploreController(battleController, null, inventoryController, gameState); // 임시로 null
 
       logger.debug("모든 컨트롤러 초기화 완료");
     } catch (Exception e) {
@@ -247,13 +245,38 @@ public class Game {
       currentSaveSlot = slotNumber;
       gameStartTime = System.currentTimeMillis(); // 플레이 시간을 새로 시작
 
+      // 🔥 로드 후 데이터 검증 (추가된 부분)
+      player.validateLoadedData();
+
       // 컨트롤러들에 새로운 gameState 적용
       updateControllersWithNewGameState();
+
+      QuestManager questManager = player.getQuestManager();
+      int activeCount = questManager.getActiveQuests().size();
+      int completedCount = questManager.getCompletedQuests().size();
+
+      if (activeCount > 0 || completedCount > 0) {
+        System.out.println("📋 퀘스트 진행 상황이 복원되었습니다: 활성 " + activeCount + "개, 완료 " + completedCount + "개");
+      }
 
       System.out.println("🎮 슬롯 " + slotNumber + "에서 게임을 불러왔습니다!");
       System.out.println("어서오세요, " + player.getName() + "님!");
       player.displayStats();
       gameState.displayGameStats();
+
+      // 🔥 착용 장비 상태 확인 메시지 (추가된 부분)
+      GameInventory inventory = player.getInventory();
+      int equippedCount = 0;
+      if (inventory.getEquippedWeapon() != null)
+        equippedCount++;
+      if (inventory.getEquippedArmor() != null)
+        equippedCount++;
+      if (inventory.getEquippedAccessory() != null)
+        equippedCount++;
+
+      if (equippedCount > 0) {
+        System.out.println("⚔️ 착용 장비 " + equippedCount + "개가 복원되었습니다.");
+      }
 
       logger.info("슬롯 {} 기존 캐릭터 로드: {}", slotNumber, player.getName());
 
@@ -282,9 +305,12 @@ public class Game {
    * 새로운 게임 상태로 컨트롤러들을 업데이트합니다.
    */
   private void updateControllersWithNewGameState() {
+    QuestManager questManager = player.getQuestManager();
+
     questController = new QuestController(questManager, gameState);
     battleController = new BattleController(questManager, gameState);
     exploreController = new ExploreController(battleController, questController, inventoryController, gameState);
+
   }
 
   /**
@@ -339,7 +365,7 @@ public class Game {
             System.out.println("잘못된 선택입니다.");
         }
 
-       
+
       } catch (Exception e) {
         logger.error("게임 루프 중 오류", e);
         System.out.println("게임 진행 중 오류가 발생했습니다. 계속 진행합니다.");

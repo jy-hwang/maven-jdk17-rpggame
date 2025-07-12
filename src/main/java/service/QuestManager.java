@@ -42,6 +42,18 @@ public class QuestManager {
     logger.info("QuestManager 초기화 완료 (GameItemFactory 통합)");
   }
 
+  // 로드 전용 생성자 (정적 팩토리 메서드)
+  public static QuestManager createForLoading() {
+    QuestManager questManager = new QuestManager();
+    // 기본 퀘스트들을 제거 (로드된 데이터로 교체될 예정)
+    questManager.availableQuests.clear();
+    questManager.activeQuests.clear();
+    questManager.completedQuests.clear();
+
+    logger.info("로드용 QuestManager 생성 완료 (기본 퀘스트 제거됨)");
+    return questManager;
+  }
+
   /**
    * 기본 퀘스트들을 초기화합니다.
    */
@@ -75,6 +87,26 @@ public class QuestManager {
     }
   }
 
+  /**
+   * 기본 퀘스트만 초기화 (중복 방지용)
+   */
+  private void initializeDefaultQuestsOnly() {
+      logger.info("기본 퀘스트만 초기화 중...");
+      
+      try {
+          // 최소한의 기본 퀘스트만 생성
+          createSlimeQuest();
+          createLevelQuest();
+          
+          logger.info("기본 퀘스트 초기화 완료: {}개 퀘스트", availableQuests.size());
+          
+      } catch (Exception e) {
+          logger.error("기본 퀘스트 초기화 실패", e);
+          createFallbackQuests();
+      }
+  }
+
+  
   /**
    * 슬라임 사냥 퀘스트 생성
    */
@@ -776,6 +808,76 @@ public class QuestManager {
     System.out.println("==========================");
   }
 
+  /**
+   * 퀘스트 데이터 검증 (로드 후 호출)
+   */
+  public void validateQuestData() {
+    logger.info("퀘스트 데이터 검증 시작");
+
+    // null 체크 및 초기화
+    if (availableQuests == null) {
+      availableQuests = new ArrayList<>();
+    }
+    if (activeQuests == null) {
+      activeQuests = new ArrayList<>();
+    }
+    if (completedQuests == null) {
+      completedQuests = new ArrayList<>();
+    }
+
+    // 잘못된 상태의 퀘스트 정리
+    activeQuests.removeIf(quest -> quest == null || quest.getStatus() != Quest.QuestStatus.ACTIVE);
+    completedQuests.removeIf(quest -> quest == null);
+
+    // 🔥 로드된 데이터가 비어있으면 기본 퀘스트만 추가 (중복 방지)
+    if (availableQuests.isEmpty() && activeQuests.isEmpty() && completedQuests.isEmpty()) {
+      logger.info("빈 퀘스트 데이터 감지 - 기본 퀘스트 추가");
+      initializeDefaultQuestsOnly();
+    }
+
+    logger.info("퀘스트 데이터 검증 완료: 사용가능 {}개, 활성 {}개, 완료 {}개", availableQuests.size(), activeQuests.size(), completedQuests.size());
+  }
+
+  /**
+   * 🔥 로드용 전용: 모든 퀘스트를 제거하고 로드된 데이터로 교체
+   */
+  public void replaceAllQuestsForLoad(List<Quest> newAvailable, List<Quest> newActive, List<Quest> newCompleted) {
+    logger.debug("퀘스트 데이터 교체 시작");
+
+    // 기존 데이터 완전 제거
+    if (availableQuests != null) {
+      availableQuests.clear();
+    } else {
+      availableQuests = new ArrayList<>();
+    }
+
+    if (activeQuests != null) {
+      activeQuests.clear();
+    } else {
+      activeQuests = new ArrayList<>();
+    }
+
+    if (completedQuests != null) {
+      completedQuests.clear();
+    } else {
+      completedQuests = new ArrayList<>();
+    }
+
+    // 로드된 데이터로 교체
+    if (newAvailable != null) {
+      availableQuests.addAll(newAvailable);
+    }
+    if (newActive != null) {
+      activeQuests.addAll(newActive);
+    }
+    if (newCompleted != null) {
+      completedQuests.addAll(newCompleted);
+    }
+
+    logger.debug("퀘스트 데이터 교체 완료: 사용가능 {}개, 활성 {}개, 완료 {}개", availableQuests.size(), activeQuests.size(), completedQuests.size());
+  }
+
+
   // ==================== Getters ====================
 
   public List<Quest> getAvailableQuests() {
@@ -840,5 +942,7 @@ public class QuestManager {
       return String.format("QuestStatistics{available=%d, active=%d, claimable=%d, claimed=%d, completion=%.1f%%}", availableCount, activeCount,
           claimableCount, claimedCount, getCompletionRate());
     }
+
+
   }
 }

@@ -2,6 +2,7 @@ package dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import service.QuestManager;
 
 public class GameCharacterDto {
   private String name;
@@ -19,6 +20,7 @@ public class GameCharacterDto {
   private GameInventoryDto inventory;
   private SkillManagerDto skillManager;
   private String playerStatusCondition;
+  private QuestManagerDto questManager;
 
   public GameCharacterDto() {}
 
@@ -40,6 +42,7 @@ public class GameCharacterDto {
 , @JsonProperty("inventory") GameInventoryDto inventory
 , @JsonProperty("skillManager") SkillManagerDto skillManager
 , @JsonProperty("playerStatusCondition") String playerStatusCondition
+, @JsonProperty("questManager") QuestManagerDto questManager
 //@formatter:off
   ) {
       this.name = name;
@@ -57,6 +60,7 @@ public class GameCharacterDto {
       this.inventory = inventory;
       this.skillManager = skillManager;
       this.playerStatusCondition = playerStatusCondition;
+      this.questManager = questManager;
   }
 
   public String getName() {
@@ -177,6 +181,14 @@ public class GameCharacterDto {
 
   public void setPlayerStatusCondition(String playerStatusCondition) {
     this.playerStatusCondition = playerStatusCondition;
+  }
+
+  public QuestManagerDto getQuestManager() {
+    return questManager;
+  }
+
+  public void setQuestManager(QuestManagerDto questManager) {
+    this.questManager = questManager;
   }
   
 }
