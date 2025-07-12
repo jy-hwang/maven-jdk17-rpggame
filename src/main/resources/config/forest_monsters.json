@@ -1,0 +1,124 @@
+[
+  {
+    "id": "FOREST_WOLF",
+    "name": "숲늑대",
+    "description": "숲에서 사는 야생 늑대. 날카로운 이빨과 발톱을 가지고 있다.",
+    "stats": {
+      "hp": 32,
+      "attack": 9,
+      "defense": 4,
+      "speed": 8,
+      "criticalRate": 0.2
+    },
+    "rewards": {
+      "exp": 18,
+      "gold": 12,
+      "dropItems": [
+        {
+          "itemId": "WOLF_PELT",
+          "dropRate": 0.6,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": "SHARP_FANG",
+          "dropRate": 0.25,
+          "minQuantity": 1,
+          "maxQuantity": 2
+        }
+      ]
+    },
+    "locations": ["숲속 깊은 곳", "마법의 숲"],
+    "minLevel": 3,
+    "maxLevel": 7,
+    "spawnRate": 0.6,
+    "rarity": "COMMON",
+    "abilities": ["무리 사냥", "속도 증가"],
+    "properties": {
+      "element": "nature",
+      "packHunter": true
+    }
+  },
+  {
+    "id": "TREE_SPIRIT",
+    "name": "나무정령",
+    "description": "고대의 나무에 깃든 정령. 자연의 힘을 조종한다.",
+    "stats": {
+      "hp": 45,
+      "attack": 11,
+      "defense": 6,
+      "speed": 4,
+      "criticalRate": 0.12
+    },
+    "rewards": {
+      "exp": 22,
+      "gold": 18,
+      "dropItems": [
+        {
+          "itemId": "NATURE_ESSENCE",
+          "dropRate": 0.4,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": "MYSTICAL_BARK",
+          "dropRate": 0.3,
+          "minQuantity": 1,
+          "maxQuantity": 2
+        }
+      ]
+    },
+    "locations": ["마법의 숲"],
+    "minLevel": 4,
+    "maxLevel": 8,
+    "spawnRate": 0.4,
+    "rarity": "UNCOMMON",
+    "abilities": ["자연 치유", "뿌리 속박"],
+    "properties": {
+      "element": "nature",
+      "magical": true,
+      "regeneration": 5
+    }
+  },
+  {
+    "id": "FOREST_GUARDIAN",
+    "name": "숲의수호자",
+    "description": "숲을 지키는 강력한 수호령. 침입자에게는 무자비하다.",
+    "stats": {
+      "hp": 95,
+      "attack": 18,
+      "defense": 12,
+      "speed": 6,
+      "criticalRate": 0.15
+    },
+    "rewards": {
+      "exp": 48,
+      "gold": 38,
+      "dropItems": [
+        {
+          "itemId": "GUARDIAN_HEART",
+          "dropRate": 0.8,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": "ANCIENT_WOOD",
+          "dropRate": 0.5,
+          "minQuantity": 2,
+          "maxQuantity": 3
+        }
+      ]
+    },
+    "locations": ["마법의 숲"],
+    "minLevel": 8,
+    "maxLevel": 15,
+    "spawnRate": 0.2,
+    "rarity": "RARE",
+    "abilities": ["숲의 분노", "자연 소환", "강화된 재생"],
+    "properties": {
+      "element": "nature",
+      "boss": true,
+      "regeneration": 10
+    }
+  }
+]

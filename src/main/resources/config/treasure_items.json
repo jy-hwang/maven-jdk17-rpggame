@@ -1,0 +1,77 @@
+[
+  {
+    "id": "PREMIUM_HEALTH_POTION",
+    "name": "고급 체력 물약",
+    "description": "HP를 100 회복합니다",
+    "type": "CONSUMABLE",
+    "value": 50,
+    "rarity": "UNCOMMON",
+    "stackable": true,
+    "effects": [
+      {
+        "type": "HEAL_HP",
+        "value": 100
+      }
+    ],
+    "cooldown": 0,
+    "category": "treasure",
+    "properties": {
+      "source": "treasure_chest",
+      "dropChance": 0.3
+    }
+  },
+  {
+    "id": "MYSTICAL_POTION",
+    "name": "신비한 물약",
+    "description": "HP와 MP를 100 회복합니다",
+    "type": "CONSUMABLE",
+    "value": 80,
+    "rarity": "RARE",
+    "stackable": true,
+    "effects": [
+      {
+        "type": "HEAL_HP",
+        "value": 100
+      },
+      {
+        "type": "HEAL_MP",
+        "value": 100
+      }
+    ],
+    "cooldown": 1,
+    "category": "treasure",
+    "properties": {
+      "source": "special_merchant",
+      "magical": true
+    }
+  },
+  {
+    "id": "CRYSTAL_VIAL",
+    "name": "수정 물약",
+    "description": "모든 능력을 일시적으로 회복합니다",
+    "type": "CONSUMABLE",
+    "value": 120,
+    "rarity": "EPIC",
+    "stackable": true,
+    "effects": [
+      {
+        "type": "HEAL_HP",
+        "value": 150
+      },
+      {
+        "type": "HEAL_MP",
+        "value": 80
+      },
+      {
+        "type": "GAIN_EXP",
+        "value": 25
+      }
+    ],
+    "cooldown": 3,
+    "category": "treasure",
+    "properties": {
+      "source": "crystal_cave",
+      "rare_find": true
+    }
+  }
+]

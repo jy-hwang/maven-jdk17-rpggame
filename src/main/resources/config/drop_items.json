@@ -1,0 +1,91 @@
+[
+  {
+    "id": "BASIC_HEALTH_POTION",
+    "name": "체력 물약",
+    "description": "HP를 50 회복합니다",
+    "type": "CONSUMABLE",
+    "value": 20,
+    "rarity": "COMMON",
+    "stackable": true,
+    "effects": [
+      {
+        "type": "HEAL_HP",
+        "value": 50
+      }
+    ],
+    "cooldown": 0,
+    "category": "drop",
+    "properties": {
+      "source": "monster_drop",
+      "common_find": true
+    }
+  },
+  {
+    "id": "BASIC_MANA_POTION",
+    "name": "마나 물약",
+    "description": "마나를 30 회복합니다",
+    "type": "CONSUMABLE",
+    "value": 25,
+    "rarity": "COMMON",
+    "stackable": true,
+    "effects": [
+      {
+        "type": "HEAL_MP",
+        "value": 30
+      }
+    ],
+    "cooldown": 0,
+    "category": "drop",
+    "properties": {
+      "source": "monster_drop",
+      "blue_liquid": true
+    }
+  },
+  {
+    "id": "ENERGY_DRINK",
+    "name": "기력 회복약",
+    "description": "HP와 MP를 소량 회복합니다",
+    "type": "CONSUMABLE",
+    "value": 35,
+    "rarity": "COMMON",
+    "stackable": true,
+    "effects": [
+      {
+        "type": "HEAL_HP",
+        "value": 25
+      },
+      {
+        "type": "HEAL_MP",
+        "value": 15
+      }
+    ],
+    "cooldown": 0,
+    "category": "drop",
+    "properties": {
+      "source": "monster_drop",
+      "refreshing": true
+    }
+  },
+  {
+    "id": "EXPERIENCE_CRYSTAL",
+    "name": "경험치 크리스탈",
+    "description": "경험치를 즉시 획득합니다",
+    "type": "CONSUMABLE",
+    "value": 45,
+    "rarity": "UNCOMMON",
+    "stackable": true,
+    "effects": [
+      {
+        "type": "GAIN_EXP",
+        "value": 50
+      }
+    ],
+    "cooldown": 0,
+    "category": "drop",
+    "properties": {
+      "source": "magical_monster",
+      "crystalline": true,
+      "glowing": true
+    }
+  }
+]

@@ -1,0 +1,76 @@
+[
+  {
+    "id": "SLIME",
+    "name": "슬라임",
+    "description": "젤리 같은 부드러운 몬스터. 초보자에게 적합한 상대다.",
+    "stats": {
+      "hp": 20,
+      "attack": 5,
+      "defense": 2,
+      "speed": 3,
+      "criticalRate": 0.1
+    },
+    "rewards": {
+      "exp": 10,
+      "gold": 5,
+      "dropItems": [
+        {
+          "itemId": "SLIME_GEL",
+          "dropRate": 0.3,
+          "minQuantity": 1,
+          "maxQuantity": 2
+        }
+      ]
+    },
+    "locations": ["숲속 깊은 곳"],
+    "minLevel": 1,
+    "maxLevel": 3,
+    "spawnRate": 0.8,
+    "rarity": "COMMON",
+    "abilities": ["자가치유"],
+    "properties": {
+      "element": "neutral",
+      "weakness": "fire"
+    }
+  },
+  {
+    "id": "GOBLIN",
+    "name": "고블린",
+    "description": "작고 교활한 녹색 몬스터. 무리를 이루어 다닌다.",
+    "stats": {
+      "hp": 30,
+      "attack": 8,
+      "defense": 3,
+      "speed": 5,
+      "criticalRate": 0.15
+    },
+    "rewards": {
+      "exp": 15,
+      "gold": 10,
+      "dropItems": [
+        {
+          "itemId": "RUSTY_DAGGER",
+          "dropRate": 0.15,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        },
+        {
+          "itemId": "GOBLIN_EAR",
+          "dropRate": 0.4,
+          "minQuantity": 1,
+          "maxQuantity": 1
+        }
+      ]
+    },
+    "locations": ["숲속 깊은 곳", "어두운 동굴"],
+    "minLevel": 2,
+    "maxLevel": 5,
+    "spawnRate": 0.7,
+    "rarity": "COMMON",
+    "abilities": ["도주", "독 공격"],
+    "properties": {
+      "element": "neutral",
+      "social": true
+    }
+  }
+]
