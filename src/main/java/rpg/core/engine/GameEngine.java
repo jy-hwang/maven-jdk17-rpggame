@@ -22,6 +22,7 @@ import rpg.presentation.controller.ShopController;
 import rpg.shared.constant.SystemConstants;
 import rpg.shared.debug.DebugController;
 import rpg.shared.persistence.SaveGameController;
+import rpg.shared.util.ConsoleColors;
 
 /**
  * 리팩토링된 메인 게임 컨트롤러 각 기능별 Controller들을 조율하는 역할
@@ -116,9 +117,11 @@ public class GameEngine {
    * 환영 메시지를 표시합니다.
    */
   private void showWelcomeMessage() {
-    System.out.println("====================================");
-    System.out.println("   🎮 RPG 게임 v" + SystemConstants.GAME_VERSION + " 🎮   ");
-    System.out.println("====================================");
+    System.out.println(ConsoleColors.CYAN + "====================================");
+    System.out.println("   🎮 " + ConsoleColors.BOLD + ConsoleColors.GOLD_FALLBACK + "RPG 게임 v" + SystemConstants.GAME_VERSION + ConsoleColors.RESET
+        + ConsoleColors.CYAN + " 🎮   ");
+    System.out.println("====================================" + ConsoleColors.RESET);
+
     System.out.println("새로운 기능:");
     System.out.println("• 📦 다중 저장 슬롯 시스템 (5개)");
     System.out.println("• 🏗️ 개선된 아키텍처 (Controller 분리)");
@@ -132,13 +135,13 @@ public class GameEngine {
    * 메인 메뉴를 표시합니다.
    */
   private void showMainMenu() {
-    System.out.println("\n=== 🎮 메인 메뉴 ===");
-    System.out.println("1. 🆕 새로하기");
-    System.out.println("2. 📁 불러오기");
-    System.out.println("3. 🚪 종료하기");
-    System.out.println("==================");
-
+    System.out.println("\n" + ConsoleColors.BRIGHT_GREEN + "=== 🎮 메인 메뉴 ===" + ConsoleColors.RESET);
+    System.out.println(ConsoleColors.colorize("1. 🆕 새로하기", ConsoleColors.BRIGHT_GREEN));
+    System.out.println(ConsoleColors.colorize("2. 📁 불러오기", ConsoleColors.BRIGHT_BLUE));
+    System.out.println(ConsoleColors.colorize("3. 🚪 종료하기", ConsoleColors.BRIGHT_RED));
+    System.out.println(ConsoleColors.CYAN + "==================" + ConsoleColors.RESET);
   }
+
 
   /**
    * 새 게임을 시작합니다.
