@@ -13,9 +13,9 @@ public class SkillDto {
   private double damageMultiplier;
   private int healAmount;
   private int buffDuration;
-  
+
   public SkillDto() {}
-  
+
   @JsonCreator
   public SkillDto(
 //@formatter:off
@@ -30,15 +30,15 @@ public class SkillDto {
 , @JsonProperty("buffDuration") int buffDuration
 //@formatter:on
   ) {
-      this.name = name;
-      this.description = description;
-      this.type = type;
-      this.requiredLevel = requiredLevel;
-      this.manaCost = manaCost;
-      this.cooldown = cooldown;
-      this.damageMultiplier = damageMultiplier;
-      this.healAmount = healAmount;
-      this.buffDuration = buffDuration;
+    this.name = name;
+    this.description = description;
+    this.type = type;
+    this.requiredLevel = requiredLevel;
+    this.manaCost = manaCost;
+    this.cooldown = cooldown;
+    this.damageMultiplier = damageMultiplier;
+    this.healAmount = healAmount;
+    this.buffDuration = buffDuration;
   }
 
   public String getName() {
@@ -112,5 +112,5 @@ public class SkillDto {
   public void setBuffDuration(int buffDuration) {
     this.buffDuration = buffDuration;
   }
-  
+
 }

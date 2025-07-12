@@ -409,13 +409,11 @@ public class ShopController {
   }
 
   /**
-   * 플레이어 레벨에 맞는 스마트 정렬을 반환합니다
-   * 콘솔 UX를 고려하여 적합한 아이템을 맨 아래(보기 쉬운 곳)에 표시
+   * 플레이어 레벨에 맞는 스마트 정렬을 반환합니다 콘솔 UX를 고려하여 적합한 아이템을 맨 아래(보기 쉬운 곳)에 표시
    */
   private Comparator<ShopItem> getSmartSorting(GameCharacter player) {
-      return Comparator.comparing((ShopItem item) -> getRarityPriority(item.getItem().getRarity(), player.getLevel()))
-                       .thenComparingInt(ShopItem::getPrice)
-                       .reversed();  // 전체 순서를 뒤집어서 적합한 아이템이 아래로
+    return Comparator.comparing((ShopItem item) -> getRarityPriority(item.getItem().getRarity(), player.getLevel()))
+        .thenComparingInt(ShopItem::getPrice).reversed(); // 전체 순서를 뒤집어서 적합한 아이템이 아래로
   }
 
   /**
@@ -559,12 +557,12 @@ public class ShopController {
 
       System.out.println();
     }
-    
+
     System.out.println("💰 보유 골드: " + player.getGold());
 
     // 스마트 정렬 정보 표시 (선택적)
     displaySmartSortingInfo(player, category);
-    
+
     System.out.println("0. 🔙 뒤로가기");
     System.out.println("====================");
   }

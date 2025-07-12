@@ -6,9 +6,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class ItemStackDto {
   private GameItemDto item;
   private int quantity;
-  
+
   public ItemStackDto() {}
-  
+
   @JsonCreator
   public ItemStackDto(
 //@formatter:off
@@ -16,8 +16,8 @@ public class ItemStackDto {
 , @JsonProperty("quantity") int quantity
 //@formatter:on
   ) {
-      this.item = item;
-      this.quantity = quantity;
+    this.item = item;
+    this.quantity = quantity;
   }
 
   public GameItemDto getItem() {
@@ -35,5 +35,5 @@ public class ItemStackDto {
   public void setQuantity(int quantity) {
     this.quantity = quantity;
   }
-  
+
 }

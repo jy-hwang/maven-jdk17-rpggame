@@ -20,7 +20,7 @@ public class BaseConstant {
   public static final String EXPLORE_TREASURE = "/config/treasure_items.json";
   public static final String EXPLORE_EQUIPMENT = "/config/equipment_items.json";
   public static final String EXPLORE_DROP = "/config/drop_items.json";
-  
+
   // === 몬스터 JSON 설정 파일 경로 ===
   public static final String MONSTERS_CONFIG = "/config/monsters.json";
   public static final String FOREST_MONSTERS_CONFIG = "/config/forest_monsters.json";

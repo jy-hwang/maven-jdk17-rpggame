@@ -6,9 +6,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class SkillCooldownDto {
   private String skillName;
   private int remainingTurns;
-  
+
   public SkillCooldownDto() {}
-  
+
   @JsonCreator
   public SkillCooldownDto(
 //@formatter:off
@@ -16,8 +16,8 @@ public class SkillCooldownDto {
 , @JsonProperty("remainingTurns") int remainingTurns
 //@formatter:on
   ) {
-      this.skillName = skillName;
-      this.remainingTurns = remainingTurns;
+    this.skillName = skillName;
+    this.remainingTurns = remainingTurns;
   }
 
   public String getSkillName() {
@@ -35,5 +35,5 @@ public class SkillCooldownDto {
   public void setRemainingTurns(int remainingTurns) {
     this.remainingTurns = remainingTurns;
   }
-  
+
 }

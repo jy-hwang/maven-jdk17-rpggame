@@ -64,7 +64,7 @@ public class BattleController {
             break;
           case ESCAPE:
             if (attemptEscape()) {
-              player.postBattleRegeneration();  // 도망 성공 시 회복
+              player.postBattleRegeneration(); // 도망 성공 시 회복
               return BattleResult.ESCAPED;
             }
             playerTurnUsed = true;
@@ -82,7 +82,7 @@ public class BattleController {
 
       if (!monster.isAlive()) {
         handleVictory(player, monster);
-        player.postBattleRegeneration();  // 승리 후 회복
+        player.postBattleRegeneration(); // 승리 후 회복
         return BattleResult.VICTORY;
       } else {
         return BattleResult.DEFEAT;

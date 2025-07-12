@@ -47,7 +47,7 @@ public class ExploreController {
     initializeMonsterData();
     logger.debug("ExploreController 초기화 완료 (JSON 기반)");
   }
-  
+
   /**
    * JSON에서 몬스터 데이터를 초기화합니다.
    */
@@ -55,20 +55,20 @@ public class ExploreController {
     try {
       // MonsterDataLoader를 통해 JSON 데이터 로드
       var monsterData = MonsterDataLoader.loadAllMonsters();
-      
+
       logger.info("JSON에서 몬스터 데이터 로드 완료: {}종류", monsterData.size());
-      
+
       // 개발 모드에서 몬스터 통계 출력
       if (logger.isDebugEnabled()) {
         MonsterDataLoader.printMonsterStatistics();
       }
-      
+
     } catch (Exception e) {
       logger.error("몬스터 데이터 초기화 실패", e);
       logger.warn("기본 몬스터 데이터로 대체됩니다.");
     }
   }
-  
+
   /**
    * 탐험을 시작합니다.
    */
@@ -98,10 +98,7 @@ public class ExploreController {
    * 플레이어의 현재 위치를 업데이트합니다.
    */
   private void updatePlayerLocation(GameCharacter player) {
-    String[] locations = {
-        "숲속 깊은 곳", "고대 유적", "어두운 동굴", "험준한 산길", 
-        "신비한 호수", "폐허가 된 성", "마법의 숲", "용암 동굴"
-    };
+    String[] locations = {"숲속 깊은 곳", "고대 유적", "어두운 동굴", "험준한 산길", "신비한 호수", "폐허가 된 성", "마법의 숲", "용암 동굴"};
 
     // 플레이어 레벨에 따른 지역 가중치 적용
     String newLocation = getLocationByLevel(player.getLevel(), locations);
@@ -109,7 +106,7 @@ public class ExploreController {
 
     System.out.println("📍 현재 위치: " + newLocation);
     showLocationDescription(newLocation);
-    
+
     // 현재 위치의 몬스터 정보 표시 (옵션)
     if (random.nextInt(100) < 30) { // 30% 확률로 몬스터 정보 힌트
       showLocationMonsterHint(newLocation, player.getLevel());
@@ -160,20 +157,19 @@ public class ExploreController {
    */
   private void showLocationMonsterHint(String location, int playerLevel) {
     List<MonsterData> locationMonsters = MonsterDataLoader.getMonstersByLocation(location);
-    
+
     if (locationMonsters.isEmpty()) {
       return;
     }
 
     // 플레이어 레벨에 적합한 몬스터만 필터링
     List<MonsterData> suitableMonsters = locationMonsters.stream()
-        .filter(monster -> playerLevel >= monster.getMinLevel() && playerLevel <= monster.getMaxLevel())
-        .collect(Collectors.toList());
+        .filter(monster -> playerLevel >= monster.getMinLevel() && playerLevel <= monster.getMaxLevel()).collect(Collectors.toList());
 
     if (!suitableMonsters.isEmpty()) {
       MonsterData hintMonster = suitableMonsters.get(random.nextInt(suitableMonsters.size()));
       String difficulty = getDifficultyString(estimateMonsterLevel(hintMonster), playerLevel);
-      
+
       System.out.println("👀 이 지역에서 " + hintMonster.getName() + "의 흔적이 보입니다. " + difficulty);
     }
   }
@@ -223,10 +219,7 @@ public class ExploreController {
   private GameItem handleMonsterDrops(Monster monster) {
     // 몬스터 이름으로 MonsterData 찾기
     var monsterDataMap = MonsterDataLoader.loadAllMonsters();
-    MonsterData monsterData = monsterDataMap.values().stream()
-        .filter(data -> data.getName().equals(monster.getName()))
-        .findFirst()
-        .orElse(null);
+    MonsterData monsterData = monsterDataMap.values().stream().filter(data -> data.getName().equals(monster.getName())).findFirst().orElse(null);
 
     if (monsterData == null || monsterData.getRewards().getDropItems().isEmpty()) {
       // 기본 드롭 아이템 (레거시)
@@ -238,7 +231,7 @@ public class ExploreController {
       if (random.nextDouble() < dropItem.getDropRate()) {
         // 드롭 성공! 아이템 생성
         int quantity = random.nextInt(dropItem.getMaxQuantity() - dropItem.getMinQuantity() + 1) + dropItem.getMinQuantity();
-        
+
         // 실제 게임에서는 ItemFactory에서 itemId로 아이템 생성
         return createDropItem(dropItem.getItemId(), quantity);
       }
@@ -269,15 +262,15 @@ public class ExploreController {
    */
   public Monster getRandomMonster(int playerLevel) {
     String currentLocation = gameState.getCurrentLocation();
-    
+
     // JSON에서 해당 지역과 레벨에 맞는 몬스터 가져오기
     List<MonsterData> suitableMonsters = MonsterDataLoader.getMonstersByLocationAndLevel(currentLocation, playerLevel);
-    
+
     // 적합한 몬스터가 없으면 레벨만 고려
     if (suitableMonsters.isEmpty()) {
       suitableMonsters = MonsterDataLoader.getMonstersByLevel(playerLevel);
     }
-    
+
     // 그래도 없으면 전체 몬스터에서 선택
     if (suitableMonsters.isEmpty()) {
       var allMonsters = MonsterDataLoader.loadAllMonsters();
@@ -286,13 +279,12 @@ public class ExploreController {
 
     // 출현 확률을 고려한 몬스터 선택
     MonsterData selectedData = selectMonsterBySpawnRate(suitableMonsters);
-    
+
     // MonsterData를 Monster 객체로 변환
     Monster monster = convertToMonster(selectedData);
-    
-    logger.debug("몬스터 생성: {} (위치: {}, 플레이어 레벨: {}, 출현율: {})", 
-                 monster.getName(), currentLocation, playerLevel, selectedData.getSpawnRate());
-    
+
+    logger.debug("몬스터 생성: {} (위치: {}, 플레이어 레벨: {}, 출현율: {})", monster.getName(), currentLocation, playerLevel, selectedData.getSpawnRate());
+
     return monster;
   }
 
@@ -303,7 +295,7 @@ public class ExploreController {
     // 가중치가 있는 랜덤 선택
     double totalWeight = monsters.stream().mapToDouble(MonsterData::getSpawnRate).sum();
     double randomValue = random.nextDouble() * totalWeight;
-    
+
     double currentWeight = 0;
     for (MonsterData monster : monsters) {
       currentWeight += monster.getSpawnRate();
@@ -311,7 +303,7 @@ public class ExploreController {
         return monster;
       }
     }
-    
+
     // 기본값으로 첫 번째 몬스터 반환
     return monsters.get(0);
   }
@@ -336,10 +328,14 @@ public class ExploreController {
    */
   private String getDifficultyString(int monsterLevel, int playerLevel) {
     int diff = monsterLevel - playerLevel;
-    if (diff <= -3) return "😴 (매우 쉬움)";
-    if (diff <= -1) return "😊 (쉬움)";
-    if (diff <= 1) return "😐 (보통)";
-    if (diff <= 3) return "😰 (어려움)";
+    if (diff <= -3)
+      return "😴 (매우 쉬움)";
+    if (diff <= -1)
+      return "😊 (쉬움)";
+    if (diff <= 1)
+      return "😐 (보통)";
+    if (diff <= 3)
+      return "😰 (어려움)";
     return "💀 (매우 어려움)";
   }
 
@@ -349,7 +345,7 @@ public class ExploreController {
   public void showCurrentLocationMonsters(int playerLevel) {
     String currentLocation = gameState.getCurrentLocation();
     List<MonsterData> locationMonsters = MonsterDataLoader.getMonstersByLocation(currentLocation);
-    
+
     if (locationMonsters.isEmpty()) {
       System.out.println("이 지역에는 특별한 몬스터가 없습니다.");
       return;
@@ -360,10 +356,9 @@ public class ExploreController {
       int level = estimateMonsterLevel(monster);
       String difficulty = getDifficultyString(level, playerLevel);
       String rarity = getRarityIcon(monster.getRarity());
-      
-      System.out.printf("   %s %s %s (레벨 %d, 출현율: %.0f%%)%n", 
-                       rarity, monster.getName(), difficulty, level, monster.getSpawnRate() * 100);
-      
+
+      System.out.printf("   %s %s %s (레벨 %d, 출현율: %.0f%%)%n", rarity, monster.getName(), difficulty, level, monster.getSpawnRate() * 100);
+
       if (!monster.getAbilities().isEmpty()) {
         System.out.printf("      💫 특수능력: %s%n", String.join(", ", monster.getAbilities()));
       }
@@ -390,13 +385,13 @@ public class ExploreController {
    */
   public void reloadAllData() {
     logger.info("전체 게임 데이터 리로드 중...");
-    
+
     // 몬스터 데이터 리로드
     MonsterDataLoader.reloadMonsterData();
-    
+
     // 아이템 데이터 리로드
     GameDataLoader.reloadGameData();
-    
+
     System.out.println("몬스터 및 아이템 데이터가 다시 로드되었습니다!");
     logger.info("전체 게임 데이터 리로드 완료");
   }
@@ -410,7 +405,7 @@ public class ExploreController {
     System.out.println("몬스터 데이터가 다시 로드되었습니다!");
   }
 
-  
+
   /**
    * 랜덤 이벤트를 처리합니다.
    */
@@ -574,119 +569,111 @@ public class ExploreController {
   }
 
   /**
-   * 랜덤 보물 아이템을 생성합니다.
-   * ItemDataLoader의 JSON 기반 시스템을 사용합니다.
+   * 랜덤 보물 아이템을 생성합니다. ItemDataLoader의 JSON 기반 시스템을 사용합니다.
    */
   private GameItem generateRandomTreasureItem() {
-      try {
-          // ItemDataLoader의 JSON 기반 메서드 사용
-          GameItem treasureItem = ItemDataLoader.generateRandomTreasureItem();
-          
-          if (treasureItem != null) {
-              logger.debug("보물 아이템 생성: {}", treasureItem.getName());
-              return treasureItem;
-          }
-          
-          // 폴백: GameItemFactory 사용
-          GameItemFactory factory = GameItemFactory.getInstance();
-          GameItem fallbackItem = factory.createItem("HEALTH_POTION");
-          
-          if (fallbackItem != null) {
-              logger.warn("폴백 보물 아이템 사용: {}", fallbackItem.getName());
-              return fallbackItem;
-          }
-          
-          // 최후의 수단: 직접 생성
-          logger.warn("모든 방법 실패, 기본 보물 아이템 생성");
-          return new GameConsumable("신비한 물약", "HP를 75 회복합니다", 60, ItemRarity.UNCOMMON, 
-                                  List.of(GameEffectFactory.createHealHpEffect(75)), 0);
-                                  
-      } catch (Exception e) {
-          logger.error("보물 아이템 생성 실패", e);
-          // 응급 폴백
-          return new GameConsumable("기본 물약", "HP를 50 회복합니다", 30, ItemRarity.COMMON,
-                                  List.of(GameEffectFactory.createHealHpEffect(50)), 0);
+    try {
+      // ItemDataLoader의 JSON 기반 메서드 사용
+      GameItem treasureItem = ItemDataLoader.generateRandomTreasureItem();
+
+      if (treasureItem != null) {
+        logger.debug("보물 아이템 생성: {}", treasureItem.getName());
+        return treasureItem;
       }
+
+      // 폴백: GameItemFactory 사용
+      GameItemFactory factory = GameItemFactory.getInstance();
+      GameItem fallbackItem = factory.createItem("HEALTH_POTION");
+
+      if (fallbackItem != null) {
+        logger.warn("폴백 보물 아이템 사용: {}", fallbackItem.getName());
+        return fallbackItem;
+      }
+
+      // 최후의 수단: 직접 생성
+      logger.warn("모든 방법 실패, 기본 보물 아이템 생성");
+      return new GameConsumable("신비한 물약", "HP를 75 회복합니다", 60, ItemRarity.UNCOMMON, List.of(GameEffectFactory.createHealHpEffect(75)), 0);
+
+    } catch (Exception e) {
+      logger.error("보물 아이템 생성 실패", e);
+      // 응급 폴백
+      return new GameConsumable("기본 물약", "HP를 50 회복합니다", 30, ItemRarity.COMMON, List.of(GameEffectFactory.createHealHpEffect(50)), 0);
+    }
   }
 
   /**
-   * 특별한 상인 아이템을 생성합니다.
-   * ItemDataLoader의 JSON 기반 시스템을 사용합니다.
+   * 특별한 상인 아이템을 생성합니다. ItemDataLoader의 JSON 기반 시스템을 사용합니다.
    */
   private GameItem generateSpecialMerchantItem() {
-      try {
-          // ItemDataLoader의 JSON 기반 메서드 사용
-          GameItem merchantItem = ItemDataLoader.generateSpecialMerchantItem();
-          
-          if (merchantItem != null) {
-              logger.debug("상인 아이템 생성: {}", merchantItem.getName());
-              return merchantItem;
-          }
-          
-          // 폴백: GameItemFactory 사용 (상인용 고급 아이템)
-          GameItemFactory factory = GameItemFactory.getInstance();
-          String[] merchantItems = {"LARGE_HEALTH_POTION", "MANA_POTION", "STEEL_SWORD", "CHAIN_MAIL", "POWER_RING"};
-          
-          for (String itemId : merchantItems) {
-              GameItem fallbackItem = factory.createItem(itemId);
-              if (fallbackItem != null) {
-                  logger.warn("폴백 상인 아이템 사용: {}", fallbackItem.getName());
-                  return fallbackItem;
-              }
-          }
-          
-          // 최후의 수단: 직접 생성 (특별한 상인 아이템)
-          logger.warn("모든 방법 실패, 기본 상인 아이템 생성");
-          return new GameEquipment("상인의 반지", "상인이 파는 특별한 반지", 150, ItemRarity.RARE, 
-                                 GameEquipment.EquipmentType.ACCESSORY, 3, 3, 15);
-                                 
-      } catch (Exception e) {
-          logger.error("상인 아이템 생성 실패", e);
-          // 응급 폴백
-          return new GameConsumable("상인의 물약", "HP와 MP를 모두 회복", 80, ItemRarity.RARE,
-                                  List.of(GameEffectFactory.createHealHpEffect(60), 
-                                         GameEffectFactory.createHealMpEffect(40)), 0);
+    try {
+      // ItemDataLoader의 JSON 기반 메서드 사용
+      GameItem merchantItem = ItemDataLoader.generateSpecialMerchantItem();
+
+      if (merchantItem != null) {
+        logger.debug("상인 아이템 생성: {}", merchantItem.getName());
+        return merchantItem;
       }
+
+      // 폴백: GameItemFactory 사용 (상인용 고급 아이템)
+      GameItemFactory factory = GameItemFactory.getInstance();
+      String[] merchantItems = {"LARGE_HEALTH_POTION", "MANA_POTION", "STEEL_SWORD", "CHAIN_MAIL", "POWER_RING"};
+
+      for (String itemId : merchantItems) {
+        GameItem fallbackItem = factory.createItem(itemId);
+        if (fallbackItem != null) {
+          logger.warn("폴백 상인 아이템 사용: {}", fallbackItem.getName());
+          return fallbackItem;
+        }
+      }
+
+      // 최후의 수단: 직접 생성 (특별한 상인 아이템)
+      logger.warn("모든 방법 실패, 기본 상인 아이템 생성");
+      return new GameEquipment("상인의 반지", "상인이 파는 특별한 반지", 150, ItemRarity.RARE, GameEquipment.EquipmentType.ACCESSORY, 3, 3, 15);
+
+    } catch (Exception e) {
+      logger.error("상인 아이템 생성 실패", e);
+      // 응급 폴백
+      return new GameConsumable("상인의 물약", "HP와 MP를 모두 회복", 80, ItemRarity.RARE,
+          List.of(GameEffectFactory.createHealHpEffect(60), GameEffectFactory.createHealMpEffect(40)), 0);
+    }
   }
 
   /**
-   * 랜덤 드롭 아이템을 생성합니다.
-   * ItemDataLoader의 JSON 기반 시스템을 사용합니다.
+   * 랜덤 드롭 아이템을 생성합니다. ItemDataLoader의 JSON 기반 시스템을 사용합니다.
    */
   private GameItem generateRandomDropItem() {
-      try {
-          // ItemDataLoader의 JSON 기반 메서드 사용
-          GameItem dropItem = ItemDataLoader.generateRandomDropItem();
-          
-          if (dropItem != null) {
-              logger.debug("드롭 아이템 생성: {}", dropItem.getName());
-              return dropItem;
-          }
-          
-          // 폴백: GameItemFactory 사용 (기본 아이템들)
-          GameItemFactory factory = GameItemFactory.getInstance();
-          String[] dropItems = {"SMALL_HEALTH_POTION", "SMALL_MANA_POTION", "WOODEN_SWORD", "LEATHER_ARMOR"};
-          
-          String selectedItemId = dropItems[random.nextInt(dropItems.length)];
-          GameItem fallbackItem = factory.createItem(selectedItemId);
-          
-          if (fallbackItem != null) {
-              logger.warn("폴백 드롭 아이템 사용: {}", fallbackItem.getName());
-              return fallbackItem;
-          }
-          
-          // 최후의 수단: 직접 생성 (기본 드롭 아이템)
-          logger.warn("모든 방법 실패, 기본 드롭 아이템 생성");
-          return new GameConsumable("슬라임 젤", "끈적한 슬라임의 젤", 10, ItemRarity.COMMON,
-                                  List.of(GameEffectFactory.createHealHpEffect(20)), 0);
-                                  
-      } catch (Exception e) {
-          logger.error("드롭 아이템 생성 실패", e);
-          // 응급 폴백 
-          return new GameConsumable("부서진 물약병", "깨진 물약병의 잔여물", 5, ItemRarity.COMMON,
-                                  List.of(GameEffectFactory.createHealHpEffect(10)), 0);
+    try {
+      // ItemDataLoader의 JSON 기반 메서드 사용
+      GameItem dropItem = ItemDataLoader.generateRandomDropItem();
+
+      if (dropItem != null) {
+        logger.debug("드롭 아이템 생성: {}", dropItem.getName());
+        return dropItem;
       }
+
+      // 폴백: GameItemFactory 사용 (기본 아이템들)
+      GameItemFactory factory = GameItemFactory.getInstance();
+      String[] dropItems = {"SMALL_HEALTH_POTION", "SMALL_MANA_POTION", "WOODEN_SWORD", "LEATHER_ARMOR"};
+
+      String selectedItemId = dropItems[random.nextInt(dropItems.length)];
+      GameItem fallbackItem = factory.createItem(selectedItemId);
+
+      if (fallbackItem != null) {
+        logger.warn("폴백 드롭 아이템 사용: {}", fallbackItem.getName());
+        return fallbackItem;
+      }
+
+      // 최후의 수단: 직접 생성 (기본 드롭 아이템)
+      logger.warn("모든 방법 실패, 기본 드롭 아이템 생성");
+      return new GameConsumable("슬라임 젤", "끈적한 슬라임의 젤", 10, ItemRarity.COMMON, List.of(GameEffectFactory.createHealHpEffect(20)), 0);
+
+    } catch (Exception e) {
+      logger.error("드롭 아이템 생성 실패", e);
+      // 응급 폴백
+      return new GameConsumable("부서진 물약병", "깨진 물약병의 잔여물", 5, ItemRarity.COMMON, List.of(GameEffectFactory.createHealHpEffect(10)), 0);
+    }
   }
+
   /**
    * 탐험 결과 클래스
    */
