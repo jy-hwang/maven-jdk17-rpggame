@@ -123,7 +123,7 @@ public class QuestManager {
       logger.debug("슬라임 퀘스트 보상: 팩토리에서 체력 물약 생성");
     } else {
       // 팩토리에서 실패 시 GameEffectFactory로 생성
-      slimeReward = createFallbackConsumableReward("체력 물약", "HP를 50 회복", 50, 2);
+      slimeReward = createFallbackConsumableReward("HEALTH_POTION", "체력 물약", "HP를 50 회복", 50, 2);
       logger.debug("슬라임 퀘스트 보상: GameEffectFactory로 폴백 생성");
     }
 
@@ -141,7 +141,7 @@ public class QuestManager {
 
     // 철검 보상 (GameEffectFactory 기반 또는 직접 생성)
     GameEquipment ironSword =
-        createSpecialEquipment("마법 철검", "슬라임을 처치하며 단련된 마법의 철검", 100, ItemRarity.UNCOMMON, GameEquipment.EquipmentType.WEAPON, 15, 0, 0);
+        createSpecialEquipment("MAGIC_IRON_SWORD","마법 철검", "슬라임을 처치하며 단련된 마법의 철검", 100, ItemRarity.UNCOMMON, GameEquipment.EquipmentType.WEAPON, 15, 0, 0);
 
     QuestReward goblinReward = new QuestReward(100, 200, ironSword, 1);
 
@@ -159,7 +159,7 @@ public class QuestManager {
 
     // 판금 갑옷 보상
     GameEquipment plateArmor =
-        createSpecialEquipment("용사의 판금 갑옷", "오크와 싸우기 위해 특별히 제작된 갑옷", 200, ItemRarity.RARE, GameEquipment.EquipmentType.ARMOR, 0, 20, 50);
+        createSpecialEquipment("RARE_PLATE_ARMOR","용사의 판금 갑옷", "오크와 싸우기 위해 특별히 제작된 갑옷", 200, ItemRarity.RARE, GameEquipment.EquipmentType.ARMOR, 0, 20, 50);
 
     QuestReward orcReward = new QuestReward(200, 500, plateArmor, 1);
 
@@ -177,7 +177,7 @@ public class QuestManager {
 
     // 전설의 드래곤 반지
     GameEquipment legendaryRing =
-        createSpecialEquipment("드래곤 하트 링", "드래곤의 심장으로 만든 전설적인 반지", 1000, ItemRarity.LEGENDARY, GameEquipment.EquipmentType.ACCESSORY, 30, 15, 100);
+        createSpecialEquipment("DRAGON_HEART_RING","드래곤 하트 링", "드래곤의 심장으로 만든 전설적인 반지", 1000, ItemRarity.LEGENDARY, GameEquipment.EquipmentType.ACCESSORY, 30, 15, 100);
 
     QuestReward dragonReward = new QuestReward(1000, 2000, legendaryRing, 1);
 
@@ -203,7 +203,7 @@ public class QuestManager {
       levelReward.addItemReward(healthPotion, 3);
     } else {
       // 폴백: GameEffectFactory로 생성
-      GameItem fallbackHealth = createFallbackConsumableItem("체력 물약", "HP를 50 회복", 50);
+      GameItem fallbackHealth = createFallbackConsumableItem("HEALTH_POTION", "체력 물약", "HP를 50 회복", 50);
       levelReward.addItemReward(fallbackHealth, 3);
     }
 
@@ -211,7 +211,7 @@ public class QuestManager {
       levelReward.addItemReward(manaPotion, 2);
     } else {
       // 폴백: GameEffectFactory로 생성
-      GameItem fallbackMana = createFallbackConsumableItem("마나 물약", "MP를 40 회복", 40);
+      GameItem fallbackMana = createFallbackConsumableItem("MANA_POTION", "마나 물약", "MP를 40 회복", 40);
       levelReward.addItemReward(fallbackMana, 2);
     }
 
@@ -228,8 +228,8 @@ public class QuestManager {
     collectionObjectives.put("collect_체력 물약", 5);
 
     // 특별 보상: 복합 효과 물약
-    GameConsumable specialPotion = createSpecialPotion("모험가의 비약", "HP와 MP를 동시에 회복하는 특별한 물약", 150, ItemRarity.RARE,
-        List.of(GameEffectFactory.createHealHpEffect(80), GameEffectFactory.createHealMpEffect(60), GameEffectFactory.createGainExpEffect(25)));
+    GameConsumable specialPotion = createSpecialPotion("ADVENTURER_POTION","모험가의 물약", "HP와 MP를 동시에 회복하고 약간의 경험치를 얻는 특별한 물약", 150, ItemRarity.RARE,
+        List.of(GameEffectFactory.createHealHpEffect(100), GameEffectFactory.createHealMpEffect(100), GameEffectFactory.createGainExpEffect(200)));
 
     QuestReward collectionReward = new QuestReward(150, 100, specialPotion, 1);
 
@@ -241,14 +241,14 @@ public class QuestManager {
   /**
    * 특별한 장비 생성
    */
-  private GameEquipment createSpecialEquipment(String name, String description, int value, ItemRarity rarity, GameEquipment.EquipmentType type,
+  private GameEquipment createSpecialEquipment(String id, String name, String description, int value, ItemRarity rarity, GameEquipment.EquipmentType type,
       int attackBonus, int defenseBonus, int hpBonus) {
     try {
-      return new GameEquipment(name, description, value, rarity, type, attackBonus, defenseBonus, hpBonus);
+      return new GameEquipment(id, name, description, value, rarity, type, attackBonus, defenseBonus, hpBonus);
     } catch (Exception e) {
       logger.error("특별 장비 생성 실패: {}", name, e);
       // 기본 장비 반환
-      return new GameEquipment("기본 " + name, "기본 장비", value / 2, ItemRarity.COMMON, type, Math.max(1, attackBonus / 2), Math.max(1, defenseBonus / 2),
+      return new GameEquipment(id, "기본 " + name, "기본 장비", value / 2, ItemRarity.COMMON, type, Math.max(1, attackBonus / 2), Math.max(1, defenseBonus / 2),
           Math.max(1, hpBonus / 2));
     }
   }
@@ -256,36 +256,36 @@ public class QuestManager {
   /**
    * 특별한 물약 생성 (GameEffectFactory 사용)
    */
-  private GameConsumable createSpecialPotion(String name, String description, int value, ItemRarity rarity, List<GameEffect> effects) {
+  private GameConsumable createSpecialPotion(String id, String name, String description, int value, ItemRarity rarity, List<GameEffect> effects) {
     try {
-      return new GameConsumable(name, description, value, rarity, effects, 1); // 1턴 쿨다운
+      return new GameConsumable(id, name, description, value, rarity, effects, 1); // 1턴 쿨다운
     } catch (Exception e) {
       logger.error("특별 물약 생성 실패: {}", name, e);
       // 기본 체력 물약으로 폴백
-      return createFallbackConsumableItem("기본 체력 물약", "HP를 30 회복", 30);
+      return createFallbackConsumableItem("HEALTH_POTION", "체력 물약", "HP를 50 회복", 50);
     }
   }
 
   /**
    * 폴백용 소비 아이템 생성
    */
-  private GameConsumable createFallbackConsumableItem(String name, String description, int healAmount) {
+  private GameConsumable createFallbackConsumableItem(String id, String name, String description, int healAmount) {
     try {
       List<GameEffect> effects = List.of(GameEffectFactory.createHealHpEffect(healAmount));
-      return new GameConsumable(name, description, healAmount / 2, ItemRarity.COMMON, effects, 0);
+      return new GameConsumable(id, name, description, healAmount, ItemRarity.COMMON, effects, 0);
     } catch (Exception e) {
       logger.error("폴백 아이템 생성 실패: {}", name, e);
       // 최후의 수단: 레거시 생성자 (올바른 시그니처)
       try {
         @SuppressWarnings("deprecation")
-        GameConsumable fallback = new GameConsumable(name, description, healAmount / 2, ItemRarity.COMMON, healAmount, 0, true);
+        GameConsumable fallback = new GameConsumable(id, name, description, healAmount, ItemRarity.COMMON, healAmount, 0, true);
         logger.warn("레거시 생성자로 폴백 아이템 생성: {}", name);
         return fallback;
       } catch (Exception fallbackException) {
         logger.error("레거시 생성자도 실패: {}", name, fallbackException);
         // 절대 null을 반환하지 않도록 최소한의 아이템 반환
         @SuppressWarnings("deprecation")
-        GameConsumable emergency = new GameConsumable("응급 물약", "최소한의 회복 효과", 1, ItemRarity.COMMON, 10, 0, true);
+        GameConsumable emergency = new GameConsumable("EMERGENCY_POTION", "응급 물약", "최소한의 회복 효과", 1, ItemRarity.COMMON, 10, 0, true);
         return emergency;
       }
     }
@@ -294,8 +294,8 @@ public class QuestManager {
   /**
    * 폴백용 보상 생성
    */
-  private QuestReward createFallbackConsumableReward(String name, String description, int healAmount, int quantity) {
-    GameConsumable item = createFallbackConsumableItem(name, description, healAmount);
+  private QuestReward createFallbackConsumableReward(String id, String name, String description, int healAmount, int quantity) {
+    GameConsumable item = createFallbackConsumableItem(id, name, description, healAmount);
     return new QuestReward(50, 100, item, quantity);
   }
 
@@ -310,7 +310,7 @@ public class QuestManager {
       Map<String, Integer> basicObjectives = new HashMap<>();
       basicObjectives.put("kill_슬라임", 3);
 
-      GameConsumable basicPotion = createFallbackConsumableItem("기본 물약", "HP를 25 회복", 25);
+      GameConsumable basicPotion = createFallbackConsumableItem("SMALL_HEALTH_POTION", "작은 체력 물약", "HP를 30 회복", 30);
       QuestReward basicReward = new QuestReward(25, 50, basicPotion, 1);
 
       Quest basicQuest = new Quest("quest_basic", "기본 퀘스트", "슬라임 3마리를 처치하세요.", Quest.QuestType.KILL, 1, basicObjectives, basicReward);
@@ -448,7 +448,7 @@ public class QuestManager {
     // 특별 보상: 경험치 증가 물약
     List<GameEffect> expPotionEffects = List.of(GameEffectFactory.createGainExpEffect(100), GameEffectFactory.createHealHpEffect(50));
 
-    GameConsumable expPotion = createSpecialPotion("경험의 영약", "경험치를 대량으로 획득하는 특별한 물약", 200, ItemRarity.EPIC, expPotionEffects);
+    GameConsumable expPotion = createSpecialPotion("EXPERIENCE_POTION","경험의 영약", "경험치를 대량으로 획득하는 특별한 물약", 200, ItemRarity.EPIC, expPotionEffects);
 
     QuestReward reward = new QuestReward(300, 200, expPotion, 2);
 
@@ -468,7 +468,7 @@ public class QuestManager {
     objectives.put("kill_스켈레톤", 3);
 
     GameEquipment eliteWeapon =
-        createSpecialEquipment("엘리트 킬러", "엘리트 몬스터를 사냥하기 위한 특수 무기", 400, ItemRarity.EPIC, GameEquipment.EquipmentType.WEAPON, 25, 5, 20);
+        createSpecialEquipment("ELITE_KILLER", "엘리트 킬러", "엘리트 몬스터를 사냥하기 위한 특수 무기", 400, ItemRarity.EPIC, GameEquipment.EquipmentType.WEAPON, 25, 5, 20);
 
     QuestReward reward = new QuestReward(500, 800, eliteWeapon, 1);
 
@@ -491,7 +491,7 @@ public class QuestManager {
 
     // 여러 아이템 보상
     GameEquipment ultimateWeapon =
-        createSpecialEquipment("드래곤 슬레이어", "궁극의 드래곤 처치용 무기", 2000, ItemRarity.LEGENDARY, GameEquipment.EquipmentType.WEAPON, 50, 10, 50);
+        createSpecialEquipment("DRAGON_SLAYER", "드래곤 슬레이어", "궁극의 드래곤 처치용 무기", 2000, ItemRarity.LEGENDARY, GameEquipment.EquipmentType.WEAPON, 50, 10, 50);
 
     reward.addItemReward(ultimateWeapon, 1);
 
@@ -688,7 +688,7 @@ public class QuestManager {
     // 일일 퀘스트 보상 (적당한 수준)
     GameItem dailyReward = itemFactory.createItem("HEALTH_POTION");
     if (dailyReward == null) {
-      dailyReward = createFallbackConsumableItem("일일 보상 물약", "HP를 40 회복", 40);
+      dailyReward = createFallbackConsumableItem("DAILY_POTION", "일일 보상 물약", "HP를 40 회복", 40);
     }
 
     QuestReward reward = new QuestReward(playerLevel * 10, // 골드
@@ -714,7 +714,7 @@ public class QuestManager {
     // 특별 일일 보상
     List<GameEffect> dailyEffects = List.of(GameEffectFactory.createHealHpEffect(60), GameEffectFactory.createGainExpEffect(30));
 
-    GameConsumable dailyPotion = createSpecialPotion("일일 특제 물약", "하루 한 번 받을 수 있는 특별한 물약", 100, ItemRarity.UNCOMMON, dailyEffects);
+    GameConsumable dailyPotion = createSpecialPotion("DAILY_SPECIAL_POTION", "일일 특제 물약", "하루 한 번 받을 수 있는 특별한 물약", 100, ItemRarity.UNCOMMON, dailyEffects);
 
     QuestReward reward = new QuestReward(100, 150, dailyPotion, 1);
 

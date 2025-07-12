@@ -17,6 +17,7 @@ import rpg.domain.player.Player;
 //@formatter:on
     )})
 public abstract class GameItem {
+  protected String id;
   protected String name;
   protected String description;
   protected int value; // 판매 가격
@@ -26,12 +27,14 @@ public abstract class GameItem {
   @JsonCreator
   public GameItem(
 //@formatter:off
-  @JsonProperty("name") String name
+  @JsonProperty("id") String id
+, @JsonProperty("name") String name
 , @JsonProperty("description") String description
 , @JsonProperty("value") int value
 , @JsonProperty("rarity") ItemRarity rarity
 //@formatter:off
       ) {
+    this.id = id;
     this.name = name;
     this.description = description;
     this.value = value;
@@ -43,6 +46,10 @@ public abstract class GameItem {
   public abstract String getItemInfo();
 
   // Getters
+  public String getId() {
+    return id;
+  }
+  
   public String getName() {
     return name;
   }

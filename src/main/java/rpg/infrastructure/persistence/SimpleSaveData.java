@@ -439,44 +439,10 @@ public class SimpleSaveData {
     if (name == null) {
       return "UNKNOWN_ITEM";
     }
-
-    // 정확한 매핑 테이블
-    Map<String, String> nameToIdMap =
-        Map.of("작은 체력 물약", "SMALL_HEALTH_POTION", "작은 마나 물약", "SMALL_MANA_POTION", "체력 물약", "HEALTH_POTION", "마나 물약", "MANA_POTION", "큰 체력 물약",
-            "LARGE_HEALTH_POTION", "큰 마나 물약", "LARGE_MANA_POTION", "철검", "IRON_SWORD", "가죽 갑옷", "LEATHER_ARMOR", "마법 철검", "MAGIC_IRON_SWORD");
-
-    String mappedId = nameToIdMap.get(name);
-    if (mappedId != null) {
-      logger.debug("아이템 ID 매핑: {} -> {}", name, mappedId);
-      return mappedId;
-    }
-
-    // 매핑되지 않은 아이템의 경우 기본 변환 (개선된 버전)
-    String converted = name.toUpperCase().replace(" ", "_").replace("작은_", "SMALL_").replace("큰_", "LARGE_").replace("체력_물약", "HEALTH_POTION")
-        .replace("마나_물약", "MANA_POTION").replace("물약", "POTION").replace("검", "SWORD").replace("갑옷", "ARMOR");
-
-    logger.debug("아이템 ID 기본 변환: {} -> {}", name, converted);
-    return converted;
+    
+      return item.getId();
   }
 
-  // 또는 더 간단한 해결책: 역방향 매핑 추가
-  private static final Map<String, String> ITEM_NAME_TO_ID = Map.of("작은 체력 물약", "SMALL_HEALTH_POTION", "작은 마나 물약", "SMALL_MANA_POTION", "체력 물약",
-      "HEALTH_POTION", "마나 물약", "MANA_POTION", "큰 체력 물약", "LARGE_HEALTH_POTION", "큰 마나 물약", "LARGE_MANA_POTION");
-  //
-  // private static String getItemId(GameItem item) {
-  // if (item == null || item.getName() == null) {
-  // return "UNKNOWN_ITEM";
-  // }
-  //
-  // String itemId = ITEM_NAME_TO_ID.get(item.getName());
-  // if (itemId != null) {
-  // return itemId;
-  // }
-  //
-  // // 매핑되지 않은 경우 경고 로그와 함께 안전한 기본값
-  // logger.warn("매핑되지 않은 아이템: {}", item.getName());
-  // return item.getName().toUpperCase().replace(" ", "_");
-  // }
 
   // 퀘스트 진행도에서 퀘스트 객체 복원
   private static Quest restoreQuestFromProgress(QuestProgress questProgress) {
@@ -536,8 +502,8 @@ public class SimpleSaveData {
     objectives.put("kill_슬라임", 5);
 
     // 간단한 보상 (ItemFactory 없이)
-    QuestReward reward = new QuestReward(50, 100);
-
+    QuestReward reward = new QuestReward(50, 100, GameItemFactory.getInstance().createItem("HEALTH_POTION"),2);
+    logger.debug("reward : {} ", reward);
     return new Quest("quest_001", "슬라임 사냥꾼", "마을 근처의 슬라임 5마리를 처치하세요.", Quest.QuestType.KILL, 1, objectives, reward);
   }
 

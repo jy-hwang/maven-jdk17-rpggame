@@ -31,7 +31,8 @@ public class GameEquipment extends GameItem {
   @JsonCreator
   public GameEquipment(
 //@formatter:off
-  @JsonProperty("name") String name
+  @JsonProperty("id") String id
+, @JsonProperty("name") String name
 , @JsonProperty("description") String description
 , @JsonProperty("value") int value
 , @JsonProperty("rarity") ItemRarity rarity
@@ -41,7 +42,7 @@ public class GameEquipment extends GameItem {
 , @JsonProperty("hpBonus") int hpBonus
 //@formatter:on
   ) {
-    super(name, description, value, rarity);
+    super(id, name, description, value, rarity);
     this.equipmentType = equipmentType;
     this.attackBonus = attackBonus;
     this.defenseBonus = defenseBonus;

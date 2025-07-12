@@ -144,7 +144,7 @@ public class GameItemFactory {
         return null;
       }
 
-      return new GameConsumable(data.getName(), data.getDescription(), data.getValue(), data.getRarity(), effects, 0 // 기본 쿨다운 없음
+      return new GameConsumable(data.getId(), data.getName(), data.getDescription(), data.getValue(), data.getRarity(), effects, 0 // 기본 쿨다운 없음
       );
 
     } catch (Exception e) {
@@ -160,7 +160,7 @@ public class GameItemFactory {
     try {
       GameEquipment.EquipmentType equipType = GameEquipment.EquipmentType.WEAPON;
 
-      return new GameEquipment(data.getName(), data.getDescription(), data.getValue(), data.getRarity(), equipType, data.getAttackBonus(),
+      return new GameEquipment(data.getId(), data.getName(), data.getDescription(), data.getValue(), data.getRarity(), equipType, data.getAttackBonus(),
           data.getDefenseBonus(), data.getHpBonus());
 
     } catch (Exception e) {
@@ -176,7 +176,7 @@ public class GameItemFactory {
     try {
       GameEquipment.EquipmentType equipType = GameEquipment.EquipmentType.ARMOR;
 
-      return new GameEquipment(data.getName(), data.getDescription(), data.getValue(), data.getRarity(), equipType, data.getAttackBonus(),
+      return new GameEquipment(data.getId(), data.getName(), data.getDescription(), data.getValue(), data.getRarity(), equipType, data.getAttackBonus(),
           data.getDefenseBonus(), data.getHpBonus());
 
     } catch (Exception e) {
@@ -192,7 +192,7 @@ public class GameItemFactory {
     try {
       GameEquipment.EquipmentType equipType = GameEquipment.EquipmentType.ACCESSORY;
 
-      return new GameEquipment(data.getName(), data.getDescription(), data.getValue(), data.getRarity(), equipType, data.getAttackBonus(),
+      return new GameEquipment(data.getId(), data.getName(), data.getDescription(), data.getValue(), data.getRarity(), equipType, data.getAttackBonus(),
           data.getDefenseBonus(), data.getHpBonus());
 
     } catch (Exception e) {

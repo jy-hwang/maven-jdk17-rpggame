@@ -1,6 +1,7 @@
 package rpg.presentation.controller;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rpg.application.service.QuestManager;
@@ -194,8 +195,13 @@ public class QuestController {
           System.out.print("경험치 " + reward.getExpReward() + " ");
         if (reward.getGoldReward() > 0)
           System.out.print("골드 " + reward.getGoldReward() + " ");
-        if (reward.getItemRewards() != null)
-          System.out.print(reward.getFirstItem() + " x" + reward.getFirstItemQuantity());
+        var itemRewards = reward.getItemRewards();
+        if (itemRewards != null && !itemRewards.isEmpty()) {
+            String itemsText = itemRewards.entrySet().stream()
+                .map(entry -> entry.getKey().getName() + " x" + entry.getValue())
+                .collect(Collectors.joining(", "));
+            System.out.print(itemsText);
+        }
         System.out.println();
       }
     }

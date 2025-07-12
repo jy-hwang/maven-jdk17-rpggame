@@ -21,8 +21,8 @@ public class GameConsumable extends GameItem {
   /**
    * GameEffect 시스템을 사용하는 생성자 (권장)
    */
-  public GameConsumable(String name, String description, int value, ItemRarity rarity, List<GameEffect> effects, int cooldown) {
-    super(name, description, value, rarity);
+  public GameConsumable(String id, String name, String description, int value, ItemRarity rarity, List<GameEffect> effects, int cooldown) {
+    super(id, name, description, value, rarity);
     this.effects = new ArrayList<>(effects);
     this.cooldown = cooldown;
 
@@ -35,8 +35,8 @@ public class GameConsumable extends GameItem {
    * @deprecated GameEffect 시스템을 사용하는 생성자를 권장
    */
   @Deprecated
-  public GameConsumable(String name, String description, int value, ItemRarity rarity, int hpRestore, int expGain, boolean stackable) {
-    super(name, description, value, rarity);
+  public GameConsumable(String id, String name, String description, int value, ItemRarity rarity, int hpRestore, int expGain, boolean stackable) {
+    super(id, name, description, value, rarity);
     this.cooldown = GameConstants.NUMBER_ZERO;
 
     // 레거시 파라미터를 효과로 변환
@@ -57,8 +57,8 @@ public class GameConsumable extends GameItem {
    * @deprecated GameEffect 시스템을 사용하는 생성자를 권장
    */
   @Deprecated
-  public GameConsumable(String name, String description, int value, ItemRarity rarity, int hpRestore, int mpRestore, int expGain, boolean stackable) {
-    super(name, description, value, rarity);
+  public GameConsumable(String id, String name, String description, int value, ItemRarity rarity, int hpRestore, int mpRestore, int expGain, boolean stackable) {
+    super(id, name, description, value, rarity);
     this.cooldown = GameConstants.NUMBER_ZERO;
 
     // 레거시 파라미터를 효과로 변환
@@ -79,8 +79,8 @@ public class GameConsumable extends GameItem {
   /**
    * 간단한 단일 효과 생성자 (편의용)
    */
-  public GameConsumable(String name, String description, int value, ItemRarity rarity, String effectType, int effectValue) {
-    super(name, description, value, rarity);
+  public GameConsumable(String id, String name, String description, int value, ItemRarity rarity, String effectType, int effectValue) {
+    super(id, name, description, value, rarity);
     this.cooldown = GameConstants.NUMBER_ZERO;
     this.effects = new ArrayList<>();
 

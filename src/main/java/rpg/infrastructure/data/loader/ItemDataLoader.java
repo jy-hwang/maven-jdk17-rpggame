@@ -301,7 +301,7 @@ public class ItemDataLoader {
         }
       }
 
-      return new GameConsumable(itemData.getName(), itemData.getDescription(), itemData.getValue(), itemData.getRarity(), effects, cooldown);
+      return new GameConsumable(itemData.getId(), itemData.getName(), itemData.getDescription(), itemData.getValue(), itemData.getRarity(), effects, cooldown);
     } catch (Exception e) {
       logger.error("소비 아이템 생성 실패: {}", itemData.getName(), e);
 
@@ -310,7 +310,7 @@ public class ItemDataLoader {
       int mpRestore = extractEffectValue(itemData, "HEAL_MP");
 
       @SuppressWarnings("deprecation")
-      GameConsumable fallback = new GameConsumable(itemData.getName(), itemData.getDescription(), itemData.getValue(), itemData.getRarity(),
+      GameConsumable fallback = new GameConsumable(itemData.getId(), itemData.getName(), itemData.getDescription(), itemData.getValue(), itemData.getRarity(),
           hpRestore, mpRestore, 0, itemData.isStackable());
 
       return fallback;
@@ -349,7 +349,7 @@ public class ItemDataLoader {
     int defense = stats.getOrDefault("defense", 0);
     int magic = stats.getOrDefault("magic", 0);
 
-    return new GameEquipment(itemData.getName(), itemData.getDescription(), itemData.getValue(), itemData.getRarity(), equipType, attack, defense,
+    return new GameEquipment(itemData.getId(), itemData.getName(), itemData.getDescription(), itemData.getValue(), itemData.getRarity(), equipType, attack, defense,
         magic);
   }
 
@@ -391,18 +391,19 @@ public class ItemDataLoader {
   @SuppressWarnings("deprecation")
   private static GameItem createFallbackTreasureItem() {
     logger.warn("폴백 보물 아이템 생성");
-    return new GameConsumable("보물 물약", "HP를 75 회복", 40, ItemRarity.UNCOMMON, 75, 0, 0, true);
+    return new GameConsumable("TREASURE_POTION", "보물 물약", "HP를 75 회복", 40, ItemRarity.UNCOMMON, 75, 0, 0, true);
   }
 
   @SuppressWarnings("deprecation")
   private static GameItem createFallbackMerchantItem() {
     logger.warn("폴백 상인 아이템 생성");
-    return new GameConsumable("상인의 물약", "HP를 60 회복", 35, ItemRarity.RARE, 60, 30, 0, true);
+    return new GameConsumable("MERCHANT_POTION", "상인의 물약", "HP를 60 회복", 35, ItemRarity.RARE, 60, 30, 0, true);
   }
 
   @SuppressWarnings("deprecation")
   private static GameItem createFallbackDropItem() {
     logger.warn("폴백 드롭 아이템 생성");
-    return new GameConsumable("기본 물약", "HP를 30 회복", 15, ItemRarity.COMMON, 30, 0, 0, true);
+    return new GameConsumable("HEALTH_POTION", "기본 물약", "HP를 50 회복합니다", 30, ItemRarity.COMMON, 50, 0, 0, true);
+    
   }
 }

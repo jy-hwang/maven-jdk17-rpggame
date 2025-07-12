@@ -50,11 +50,12 @@ public class GameItemMapper {
 
       if ("CONSUMABLE".equals(dto.getItemType())) {
         List<GameEffect> effects = GameEffectMapper.fromDtoList(dto.getEffects());
-        return new GameConsumable(dto.getName(), dto.getDescription(), dto.getValue(), rarity, effects, dto.getCooldown());
+        return null; // new GameConsumable(dto.getName(), dto.getDescription(), dto.getValue(), rarity, effects,
+                     // dto.getCooldown());
       } else if ("EQUIPMENT".equals(dto.getItemType())) {
         GameEquipment.EquipmentType equipType = GameEquipment.EquipmentType.valueOf(dto.getEquipmentType());
-        return new GameEquipment(dto.getName(), dto.getDescription(), dto.getValue(), rarity, equipType, dto.getAttackBonus(), dto.getDefenseBonus(),
-            dto.getHpBonus());
+        return null; // new GameEquipment(dto.getName(), dto.getDescription(), dto.getValue(), rarity, equipType,
+                     // dto.getAttackBonus(), dto.getDefenseBonus(), dto.getHpBonus());
       }
     } catch (Exception e) {
       logger.error("GameItem 변환 실패: {}", dto.getName(), e);

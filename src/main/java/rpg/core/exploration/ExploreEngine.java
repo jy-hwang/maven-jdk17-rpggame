@@ -250,11 +250,11 @@ public class ExploreEngine {
     // 실제 구현에서는 ItemFactory나 GameDataLoader 사용
     //@formatter:off
     return switch (itemId) {
-      case "SLIME_GEL" -> new GameConsumable("슬라임 젤", "끈적한 젤", 10, ItemRarity.COMMON, 0, 0, 0, true);
-      case "GOBLIN_EAR" -> new GameConsumable("고블린 귀", "고블린의 귀", 15, ItemRarity.COMMON, 0, 0, 0, true);
-      case "WOLF_PELT" -> new GameConsumable("늑대 가죽", "부드러운 늑대 가죽", 25, ItemRarity.COMMON, 0, 0, 0, true);
-      case "NATURE_ESSENCE" -> new GameConsumable("자연의 정수", "자연의 마력이 담긴 정수", 50, ItemRarity.UNCOMMON, 0, 30, 0, true);
-      case "DRAGON_SCALE" -> new GameConsumable("드래곤 비늘", "전설적인 드래곤의 비늘", 200, ItemRarity.LEGENDARY, 0, 0, 0, true);
+      case "SLIME_GEL" -> GameItemFactory.getInstance().createItem("SLIME_GEL");
+      case "GOBLIN_EAR" -> new GameConsumable("GOBLIN_EAR", "고블린 귀", "고블린의 귀", 20, ItemRarity.COMMON, 0, 0, 0, true);
+      case "WOLF_PELT" -> new GameConsumable("WOLF_PELT", "늑대 가죽", "부드러운 늑대 가죽", 30, ItemRarity.COMMON, 0, 0, 0, true);
+      case "NATURE_ESSENCE" -> new GameConsumable("NATURE_ESSENCE", "자연의 정수", "자연의 마력이 담긴 정수", 50, ItemRarity.UNCOMMON, 0, 30, 0, true);
+      case "DRAGON_SCALE" -> new GameConsumable("DRAGON_SCALE", "드래곤 비늘", "전설적인 드래곤의 비늘", 200, ItemRarity.LEGENDARY, 0, 0, 0, true);
       default -> generateRandomDropItem(); // 기본 아이템
     };
   //@formatter:on
@@ -595,12 +595,12 @@ public class ExploreEngine {
 
       // 최후의 수단: 직접 생성
       logger.warn("모든 방법 실패, 기본 보물 아이템 생성");
-      return new GameConsumable("신비한 물약", "HP를 75 회복합니다", 60, ItemRarity.UNCOMMON, List.of(GameEffectFactory.createHealHpEffect(75)), 0);
+      return new GameConsumable("MYSTERY_POTION", "신비한 물약", "HP를 75 회복합니다", 50, ItemRarity.UNCOMMON, List.of(GameEffectFactory.createHealHpEffect(75)), 0);
 
     } catch (Exception e) {
       logger.error("보물 아이템 생성 실패", e);
       // 응급 폴백
-      return new GameConsumable("기본 물약", "HP를 50 회복합니다", 30, ItemRarity.COMMON, List.of(GameEffectFactory.createHealHpEffect(50)), 0);
+      return new GameConsumable("HEALTH_POTION", "기본 물약", "HP를 50 회복합니다", 30, ItemRarity.COMMON, List.of(GameEffectFactory.createHealHpEffect(50)), 0);
     }
   }
 
@@ -631,13 +631,13 @@ public class ExploreEngine {
 
       // 최후의 수단: 직접 생성 (특별한 상인 아이템)
       logger.warn("모든 방법 실패, 기본 상인 아이템 생성");
-      return new GameEquipment("상인의 반지", "상인이 파는 특별한 반지", 150, ItemRarity.RARE, GameEquipment.EquipmentType.ACCESSORY, 3, 3, 15);
+      return new GameEquipment("MERCHANT_RING", "상인의 반지", "상인이 파는 특별한 반지", 150, ItemRarity.RARE, GameEquipment.EquipmentType.ACCESSORY, 3, 3, 15);
 
     } catch (Exception e) {
       logger.error("상인 아이템 생성 실패", e);
       // 응급 폴백
-      return new GameConsumable("상인의 물약", "HP와 MP를 모두 회복", 80, ItemRarity.RARE,
-          List.of(GameEffectFactory.createHealHpEffect(60), GameEffectFactory.createHealMpEffect(40)), 0);
+      return new GameConsumable("MERCHANT_POTION", "상인의 물약", "HP와 MP를 모두 회복", 80, ItemRarity.RARE,
+          List.of(GameEffectFactory.createHealHpEffect(80), GameEffectFactory.createHealMpEffect(80)), 0);
     }
   }
 
@@ -668,12 +668,12 @@ public class ExploreEngine {
 
       // 최후의 수단: 직접 생성 (기본 드롭 아이템)
       logger.warn("모든 방법 실패, 기본 드롭 아이템 생성");
-      return new GameConsumable("슬라임 젤", "끈적한 슬라임의 젤", 10, ItemRarity.COMMON, List.of(GameEffectFactory.createHealHpEffect(20)), 0);
+      return new GameConsumable("SLIME_GEL","슬라임 젤", "끈적한 슬라임의 젤", 10, ItemRarity.COMMON, List.of(GameEffectFactory.createHealHpEffect(20)), 0);
 
     } catch (Exception e) {
       logger.error("드롭 아이템 생성 실패", e);
       // 응급 폴백
-      return new GameConsumable("부서진 물약병", "깨진 물약병의 잔여물", 5, ItemRarity.COMMON, List.of(GameEffectFactory.createHealHpEffect(10)), 0);
+      return new GameConsumable("BROKEN_JAR","부서진 물약병", "깨진 물약병의 잔여물", 5, ItemRarity.COMMON, List.of(GameEffectFactory.createHealHpEffect(10)), 0);
     }
   }
 
