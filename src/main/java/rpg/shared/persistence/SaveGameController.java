@@ -27,7 +27,7 @@ public class SaveGameController {
   /**
    * 메인 저장/로드 메뉴 실행
    */
-  public SaveLoadResult showSaveLoadMenu(Player player, GameState gameState) {
+  public SaveLoadResult showSaveLoadMenu(Player player, GameState gameState, long gameStartTime) {
     while (true) {
       System.out.println("\n=== 💾 저장/로드 관리 ===");
       System.out.println("1. 💾 게임 저장");
@@ -40,7 +40,7 @@ public class SaveGameController {
 
       switch (choice) {
         case 1:
-          saveGame(player, gameState);
+          saveGame(player, gameState, gameStartTime);
           break;
         case 2:
           SaveLoadResult loadResult = loadGame();
@@ -63,13 +63,14 @@ public class SaveGameController {
   /**
    * 게임을 저장합니다.
    */
-  public void saveGame(Player player, GameState gameState) {
+  public void saveGame(Player player, GameState gameState, long gameStartTime) {
     try {
       // 현재 슬롯이 있으면 그 슬롯에 저장, 없으면 슬롯 선택
       if (currentSaveSlot > 0) {
         boolean useSameSlot = InputValidator.getConfirmation("현재 슬롯 " + currentSaveSlot + "에 저장하시겠습니까?");
 
         if (useSameSlot) {
+          updatePlayTime(gameStartTime, gameState);
           GameDataRepository.saveGame(player, gameState, currentSaveSlot);
           System.out.println("✅ 슬롯 " + currentSaveSlot + "에 게임이 저장되었습니다!");
           logger.info("슬롯 {} 게임 저장 완료: {}", currentSaveSlot, player.getName());
@@ -527,6 +528,24 @@ public class SaveGameController {
         }
         currentSaveSlot = 0;
       }
+    }
+  }
+
+  /**
+   * 현재 세션의 플레이 타임을 업데이트합니다.
+   */
+  private void updatePlayTime(long gameStartTime, GameState gameState) {
+    if (gameStartTime > 0) {
+      long currentTime = System.currentTimeMillis();
+      long sessionTime = (currentTime - gameStartTime) / (1000 * 60); // 분 단위
+
+      if (sessionTime > 0) {
+        gameState.addPlayTime((int) sessionTime);
+        logger.debug("플레이 시간 업데이트: +{}분 (총 {}분)", sessionTime, gameState.getTotalPlayTime());
+      }
+
+      // 세션 시작 시간 리셋
+      gameStartTime = System.currentTimeMillis();
     }
   }
 

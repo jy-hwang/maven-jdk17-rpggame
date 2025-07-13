@@ -33,6 +33,7 @@ import rpg.domain.quest.QuestReward;
 import rpg.domain.skill.Skill;
 import rpg.infrastructure.data.loader.QuestTemplateLoader;
 import rpg.shared.constant.SystemConstants;
+import rpg.shared.util.ConsoleColors;
 
 /**
  * 디버그 및 테스트 기능을 전담하는 컨트롤러
@@ -71,6 +72,7 @@ public class DebugController {
       System.out.println("10. 🎒 테스트 아이템 생성");
       System.out.println("11. 🛠️ 전체 시스템 진단");
       System.out.println("12. 📖 도움말 메뉴");
+      System.out.println("13. 🎨 " + ConsoleColors.rainbow("색깔테스트"));
       System.out.println("0. 🔙 돌아가기");
 
       int choice = InputValidator.getIntInput("선택 (0-12): ", 0, 12);
@@ -111,6 +113,9 @@ public class DebugController {
           break;
         case 12:
           showHelpMenu();
+          break;
+        case 13:
+          ConsoleColors.testColors();
           break;
         case 0:
           return;

@@ -301,10 +301,7 @@ public class GameEngine {
             showMonsterEncyclopedia();
             break;
           case 9:
-            saveGameController.saveGame(player, gameState);
-            break;
-          case 10:
-            SaveGameController.SaveLoadResult result = saveGameController.showSaveLoadMenu(player, gameState);
+            SaveGameController.SaveLoadResult result = saveGameController.showSaveLoadMenu(player, gameState, gameStartTime);
 
             if (result.isSuccess()) {
               // 새 게임으로 교체
@@ -314,14 +311,11 @@ public class GameEngine {
               updateControllersWithNewGameState();
             }
             break;
-          case 11:
+          case 10:
             returnToMainMenu();
             break;
-          case 12:
+          case 11:
             showHelp();
-            break;
-          case 13:
-            ConsoleColors.testColors();
             break;
           case 99:
             // 디버그 메뉴 진입 (DEBUG_MODE가 true일 때만)
@@ -372,11 +366,10 @@ public class GameEngine {
     System.out.println(ConsoleColors.colorize("8. 📚 몬스터 도감", ConsoleColors.YELLOW));
 
     // 시스템 메뉴
-    System.out.println(ConsoleColors.colorize("9. 💾 게임 저장", ConsoleColors.BLUE));
-    System.out.println(ConsoleColors.colorize("10. 📁 저장 관리", ConsoleColors.PURPLE));
-    System.out.println(ConsoleColors.colorize("11. 🚪 게임 종료", ConsoleColors.RED));
-    System.out.println(ConsoleColors.colorize("12. ❓ 도움말", ConsoleColors.WHITE));
-    System.out.println("13. 🎨 " + ConsoleColors.rainbow("색깔테스트"));
+    System.out.println(ConsoleColors.colorize("9. 📁 저장 관리", ConsoleColors.PURPLE));
+    System.out.println(ConsoleColors.colorize("10. 🚪 게임 종료", ConsoleColors.RED));
+    System.out.println(ConsoleColors.colorize("11. ❓ 도움말", ConsoleColors.WHITE));
+    
     // 디버그 모드가 활성화된 경우에만 디버그 메뉴 표시
     if (SystemConstants.DEBUG_MODE) {
       System.out.println(ConsoleColors.colorize("99. 🔧 디버그 메뉴", ConsoleColors.GOLD_FALLBACK));
@@ -770,10 +763,9 @@ public class GameEngine {
     boolean shouldSave = InputValidator.getConfirmation("게임을 저장하고 메인 메뉴로 돌아가시겠습니까?");
 
     if (shouldSave) {
-      saveGameController.saveGame(player, gameState);
+      saveGameController.saveGame(player, gameState, gameStartTime);
     }
 
-    // updatePlayTime(); // 플레이 시간 업데이트
     inGameLoop = false;
     System.out.println("🏠 메인 메뉴로 돌아갑니다.");
   }
@@ -1054,11 +1046,6 @@ public class GameEngine {
     // 시스템 정보
     showSystemInfo();
 
-    System.out.println("\n⚙️ === 시스템 정보 ===");
-    GameItemFactory itemFactory = GameItemFactory.getInstance();
-    System.out.printf("• 로드된 아이템 수: %d개\n", itemFactory.getItemCount());
-    System.out.printf("• 초기화 상태: %s\n", itemFactory.isInitialized() ? "정상" : "오류");
-
     try {
       JsonBasedQuestFactory questFactory = JsonBasedQuestFactory.getInstance();
       System.out.printf("• 퀘스트 템플릿: 메인 %d개, 사이드 %d개, 일일 %d개\n", questFactory.getQuestCount("MAIN"), questFactory.getQuestCount("SIDE"),
@@ -1086,6 +1073,7 @@ public class GameEngine {
       System.out.println("• 시스템 상태: 일부 오류 발생 (" + e.getMessage() + ")");
     }
   }
+
 
   /**
    * 지역 정보를 담는 내부 클래스
