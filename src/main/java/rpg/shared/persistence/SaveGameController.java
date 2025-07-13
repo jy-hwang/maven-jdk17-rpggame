@@ -1,5 +1,7 @@
 package rpg.shared.persistence;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rpg.application.validator.InputValidator;
@@ -185,6 +187,20 @@ public class SaveGameController {
         var questManager = loadedPlayer.getQuestManager();
         int activeCount = questManager.getActiveQuests().size();
         int completedCount = questManager.getCompletedQuests().size();
+          
+        // 🆕 만료된 일일 퀘스트가 있는지 확인
+        questManager.validateQuestData();
+        questManager.cleanupExpiredQuests();
+        
+     // 🆕 새로운 일일 퀘스트가 필요한지 확인
+        String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        boolean hasTodaysQuests = questManager.getAvailableQuests(loadedPlayer).stream()
+            .anyMatch(quest -> quest.getId().contains(today));
+        
+        if (!hasTodaysQuests) {
+            System.out.println("📅 새로운 일일 퀘스트를 생성합니다...");
+            questManager.generateDailyQuests(loadedPlayer);
+        }
         
         // 착용 장비 상태 확인
         PlayerInventory inventory = loadedPlayer.getInventory();

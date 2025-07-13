@@ -38,7 +38,7 @@ public class QuestController {
     while (true) {
       displayQuestMenu();
 
-      int choice = InputValidator.getIntInput("선택: ", 1, 6);
+      int choice = InputValidator.getIntInput("선택: ", 0, 8);
 
       switch (choice) {
         case 1:
@@ -53,12 +53,26 @@ public class QuestController {
           showQuestDetails("completed");
           break;
         case 4:
-          claimQuestReward(player);
+          // 일일 퀘스트 새로고침
+          if (InputValidator.getConfirmation("일일 퀘스트를 새로고침하시겠습니까?")) {
+            player.getQuestManager().refreshDailyQuests(player);
+          }
           break;
         case 5:
-          displayQuestStatistics(player);
+          // 퀘스트 히스토리
+          player.getQuestManager().showQuestHistory(player);
           break;
         case 6:
+          // 일일 퀘스트 통계
+          player.getQuestManager().showDailyQuestStats();
+          player.getQuestManager().simulateDailyQuests(player);
+        case 7:
+          claimQuestReward(player);
+          break;
+        case 8:
+          displayQuestStatistics(player);
+          break;
+        case 0:
           return;
       }
     }
@@ -72,9 +86,12 @@ public class QuestController {
     System.out.println("1. 📋 수락 가능한 퀘스트");
     System.out.println("2. ⚡ 진행 중인 퀘스트");
     System.out.println("3. ✅ 완료된 퀘스트");
-    System.out.println("4. 🎁 퀘스트 보상 수령");
-    System.out.println("5. 📊 퀘스트 통계");
-    System.out.println("6. 🔙 돌아가기");
+    System.out.println("4. 🔄 일일 퀘스트 새로고침");
+    System.out.println("5. 📚 퀘스트 히스토리");
+    System.out.println("6. 📊 일일 퀘스트 통계");
+    System.out.println("7. 🎁 퀘스트 보상 수령");
+    System.out.println("8. 📊 퀘스트 통계");
+    System.out.println("0. 🔙 돌아가기");
   }
 
   /**
@@ -197,10 +214,9 @@ public class QuestController {
           System.out.print("골드 " + reward.getGoldReward() + " ");
         var itemRewards = reward.getItemRewards();
         if (itemRewards != null && !itemRewards.isEmpty()) {
-            String itemsText = itemRewards.entrySet().stream()
-                .map(entry -> entry.getKey().getName() + " x" + entry.getValue())
-                .collect(Collectors.joining(", "));
-            System.out.print(itemsText);
+          String itemsText =
+              itemRewards.entrySet().stream().map(entry -> entry.getKey().getName() + " x" + entry.getValue()).collect(Collectors.joining(", "));
+          System.out.print(itemsText);
         }
         System.out.println();
       }

@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -17,13 +19,17 @@ import rpg.application.factory.GameEffectFactory;
 import rpg.application.factory.GameItemFactory;
 import rpg.application.factory.JsonBasedQuestFactory;
 import rpg.application.factory.SkillFactory;
+import rpg.application.service.QuestManager;
 import rpg.application.validator.InputValidator;
 import rpg.core.engine.GameEngine;
+import rpg.domain.inventory.PlayerInventory;
+import rpg.domain.item.GameEquipment;
 import rpg.domain.item.GameItem;
 import rpg.domain.item.ItemRarity;
 import rpg.domain.item.effect.GameEffect;
 import rpg.domain.player.Player;
 import rpg.domain.quest.Quest;
+import rpg.domain.quest.QuestReward;
 import rpg.domain.skill.Skill;
 import rpg.infrastructure.data.loader.QuestTemplateLoader;
 import rpg.shared.constant.SystemConstants;
@@ -337,6 +343,9 @@ public class DebugController {
         case 4:
           testDailyWeeklyQuests(factory);
           break;
+        case 5:
+          testImprovedDailyQuestSystem();
+          break;
       }
 
     } catch (Exception e) {
@@ -415,6 +424,7 @@ public class DebugController {
   /**
    * 일일/주간 퀘스트 테스트
    */
+  @Deprecated
   private void testDailyWeeklyQuests(JsonBasedQuestFactory factory) {
     System.out.println("\n📅 일일/주간 퀘스트 테스트:");
 
@@ -1425,4 +1435,416 @@ public class DebugController {
       System.out.println("❌ 스킬 생성 중 오류: " + e.getMessage());
     }
   }
+
+  /**
+   * 만료 처리 테스트
+   */
+  private void testExpiryProcessing(QuestManager questManager) {
+    System.out.println("\n⏰ === 퀘스트 만료 처리 테스트 ===");
+
+    try {
+      // 현재 활성 퀘스트 상태 표시
+      System.out.println("📋 현재 활성 퀘스트:");
+      List<Quest> activeQuests = questManager.getActiveQuests();
+      if (activeQuests.isEmpty()) {
+        System.out.println("   활성 퀘스트가 없습니다.");
+      } else {
+        for (int i = 0; i < activeQuests.size(); i++) {
+          Quest quest = activeQuests.get(i);
+          System.out.printf("   %d. %s (ID: %s)\n", i + 1, quest.getTitle(), quest.getId());
+        }
+      }
+
+      // 테스트용 만료된 일일 퀘스트 추가
+      System.out.println("\n🧪 테스트용 만료된 일일 퀘스트 생성...");
+      addExpiredTestQuests(questManager);
+
+      // 만료 처리 전 상태
+      System.out.println("\n📊 만료 처리 전:");
+      System.out.printf("   사용 가능한 퀘스트: %d개\n", questManager.getAvailableQuests().size());
+      System.out.printf("   활성 퀘스트: %d개\n", questManager.getActiveQuests().size());
+
+      // 만료 처리 실행
+      System.out.println("\n🔄 만료된 퀘스트 정리 중...");
+      questManager.cleanupExpiredQuests();
+
+      // 만료 처리 후 상태
+      System.out.println("\n📊 만료 처리 후:");
+      System.out.printf("   사용 가능한 퀘스트: %d개\n", questManager.getAvailableQuests().size());
+      System.out.printf("   활성 퀘스트: %d개\n", questManager.getActiveQuests().size());
+
+      // 새로운 일일 퀘스트 생성 테스트
+      if (player != null) {
+        System.out.println("\n🆕 새로운 일일 퀘스트 생성 테스트...");
+        questManager.generateDailyQuests(player);
+        System.out.printf("   새로 생성된 퀘스트: %d개\n", questManager.getAvailableQuests(player).size());
+      }
+
+      System.out.println("✅ 만료 처리 테스트 완료");
+
+    } catch (Exception e) {
+      System.out.println("❌ 만료 처리 테스트 중 오류: " + e.getMessage());
+      logger.error("만료 처리 테스트 실패", e);
+    }
+  }
+
+  /**
+   * 테스트용 만료된 퀘스트 추가
+   */
+  private void addExpiredTestQuests(QuestManager questManager) {
+    try {
+      // 어제 날짜로 된 일일 퀘스트 ID 생성
+      LocalDate yesterday = LocalDate.now().minusDays(1);
+      String yesterdayStr = yesterday.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+
+      // 테스트용 만료된 퀘스트들
+      String[] expiredQuestIds =
+          {"daily_kill_" + yesterdayStr + "_A01", "daily_collect_" + yesterdayStr + "_A01", "daily_exploration_" + yesterdayStr + "_B01"};
+
+      for (String questId : expiredQuestIds) {
+        // 간단한 테스트 퀘스트 생성
+        Map<String, Integer> objectives = new HashMap<>();
+        objectives.put("test_objective", 1);
+
+        QuestReward reward = new QuestReward(50, 30);
+
+        Quest expiredQuest = new Quest(questId, "만료된 테스트 퀘스트", "테스트용 만료된 일일 퀘스트입니다.", Quest.QuestType.KILL, 1, objectives, reward);
+
+        // 사용 가능한 퀘스트 목록에 추가 (테스트용)
+        questManager.getAvailableQuests().add(expiredQuest);
+      }
+
+      System.out.printf("   테스트용 만료된 퀘스트 %d개 추가됨\n", expiredQuestIds.length);
+
+    } catch (Exception e) {
+      System.out.println("❌ 테스트 퀘스트 추가 실패: " + e.getMessage());
+    }
+  }
+
+  /**
+   * 테스트용 플레이어 생성
+   */
+  private Player createTestPlayer(String name, int level) {
+    try {
+      System.out.printf("🧪 테스트 플레이어 생성 중: %s (레벨 %d)\n", name, level);
+
+      // 새 플레이어 생성
+      Player testPlayer = new Player(name);
+
+      // 레벨 설정
+      for (int i = 1; i < level; i++) {
+        testPlayer.gainExp(testPlayer.getExpRequiredForNextLevel());
+      }
+
+      // 기본 스탯 조정 (레벨에 맞게)
+      int levelBonus = (level - 1) * 10;
+      testPlayer.setGold(100 + levelBonus * 5);
+
+      // 테스트용 아이템 추가
+      addTestItemsToPlayer(testPlayer, level);
+
+      System.out.printf("✅ 테스트 플레이어 생성 완료: %s (레벨 %d, 골드 %d)\n", testPlayer.getName(), testPlayer.getLevel(), testPlayer.getGold());
+
+      return testPlayer;
+
+    } catch (Exception e) {
+      System.out.println("❌ 테스트 플레이어 생성 실패: " + e.getMessage());
+      logger.error("테스트 플레이어 생성 실패", e);
+
+      // 폴백: 기본 플레이어 반환
+      return new Player(name);
+    }
+  }
+
+  /**
+   * 테스트 플레이어에게 아이템 추가
+   */
+  private void addTestItemsToPlayer(Player testPlayer, int level) {
+    try {
+      GameItemFactory itemFactory = GameItemFactory.getInstance();
+      PlayerInventory inventory = testPlayer.getInventory();
+
+      // 레벨에 맞는 기본 아이템들 추가
+      String[] basicItems = {"HEALTH_POTION", "MANA_POTION"};
+
+      for (String itemId : basicItems) {
+        GameItem item = itemFactory.createItem(itemId);
+        if (item != null) {
+          inventory.addItem(item, Math.min(3, level / 2 + 1));
+        }
+      }
+
+      // 레벨에 맞는 장비 추가
+      if (level >= 5) {
+        GameItem weapon = itemFactory.createRandomItemByRarity(ItemRarity.COMMON);
+        if (weapon != null && weapon instanceof GameEquipment) {
+          inventory.addItem(weapon, 1);
+        }
+      }
+
+      if (level >= 10) {
+        GameItem armor = itemFactory.createRandomItemByRarity(ItemRarity.UNCOMMON);
+        if (armor != null && armor instanceof GameEquipment) {
+          inventory.addItem(armor, 1);
+        }
+      }
+
+    } catch (Exception e) {
+      System.out.println("⚠️ 테스트 아이템 추가 실패: " + e.getMessage());
+    }
+  }
+
+  /**
+   * 다양한 레벨에서의 일일 퀘스트 생성 테스트
+   */
+  private void testMultipleLevelGeneration(QuestManager questManager) {
+    System.out.println("\n📈 === 다양한 레벨에서의 일일 퀘스트 생성 테스트 ===");
+
+    int[] testLevels = {1, 5, 10, 15, 20, 25, 30, 35, 40, 50};
+
+    for (int level : testLevels) {
+      System.out.printf("\n🎯 레벨 %d 테스트:\n", level);
+
+      try {
+        Player testPlayer = createTestPlayer("테스트어" + level, level);
+
+        // 원래 퀘스트 수 기록
+        int originalQuestCount = questManager.getAvailableQuests().size();
+
+        // 일일 퀘스트 생성
+        questManager.generateDailyQuests(testPlayer);
+
+        // 새로 생성된 퀘스트 수 계산
+        int newQuestCount = questManager.getAvailableQuests().size();
+        int generatedCount = newQuestCount - originalQuestCount;
+
+        System.out.printf("   생성된 일일 퀘스트: %d개\n", generatedCount);
+
+        // 생성된 퀘스트들의 상세 정보
+        List<Quest> playerQuests = questManager.getAvailableQuests(testPlayer);
+        for (Quest quest : playerQuests) {
+          if (quest.getId().startsWith("daily_")) {
+            System.out.printf("   - %s (필요 레벨: %d)\n", quest.getTitle(), quest.getRequiredLevel());
+          }
+        }
+
+      } catch (Exception e) {
+        System.out.printf("   ❌ 레벨 %d 테스트 실패: %s\n", level, e.getMessage());
+      }
+    }
+
+    System.out.println("\n✅ 다양한 레벨 테스트 완료");
+  }
+
+  /**
+   * 개선된 일일 퀘스트 시스템 전체 테스트
+   */
+  private void testImprovedDailyQuestSystem() {
+    System.out.println("\n=== 🧪 개선된 일일 퀘스트 시스템 테스트 ===");
+
+    if (player == null) {
+      System.out.println("❌ 플레이어가 설정되지 않았습니다.");
+      System.out.println("테스트용 플레이어를 생성하시겠습니까?");
+
+      if (InputValidator.getConfirmation("테스트 플레이어 생성")) {
+        int testLevel = InputValidator.getIntInput("테스트 플레이어 레벨 (1-50): ", 1, 50);
+        Player testPlayer = createTestPlayer("테스트어", testLevel);
+
+        // 임시로 테스트 플레이어 사용
+        runTestsWithPlayer(testPlayer);
+      }
+      return;
+    }
+
+    runTestsWithPlayer(player);
+  }
+
+  /**
+   * 특정 플레이어로 테스트 실행
+   */
+  private void runTestsWithPlayer(Player testPlayer) {
+    QuestManager questManager = testPlayer.getQuestManager();
+
+    System.out.println("1. 현재 일일 퀘스트 상태");
+    System.out.println("2. 일일 퀘스트 새로고침 테스트");
+    System.out.println("3. 다양한 레벨에서 생성 테스트");
+    System.out.println("4. 히스토리 시스템 테스트");
+    System.out.println("5. 만료 처리 테스트");
+    System.out.println("6. 템플릿 기반 생성 테스트");
+    System.out.println("7. 종합 테스트");
+
+    int choice = InputValidator.getIntInput("선택 (1-7): ", 1, 7);
+
+    switch (choice) {
+      case 1:
+        showCurrentDailyQuestStatus(questManager, testPlayer);
+        break;
+      case 2:
+        testDailyQuestRefresh(questManager, testPlayer);
+        break;
+      case 3:
+        testMultipleLevelGeneration(questManager);
+        break;
+      case 4:
+        testHistorySystem(questManager, testPlayer);
+        break;
+      case 5:
+        testExpiryProcessing(questManager);
+        break;
+      case 6:
+        testTemplateBasedGeneration(testPlayer);
+        break;
+      case 7:
+        runComprehensiveTest(questManager, testPlayer);
+        break;
+    }
+  }
+
+  /**
+   * 현재 일일 퀘스트 상태 표시
+   */
+  private void showCurrentDailyQuestStatus(QuestManager questManager, Player player) {
+    System.out.println("\n📊 === 현재 일일 퀘스트 상태 ===");
+
+    System.out.printf("플레이어: %s (레벨 %d)\n", player.getName(), player.getLevel());
+
+    List<Quest> availableQuests = questManager.getAvailableQuests(player);
+    List<Quest> dailyQuests = availableQuests.stream().filter(quest -> quest.getId().startsWith("daily_")).collect(Collectors.toList());
+
+    if (dailyQuests.isEmpty()) {
+      System.out.println("❌ 사용 가능한 일일 퀘스트가 없습니다.");
+    } else {
+      System.out.printf("✅ 사용 가능한 일일 퀘스트: %d개\n", dailyQuests.size());
+      for (int i = 0; i < dailyQuests.size(); i++) {
+        Quest quest = dailyQuests.get(i);
+        System.out.printf("   %d. %s (ID: %s)\n", i + 1, quest.getTitle(), quest.getId());
+        System.out.printf("      목표: %s\n", quest.getObjectives());
+        System.out.printf("      보상: 경험치 %d, 골드 %d\n", quest.getReward().getExpReward(), quest.getReward().getGoldReward());
+      }
+    }
+
+    // 활성 일일 퀘스트
+    List<Quest> activeDaily =
+        questManager.getActiveQuests().stream().filter(quest -> quest.getId().startsWith("daily_")).collect(Collectors.toList());
+
+    System.out.printf("\n⚡ 진행 중인 일일 퀘스트: %d개\n", activeDaily.size());
+    for (Quest quest : activeDaily) {
+      System.out.printf("   - %s (진행도: %s)\n", quest.getTitle(), quest.getCurrentProgress());
+    }
+  }
+
+  /**
+   * 일일 퀘스트 새로고침 테스트
+   */
+  private void testDailyQuestRefresh(QuestManager questManager, Player player) {
+    System.out.println("\n🔄 === 일일 퀘스트 새로고침 테스트 ===");
+
+    // 새로고침 전 상태
+    int beforeCount = questManager.getAvailableQuests(player).size();
+    System.out.printf("새로고침 전 퀘스트 수: %d개\n", beforeCount);
+
+    // 새로고침 실행
+    System.out.println("🔄 일일 퀘스트 새로고침 중...");
+    questManager.generateDailyQuests(player);
+
+    // 새로고침 후 상태
+    int afterCount = questManager.getAvailableQuests(player).size();
+    System.out.printf("새로고침 후 퀘스트 수: %d개\n", afterCount);
+    System.out.printf("새로 생성된 퀘스트: %d개\n", afterCount - beforeCount);
+
+    System.out.println("✅ 새로고침 테스트 완료");
+  }
+
+  /**
+   * 히스토리 시스템 테스트
+   */
+  private void testHistorySystem(QuestManager questManager, Player player) {
+    System.out.println("\n📚 === 히스토리 시스템 테스트 ===");
+
+    // TODO: QuestHistoryManager가 구현되면 여기서 테스트
+    System.out.println("히스토리 시스템 테스트는 QuestHistoryManager 구현 후 추가됩니다.");
+
+    // 현재는 기본적인 완료된 퀘스트만 표시
+    List<Quest> completedQuests = questManager.getCompletedQuests();
+    System.out.printf("완료된 퀘스트: %d개\n", completedQuests.size());
+
+    for (Quest quest : completedQuests) {
+      System.out.printf("   - %s (%s)\n", quest.getTitle(), quest.getStatus());
+    }
+  }
+
+  /**
+   * 템플릿 기반 생성 테스트
+   */
+  private void testTemplateBasedGeneration(Player player) {
+    System.out.println("\n📋 === 템플릿 기반 일일 퀘스트 생성 테스트 ===");
+
+    try {
+      // TODO: TemplateDailyQuestGenerator가 구현되면 여기서 테스트
+      System.out.println("템플릿 기반 생성 테스트는 TemplateDailyQuestGenerator 구현 후 추가됩니다.");
+
+      // 현재는 JsonBasedQuestFactory를 사용한 기본 테스트
+      JsonBasedQuestFactory factory = JsonBasedQuestFactory.getInstance();
+
+      System.out.println("일일 퀘스트 템플릿 테스트:");
+      Quest.QuestType[] types = {Quest.QuestType.KILL, Quest.QuestType.COLLECT};
+
+      for (Quest.QuestType type : types) {
+        Quest dailyQuest = factory.createDailyQuest(type);
+        if (dailyQuest != null) {
+          System.out.printf("   %s: %s\n", type, dailyQuest.getTitle());
+        } else {
+          System.out.printf("   %s: 생성 실패\n", type);
+        }
+      }
+
+    } catch (Exception e) {
+      System.out.println("❌ 템플릿 기반 생성 테스트 실패: " + e.getMessage());
+    }
+  }
+
+  /**
+   * 종합 테스트 실행
+   */
+  private void runComprehensiveTest(QuestManager questManager, Player player) {
+    System.out.println("\n🎯 === 종합 테스트 실행 ===");
+
+    System.out.println("1️⃣ 현재 상태 확인...");
+    showCurrentDailyQuestStatus(questManager, player);
+
+    System.out.println("\n2️⃣ 만료 처리 테스트...");
+    testExpiryProcessing(questManager);
+
+    System.out.println("\n3️⃣ 새로운 퀘스트 생성...");
+    testDailyQuestRefresh(questManager, player);
+
+    System.out.println("\n4️⃣ 다른 레벨에서 생성 테스트...");
+    Player testPlayer15 = createTestPlayer("테스트15", 15);
+    Player testPlayer25 = createTestPlayer("테스트25", 25);
+
+    questManager.generateDailyQuests(testPlayer15);
+    questManager.generateDailyQuests(testPlayer25);
+
+    System.out.println("\n✅ 종합 테스트 완료!");
+    System.out.println("모든 테스트가 성공적으로 실행되었습니다.");
+  }
+
+  // ==================== 추가 유틸리티 메서드들 ====================
+
+  /**
+   * 테스트 결과를 파일로 저장
+   */
+  private void saveTestResults(String testName, List<String> results) {
+    try {
+      String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+      String filename = String.format("test_results_%s_%s.txt", testName, timestamp);
+
+      // TODO: 파일 저장 로직 구현
+      System.out.printf("📄 테스트 결과가 %s에 저장되었습니다.\n", filename);
+
+    } catch (Exception e) {
+      System.out.println("❌ 테스트 결과 저장 실패: " + e.getMessage());
+    }
+  }
+
 }

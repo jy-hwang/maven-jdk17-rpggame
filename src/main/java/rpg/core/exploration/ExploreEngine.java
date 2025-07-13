@@ -73,28 +73,134 @@ public class ExploreEngine {
   }
 
   /**
-   * 탐험을 시작합니다.
+   * 특정 지역에서 탐험을 진행합니다. (기존 startExploration를 지역별로 확장)
    */
-  public ExploreResult startExploration(Player player) {
+  public ExploreResult exploreLocation(Player player, String locationName) {
     try {
-      System.out.println("\n🌲 탐험을 시작합니다...");
-      logger.info("탐험 시작: {}", player.getName());
+      System.out.println("\n📍 " + locationName + "에서 탐험을 진행합니다...");
+      logger.info("지역별 탐험 시작: {} - {}", player.getName(), locationName);
 
-      // 현재 위치 업데이트
-      updatePlayerLocation(player);
+      // 지역 설정 (이미 GameEngine에서 설정되었지만 확실히 하기 위해)
+      gameState.setCurrentLocation(locationName);
 
-      // 랜덤 이벤트 또는 몬스터 조우
-      if (random.nextInt(GameConstants.NUMBER_HUNDRED) < BattleConstants.RANDOM_EVENT_CHANCE) {
+      // 해당 지역의 몬스터 데이터 확인
+      List<MonsterData> locationMonsters = MonsterDataLoader.getMonstersByLocation(locationName);
+
+      if (locationMonsters.isEmpty()) {
+        logger.warn("지역 {}에 몬스터 데이터가 없습니다. 기본 탐험 진행", locationName);
+        // 몬스터가 없으면 랜덤 이벤트만 발생
+        return handleRandomEvent(player);
+      }
+
+      // 지역별 이벤트 확률 조정
+      int eventChance = getLocationEventChance(locationName);
+
+      if (random.nextInt(100) < eventChance) {
         return handleRandomEvent(player);
       } else {
-        return handleMonsterEncounter(player);
+        return handleLocationMonsterEncounter(player, locationName);
       }
 
     } catch (Exception e) {
-      logger.error("탐험 중 오류", e);
+      logger.error("지역별 탐험 중 오류: {}", locationName, e);
       System.out.println("탐험 중 오류가 발생했습니다.");
       return new ExploreResult(ExploreResult.ResultType.ERROR, "탐험 중 오류 발생");
     }
+  }
+
+
+  /**
+   * 지역별 이벤트 발생 확률을 반환합니다.
+   */
+  private int getLocationEventChance(String locationName) {
+    return switch (locationName) {
+      case "숲속 깊은 곳" -> 40; // 초보 지역은 이벤트 많음
+      case "어두운 동굴" -> 25; // 보물 이벤트 적당
+      case "험준한 산길" -> 20; // 전투 위주
+      case "마법의 숲" -> 35; // 마법 이벤트 많음
+      case "신비한 호수" -> 30; // 신비 이벤트
+      case "폐허가 된 성" -> 15; // 대부분 전투
+      case "고대 유적" -> 25; // 지식/보물 이벤트
+      case "용암 동굴" -> 10; // 거의 전투만
+      default -> 25;
+    };
+  }
+
+  /**
+   * 특정 지역에서 몬스터 조우를 처리합니다.
+   */
+  private ExploreResult handleLocationMonsterEncounter(Player player, String locationName) {
+    // 해당 지역의 몬스터 중에서 플레이어 레벨에 적합한 몬스터 선택
+    List<MonsterData> locationMonsters = MonsterDataLoader.getMonstersByLocation(locationName);
+    List<MonsterData> suitableMonsters =
+        locationMonsters.stream().filter(monster -> player.getLevel() >= monster.getMinLevel() && player.getLevel() <= monster.getMaxLevel() + 2) // 약간의
+                                                                                                                                                  // 여유
+            .collect(Collectors.toList());
+
+    if (suitableMonsters.isEmpty()) {
+      // 적합한 몬스터가 없으면 기존 방식 사용
+      return handleMonsterEncounter(player);
+    }
+
+    // 가중 랜덤 선택으로 몬스터 데이터 선택
+    MonsterData selectedMonsterData = selectMonsterByWeight(suitableMonsters);
+
+    // 기존 getRandomMonster와 유사하게 Monster 객체 생성
+    Monster monster = new Monster(selectedMonsterData.getName(), selectedMonsterData.getStats().getHp(), selectedMonsterData.getStats().getAttack(),
+        selectedMonsterData.getRewards().getExp(), selectedMonsterData.getRewards().getGold(), selectedMonsterData);
+
+    System.out.println("👹 " + monster.getName() + "을(를) 만났습니다!");
+
+    BattleEngine.BattleResult result = battleController.startBattle(player, monster);
+
+    // 기존 handleMonsterEncounter와 동일한 결과 처리 로직
+    String message = switch (result) {
+      case VICTORY -> {
+        // 퀘스트 진행도 업데이트
+        questController.updateKillProgress(monster.getName());
+
+        // JSON 기반 드롭 아이템 처리
+        GameItem droppedItem = handleMonsterDrops(monster);
+        if (droppedItem != null && inventoryController.addItem(player, droppedItem, 1)) {
+          System.out.println("🎁 " + droppedItem.getName() + "을(를) 획득했습니다!");
+          yield "전투 승리! " + droppedItem.getName() + " 획득!";
+        } else {
+          yield "전투 승리!";
+        }
+      }
+      case DEFEAT -> "전투 패배...";
+      case ESCAPED -> "성공적으로 도망쳤습니다!";
+      case ERROR -> "전투 중 오류 발생";
+    };
+
+    ExploreResult.ResultType resultType = switch (result) {
+      case VICTORY -> ExploreResult.ResultType.BATTLE_VICTORY;
+      case DEFEAT -> ExploreResult.ResultType.BATTLE_DEFEAT;
+      case ESCAPED -> ExploreResult.ResultType.BATTLE_ESCAPED;
+      case ERROR -> ExploreResult.ResultType.ERROR;
+    };
+
+    logger.debug("지역별 몬스터 조우: {} vs {} at {} (결과: {})", player.getName(), monster.getName(), locationName, result);
+    return new ExploreResult(resultType, message);
+  }
+
+  /**
+   * 가중치에 따라 몬스터를 선택합니다.
+   */
+  private MonsterData selectMonsterByWeight(List<MonsterData> monsters) {
+    double totalWeight = monsters.stream().mapToDouble(MonsterData::getSpawnRate).sum();
+    double randomValue = random.nextDouble() * totalWeight;
+
+    double currentWeight = 0;
+    for (MonsterData monster : monsters) {
+      currentWeight += monster.getSpawnRate();
+      if (randomValue <= currentWeight) {
+        return monster;
+      }
+    }
+
+    // 폴백: 첫 번째 몬스터 반환
+    return monsters.get(0);
   }
 
   /**
@@ -595,12 +701,14 @@ public class ExploreEngine {
 
       // 최후의 수단: 직접 생성
       logger.warn("모든 방법 실패, 기본 보물 아이템 생성");
-      return new GameConsumable("MYSTERY_POTION", "신비한 물약", "HP를 75 회복합니다", 50, ItemRarity.UNCOMMON, List.of(GameEffectFactory.createHealHpEffect(75)), 0);
+      return new GameConsumable("MYSTERY_POTION", "신비한 물약", "HP를 75 회복합니다", 50, ItemRarity.UNCOMMON,
+          List.of(GameEffectFactory.createHealHpEffect(75)), 0);
 
     } catch (Exception e) {
       logger.error("보물 아이템 생성 실패", e);
       // 응급 폴백
-      return new GameConsumable("HEALTH_POTION", "기본 물약", "HP를 50 회복합니다", 30, ItemRarity.COMMON, List.of(GameEffectFactory.createHealHpEffect(50)), 0);
+      return new GameConsumable("HEALTH_POTION", "기본 물약", "HP를 50 회복합니다", 30, ItemRarity.COMMON, List.of(GameEffectFactory.createHealHpEffect(50)),
+          0);
     }
   }
 
@@ -668,12 +776,12 @@ public class ExploreEngine {
 
       // 최후의 수단: 직접 생성 (기본 드롭 아이템)
       logger.warn("모든 방법 실패, 기본 드롭 아이템 생성");
-      return new GameConsumable("SLIME_GEL","슬라임 젤", "끈적한 슬라임의 젤", 10, ItemRarity.COMMON, List.of(GameEffectFactory.createHealHpEffect(20)), 0);
+      return new GameConsumable("SLIME_GEL", "슬라임 젤", "끈적한 슬라임의 젤", 10, ItemRarity.COMMON, List.of(GameEffectFactory.createHealHpEffect(20)), 0);
 
     } catch (Exception e) {
       logger.error("드롭 아이템 생성 실패", e);
       // 응급 폴백
-      return new GameConsumable("BROKEN_JAR","부서진 물약병", "깨진 물약병의 잔여물", 5, ItemRarity.COMMON, List.of(GameEffectFactory.createHealHpEffect(10)), 0);
+      return new GameConsumable("BROKEN_JAR", "부서진 물약병", "깨진 물약병의 잔여물", 5, ItemRarity.COMMON, List.of(GameEffectFactory.createHealHpEffect(10)), 0);
     }
   }
 
@@ -732,4 +840,5 @@ public class ExploreEngine {
     WISDOM, // 지혜의 축복
     FORTUNE // 행운의 축복
   }
+
 }

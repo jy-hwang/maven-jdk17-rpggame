@@ -7,8 +7,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import rpg.application.service.QuestManager;
 import rpg.application.service.SkillService;
+import rpg.application.validator.InputValidator;
 import rpg.domain.inventory.PlayerInventory;
-import rpg.domain.skill.Skill;
 import rpg.shared.constant.GameConstants;
 
 /**
@@ -199,6 +199,14 @@ public class Player {
         }
       }
 
+      // 🆕 레벨업 시 새로운 일일 퀘스트 확인
+      if (level % 5 == 0) { // 5레벨마다
+          System.out.println("🎉 레벨업으로 새로운 일일 퀘스트가 해금되었을 수 있습니다!");
+          if (InputValidator.getConfirmation("일일 퀘스트를 새로고침하시겠습니까?")) {
+              questManager.refreshDailyQuests(this);
+          }
+      }
+      
       logger.info("{} 레벨업 완료 - 레벨: {}, 최대HP: {}, 최대마나: {}, 공격력: {}, 방어력: {}", name, level, maxHp, maxMana, baseAttack, baseDefense);
 
     } catch (Exception e) {

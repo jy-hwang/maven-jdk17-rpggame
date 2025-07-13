@@ -1,7 +1,10 @@
 package rpg.application.service;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
@@ -10,6 +13,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import rpg.application.factory.GameEffectFactory;
 import rpg.application.factory.GameItemFactory;
 import rpg.application.factory.GameQuestFactory;
+import rpg.application.service.ImprovedDailyQuestManager.QuestTier;
 import rpg.domain.item.GameConsumable;
 import rpg.domain.item.GameEquipment;
 import rpg.domain.item.GameItem;
@@ -40,6 +44,11 @@ public class QuestManager {
 
   private final GameQuestFactory gameQuestFactory;
 
+  // 🆕 추가된 필드들
+  private final ImprovedDailyQuestManager dailyQuestManager;
+  private final QuestHistoryManager questHistoryManager;
+  private boolean useImprovedDailyQuestSystem = true;
+
   @JsonCreator
   public QuestManager() {
     this.gameQuestFactory = GameQuestFactory.getInstance();
@@ -48,6 +57,9 @@ public class QuestManager {
     this.activeQuests = new ArrayList<>();
     this.completedQuests = new ArrayList<>();
     this.claimedRewardIds = new ArrayList<>();
+
+    this.dailyQuestManager = new ImprovedDailyQuestManager();
+    this.questHistoryManager = new QuestHistoryManager();
     initializeQuests();
     logger.info("QuestManager 초기화 완료 (GameItemFactory 통합)");
   }
@@ -105,25 +117,11 @@ public class QuestManager {
   /**
    * 일일 퀘스트 추가
    */
+  @Deprecated
   private void addDailyQuests() {
-    try {
-      // 일일 사냥 퀘스트
-      Quest dailyKillQuest = gameQuestFactory.createDailyQuest(Quest.QuestType.KILL);
-      if (dailyKillQuest != null) {
-        availableQuests.add(dailyKillQuest);
-        logger.debug("일일 사냥 퀘스트 생성: {}", dailyKillQuest.getTitle());
-      }
+    // 더 이상 사용하지 않음 - generateDailyQuests가 모든 것을 처리
+    logger.debug("addDailyQuests는 더 이상 사용되지 않음 - generateDailyQuests 사용");
 
-      // 일일 수집 퀘스트
-      Quest dailyCollectQuest = gameQuestFactory.createDailyQuest(Quest.QuestType.COLLECT);
-      if (dailyCollectQuest != null) {
-        availableQuests.add(dailyCollectQuest);
-        logger.debug("일일 수집 퀘스트 생성: {}", dailyCollectQuest.getTitle());
-      }
-
-    } catch (Exception e) {
-      logger.warn("일일 퀘스트 생성 실패", e);
-    }
   }
 
   /**
@@ -696,101 +694,66 @@ public class QuestManager {
   }
 
   /**
-   * 일일 퀘스트 생성 (확장 기능)
+   * 기존 generateDailyQuests 메서드 완전 교체
    */
   public void generateDailyQuests(Player character) {
-    logger.info("일일 퀘스트 생성 중... (레벨: {})", character.getLevel());
+    logger.info("개선된 일일 퀘스트 생성 중... (레벨: {})", character.getLevel());
 
     try {
-      // 플레이어 레벨에 맞는 일일 퀘스트 생성
-      if (character.getLevel() >= 5) {
-        createDailyKillQuest(character.getLevel());
-      }
+      if (useImprovedDailyQuestSystem && dailyQuestManager != null) {
+        // 🆕 개선된 시스템 사용
+        List<Quest> newDailyQuests = dailyQuestManager.generateDailyQuestsForPlayer(character);
 
-      if (character.getLevel() >= 10) {
-        createDailyCollectionQuest();
+        // 기존 일일 퀘스트 정리
+        cleanupOldDailyQuests();
+
+        // 새로운 일일 퀘스트 추가
+        for (Quest quest : newDailyQuests) {
+          availableQuests.add(quest);
+          logger.info("일일 퀘스트 추가: {}", quest.getTitle());
+        }
+
+        logger.info("개선된 일일 퀘스트 생성 완료: {}개", newDailyQuests.size());
+
+      } else {
+        // 기존 하드코딩 방식 사용 (폴백)
+        logger.warn("개선된 시스템을 사용할 수 없어 기존 방식 사용");
+        generateLegacyDailyQuests(character);
       }
 
     } catch (Exception e) {
       logger.error("일일 퀘스트 생성 실패", e);
+      // 폴백: 기존 방식으로 생성
+      generateLegacyDailyQuests(character);
     }
   }
 
-  /**
-   * 일일 처치 퀘스트 생성
-   */
-  private void createDailyKillQuest(int playerLevel) {
-    Map<String, Integer> objectives = new HashMap<>();
-
-    // 레벨에 따른 적절한 몬스터 선택
-    String targetMonster = switch (playerLevel) {
-      case 5, 6, 7 -> "고블린";
-      case 8, 9, 10, 11, 12 -> "오크";
-      case 13, 14, 15, 16, 17 -> "트롤";
-      default -> "슬라임";
-    };
-
-    int killCount = Math.max(3, playerLevel / 3);
-    objectives.put("kill_" + targetMonster, killCount);
-
-    // 일일 퀘스트 보상 (적당한 수준)
-    GameItem dailyReward = itemFactory.createItem("HEALTH_POTION");
-    if (dailyReward == null) {
-      dailyReward = createFallbackConsumableItem("DAILY_POTION", "일일 보상 물약", "HP를 40 회복", 40);
-    }
-
-    QuestReward reward = new QuestReward(playerLevel * 10, // 골드
-        playerLevel * 15, // 경험치
-        dailyReward, Math.max(1, playerLevel / 5) // 수량
-    );
-
-    Quest dailyQuest = new Quest("daily_kill_" + System.currentTimeMillis(), // 고유 ID
-        "일일 사냥 - " + targetMonster, targetMonster + " " + killCount + "마리를 처치하세요.", Quest.QuestType.KILL, Math.max(1, playerLevel - 2), // 최소 레벨 요구사항
-        objectives, reward);
-
-    availableQuests.add(dailyQuest);
-    logger.info("일일 처치 퀘스트 생성: {} (레벨: {})", dailyQuest.getTitle(), playerLevel);
-  }
-
-  /**
-   * 일일 수집 퀘스트 생성
-   */
-  private void createDailyCollectionQuest() {
-    Map<String, Integer> objectives = new HashMap<>();
-    objectives.put("collect_체력 물약", 3);
-
-    // 특별 일일 보상
-    List<GameEffect> dailyEffects = List.of(GameEffectFactory.createHealHpEffect(60), GameEffectFactory.createGainExpEffect(30));
-
-    GameConsumable dailyPotion =
-        createSpecialPotion("DAILY_SPECIAL_POTION", "일일 특제 물약", "하루 한 번 받을 수 있는 특별한 물약", 100, ItemRarity.UNCOMMON, dailyEffects);
-
-    QuestReward reward = new QuestReward(100, 150, dailyPotion, 1);
-
-    Quest dailyCollectionQuest = new Quest("daily_collection_" + System.currentTimeMillis(), "일일 수집 - 물약", "체력 물약 3개를 수집하세요.",
-        Quest.QuestType.COLLECT, 10, objectives, reward);
-
-    availableQuests.add(dailyCollectionQuest);
-    logger.info("일일 수집 퀘스트 생성: {}", dailyCollectionQuest.getTitle());
-  }
 
   /**
    * 만료된 퀘스트 정리 (일일 퀘스트 등)
    */
   public void cleanupExpiredQuests() {
-    // 일일 퀘스트 ID 패턴으로 식별하여 제거
-    availableQuests.removeIf(quest -> quest.getId().startsWith("daily_") && isQuestExpired(quest));
+    logger.info("만료된 퀘스트 정리 시작...");
 
-    logger.debug("만료된 퀘스트 정리 완료");
-  }
+    // 활성 퀘스트에서 만료된 일일 퀘스트 찾기
+    List<Quest> expiredQuests = new ArrayList<>();
+    activeQuests.removeIf(quest -> {
+      if (dailyQuestManager.isQuestExpired(quest)) {
+        expiredQuests.add(quest);
+        return true;
+      }
+      return false;
+    });
 
-  /**
-   * 퀘스트 만료 여부 확인 (단순 구현)
-   */
-  private boolean isQuestExpired(Quest quest) {
-    // 실제 구현에서는 생성 시간을 추적해야 함
-    // 현재는 단순히 일일 퀘스트만 체크
-    return quest.getId().startsWith("daily_");
+    // 사용 가능한 퀘스트에서도 만료된 퀘스트 제거
+    availableQuests.removeIf(quest -> dailyQuestManager.isQuestExpired(quest));
+
+    // 만료된 퀘스트를 히스토리에 기록
+    for (Quest expiredQuest : expiredQuests) {
+      questHistoryManager.recordQuestExpiry(expiredQuest.getId(), "일일 리셋으로 인한 만료");
+    }
+
+    logger.info("만료된 퀘스트 정리 완료: {}개 만료됨", expiredQuests.size());
   }
 
   /**
@@ -858,44 +821,7 @@ public class QuestManager {
   }
 
   /**
-   * 퀘스트 데이터 검증 (로드 후 호출)
-   */
-  public void validateQuestData() {
-    logger.info("퀘스트 데이터 검증 시작");
-
-    // null 체크 및 초기화
-    if (availableQuests == null) {
-      availableQuests = new ArrayList<>();
-    }
-    if (activeQuests == null) {
-      activeQuests = new ArrayList<>();
-    }
-    if (completedQuests == null) {
-      completedQuests = new ArrayList<>();
-    }
-    if (claimedRewardIds == null) {
-      claimedRewardIds = new ArrayList<>();
-    }
-
-    // 잘못된 상태의 퀘스트 정리
-    activeQuests.removeIf(quest -> quest == null || quest.getStatus() != Quest.QuestStatus.ACTIVE);
-    completedQuests.removeIf(quest -> quest == null);
-    claimedRewardIds.removeIf(id -> id == null || id.trim().isEmpty());
-
-
-    // 🔥 로드된 데이터가 비어있으면 기본 퀘스트만 추가 (중복 방지)
-    if (availableQuests.isEmpty() && activeQuests.isEmpty() && completedQuests.isEmpty()) {
-      logger.info("빈 퀘스트 데이터 감지 - 기본 퀘스트 추가");
-      initializeDefaultQuestsOnly();
-    }
-
-    logger.info("퀘스트 데이터 검증 완료: 사용가능 {}개, 활성 {}개, 완료 {}개, 보상수령 {}개", availableQuests.size(), activeQuests.size(), completedQuests.size(),
-        claimedRewardIds.size());
-
-  }
-
-  /**
-   * 🔥 로드용 전용: 모든 퀘스트를 제거하고 로드된 데이터로 교체
+   * 로드용 전용: 모든 퀘스트를 제거하고 로드된 데이터로 교체
    */
   public void replaceAllQuestsForLoad(List<Quest> newAvailable, List<Quest> newActive, List<Quest> newCompleted, List<String> newClaimedIds) {
 
@@ -1010,14 +936,44 @@ public class QuestManager {
   }
 
   /**
-   * ⭐ 기존 claimQuestReward 메서드 수정 (보상 수령 시 상태 추적)
+   * SimpleSaveData 로드 시 보상 수령 상태 복원
+   */
+  public void setClaimedRewardIds(List<String> claimedIds) {
+    this.claimedRewardIds = claimedIds != null ? new ArrayList<>(claimedIds) : new ArrayList<>();
+    logger.debug("보상 수령 상태 복원: {}개", this.claimedRewardIds.size());
+  }
+
+  /**
+   * 🔥 퀘스트 완료 처리 개선
+   */
+  public boolean completeQuest(String questId, Player character) {
+    Quest quest = findQuestById(questId, activeQuests);
+    if (quest != null && quest.isCompleted()) {
+      // 기존 완료 처리
+      activeQuests.remove(quest);
+      completedQuests.add(quest);
+      quest.setStatus(Quest.QuestStatus.COMPLETED);
+
+      // 🆕 히스토리에 기록
+      questHistoryManager.recordQuestCompletion(quest, false);
+
+      logger.info("퀘스트 완료: {} (캐릭터: {})", quest.getTitle(), character.getName());
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * 🔥 퀘스트 보상 수령 처리 개선
    */
   public boolean claimQuestReward(String questId, Player character) {
     Quest quest = findQuestById(questId, completedQuests);
     if (quest != null && quest.getStatus() == Quest.QuestStatus.COMPLETED) {
       if (quest.claimReward(character)) {
-        // ⭐ 보상 수령 상태 추가
         markRewardAsClaimed(questId);
+
+        // 🆕 히스토리 업데이트
+        questHistoryManager.recordQuestCompletion(quest, true);
 
         logger.info("퀘스트 보상 수령: {} (캐릭터: {})", quest.getTitle(), character.getName());
         return true;
@@ -1027,14 +983,66 @@ public class QuestManager {
   }
 
   /**
-   * SimpleSaveData 로드 시 보상 수령 상태 복원
+   * 일일 퀘스트 강제 새로고침
    */
-  public void setClaimedRewardIds(List<String> claimedIds) {
-    this.claimedRewardIds = claimedIds != null ? new ArrayList<>(claimedIds) : new ArrayList<>();
-    logger.debug("보상 수령 상태 복원: {}개", this.claimedRewardIds.size());
+  public void refreshDailyQuests(Player character) {
+    logger.info("일일 퀘스트 강제 새로고침...");
+    cleanupExpiredQuests();
+    generateDailyQuests(character);
+    System.out.println("✅ 일일 퀘스트가 새로고침되었습니다!");
   }
 
+  /**
+   * 퀘스트 히스토리 표시
+   */
+  public void showQuestHistory(Player character) {
+    questHistoryManager.displayQuestHistory(character);
+  }
 
+  /**
+   * 일일 퀘스트 생성 통계 표시
+   */
+  public void showDailyQuestStats() {
+    dailyQuestManager.printGenerationStats();
+  }
+
+  /**
+   * 특정 플레이어를 위한 일일 퀘스트 시뮬레이션
+   */
+  public void simulateDailyQuests(Player character) {
+    dailyQuestManager.simulateGenerationForPlayer(character);
+  }
+
+  // ==================== 5. 로드 시 처리 개선 ====================
+
+  /**
+   * 🔥 로드 후 데이터 검증 개선
+   */
+  public void validateQuestData() {
+    logger.info("퀘스트 데이터 검증 시작 (개선된 시스템)");
+
+    // 기존 검증...
+    if (availableQuests == null)
+      availableQuests = new ArrayList<>();
+    if (activeQuests == null)
+      activeQuests = new ArrayList<>();
+    if (completedQuests == null)
+      completedQuests = new ArrayList<>();
+    if (claimedRewardIds == null)
+      claimedRewardIds = new ArrayList<>();
+
+    // 🆕 만료된 일일 퀘스트 자동 정리
+    cleanupExpiredQuests();
+
+    // 🆕 로드된 퀘스트 히스토리 검증
+    if (questHistoryManager != null) {
+      // 저장된 히스토리가 있다면 복원
+      // (SimpleSaveData에서 히스토리 정보를 가져와야 함)
+    }
+
+    logger.info("퀘스트 데이터 검증 완료: 사용가능 {}개, 활성 {}개, 완료 {}개, 보상수령 {}개", availableQuests.size(), activeQuests.size(), completedQuests.size(),
+        claimedRewardIds.size());
+  }
 
   // ==================== Getters ====================
 
@@ -1100,6 +1108,159 @@ public class QuestManager {
       return String.format("QuestStatistics{available=%d, active=%d, claimable=%d, claimed=%d, completion=%.1f%%}", availableCount, activeCount,
           claimableCount, claimedCount, getCompletionRate());
     }
+  }
+
+  /**
+   * 기존 QuestManager의 createDailyKillQuest 메서드 (하드코딩 버전 - 호환성용)
+   */
+  private void createDailyKillQuest(int playerLevel) {
+    Map<String, Integer> objectives = new HashMap<>();
+
+    // 레벨에 따른 적절한 몬스터 선택 (기존 하드코딩 방식)
+    String targetMonster = switch (playerLevel) {
+      case 5, 6, 7 -> "고블린";
+      case 8, 9, 10, 11, 12 -> "오크";
+      case 13, 14, 15, 16, 17 -> "트롤";
+      case 18, 19, 20, 21, 22 -> "스켈레톤";
+      case 23, 24, 25, 26, 27 -> "늑대";
+      default -> playerLevel <= 4 ? "슬라임" : "드래곤";
+    };
+
+    int killCount = Math.max(3, playerLevel / 3);
+    objectives.put("kill_" + targetMonster, killCount);
+
+    // 일일 퀘스트 보상 (레벨에 맞게 스케일링)
+    GameItem dailyReward = itemFactory.createItem("HEALTH_POTION");
+    if (dailyReward == null) {
+      dailyReward = createFallbackConsumableItem("DAILY_POTION", "일일 보상 물약", "HP를 40 회복", 40);
+    }
+
+    QuestReward reward = new QuestReward(playerLevel * 10 + 50, // 경험치 (기본 50 + 레벨당 10)
+        playerLevel * 5 + 30, // 골드 (기본 30 + 레벨당 5)
+        dailyReward, Math.max(1, playerLevel / 5) // 아이템 수량
+    );
+
+    // 오늘 날짜 기반 ID 생성
+    String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+    QuestTier tier = QuestTier.getTierForLevel(playerLevel);
+    String questId = String.format("daily_kill_%s_%s01", today, tier.getCode());
+
+    Quest dailyQuest = new Quest(questId, String.format("[%s] 일일 사냥 - %s", tier.getDescription(), targetMonster),
+        String.format("%s을(를) %d마리 처치하세요.", targetMonster, killCount), Quest.QuestType.KILL, Math.max(1, playerLevel - 2), // 최소 레벨 요구사항
+        objectives, reward);
+
+    availableQuests.add(dailyQuest);
+    logger.info("일일 처치 퀘스트 생성: {} (레벨: {})", dailyQuest.getTitle(), playerLevel);
+  }
+
+  /**
+   * 기존 QuestManager의 createDailyCollectionQuest 메서드 (하드코딩 버전 - 호환성용)
+   */
+  private void createDailyCollectionQuest() {
+    Map<String, Integer> objectives = new HashMap<>();
+
+    // 기본 수집 아이템 (하드코딩)
+    String[] collectableItems = {"체력 물약", "마나 물약", "철광석", "허브", "가죽"};
+    String targetItem = collectableItems[(int) (Math.random() * collectableItems.length)];
+    int collectCount = 3 + (int) (Math.random() * 3); // 3-5개
+
+    objectives.put("collect_" + targetItem, collectCount);
+
+    // 특별 일일 보상
+    List<GameEffect> dailyEffects = List.of(GameEffectFactory.createHealHpEffect(60), GameEffectFactory.createGainExpEffect(30));
+
+    GameConsumable dailyPotion =
+        createSpecialPotion("DAILY_SPECIAL_POTION", "일일 특제 물약", "하루 한 번 받을 수 있는 특별한 물약", 100, ItemRarity.UNCOMMON, dailyEffects);
+
+    QuestReward reward = new QuestReward(100, 150, dailyPotion, 1);
+
+    // 오늘 날짜 기반 ID 생성
+    String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+    String questId = String.format("daily_collect_%s_A01", today);
+
+    Quest dailyCollectionQuest = new Quest(questId, String.format("[초급] 일일 수집 - %s", targetItem),
+        String.format("%s을(를) %d개 수집하세요.", targetItem, collectCount), Quest.QuestType.COLLECT, 10, // 최소 레벨 10
+        objectives, reward);
+
+    availableQuests.add(dailyCollectionQuest);
+    logger.info("일일 수집 퀘스트 생성: {}", dailyCollectionQuest.getTitle());
+  }
+
+
+  /**
+   * 기존 방식의 일일 퀘스트 생성 (폴백용)
+   */
+  private void generateLegacyDailyQuests(Player character) {
+    logger.info("기존 방식으로 일일 퀘스트 생성 중...");
+
+    try {
+      // 플레이어 레벨에 맞는 일일 퀘스트 생성
+      if (character.getLevel() >= 5) {
+        createDailyKillQuest(character.getLevel());
+      }
+
+      if (character.getLevel() >= 10) {
+        createDailyCollectionQuest();
+      }
+
+      logger.info("기존 방식 일일 퀘스트 생성 완료");
+
+    } catch (Exception e) {
+      logger.error("기존 방식 일일 퀘스트 생성도 실패", e);
+    }
+  }
+
+  /**
+   * 오래된 일일 퀘스트 정리
+   */
+  private void cleanupOldDailyQuests() {
+    String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+
+    int removedCount = 0;
+    Iterator<Quest> iterator = availableQuests.iterator();
+    while (iterator.hasNext()) {
+      Quest quest = iterator.next();
+      if (quest.getId().startsWith("daily_")) {
+        String questDate = ImprovedDailyQuestManager.QuestIdParser.extractDate(quest.getId());
+        if (questDate != null && !today.equals(questDate)) {
+          iterator.remove();
+          removedCount++;
+        }
+      }
+    }
+
+    if (removedCount > 0) {
+      logger.info("오래된 일일 퀘스트 {}개 정리됨", removedCount);
+    }
+  }
+
+  /**
+   * 개선된 시스템 사용 여부 설정
+   */
+  public void setUseImprovedDailyQuestSystem(boolean useImproved) {
+    this.useImprovedDailyQuestSystem = useImproved;
+    logger.info("개선된 일일 퀘스트 시스템 사용: {}", useImproved);
+  }
+
+  /**
+   * 일일 퀘스트 시스템 상태 출력
+   */
+  public void printDailyQuestSystemStatus() {
+    System.out.println("\n=== 🌅 일일 퀘스트 시스템 상태 ===");
+    System.out.printf("개선된 시스템 사용: %s\n", useImprovedDailyQuestSystem ? "✅ 활성화" : "❌ 비활성화");
+
+    if (dailyQuestManager != null) {
+      System.out.println("📊 개선된 시스템 통계:");
+      dailyQuestManager.printGenerationStats();
+    } else {
+      System.out.println("❌ 개선된 시스템이 초기화되지 않음");
+    }
+
+    // 현재 일일 퀘스트 수
+    long dailyQuestCount = availableQuests.stream().filter(quest -> quest.getId().startsWith("daily_")).count();
+    System.out.printf("현재 사용 가능한 일일 퀘스트: %d개\n", dailyQuestCount);
+
+    System.out.println("=".repeat(50));
   }
 
 

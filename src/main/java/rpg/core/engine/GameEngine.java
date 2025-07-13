@@ -1,5 +1,7 @@
 package rpg.core.engine;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -166,6 +168,11 @@ public class GameEngine {
       System.out.println("🎉 새로운 모험가 " + name + "님, 환영합니다!");
       player.displayStats();
 
+      // 🆕 일일 퀘스트 초기 생성
+      player.getQuestManager().generateDailyQuests(player);
+
+      logger.info("새 게임 초기화 완료 - 일일 퀘스트 포함");
+
       // 시작 퀘스트 안내
       System.out.println("\n💡 퀘스트 메뉴에서 첫 번째 퀘스트를 수락해보세요!");
 
@@ -252,7 +259,7 @@ public class GameEngine {
 
     // 디버그 컨트롤러 초기화 (플레이어가 있을 때만)
     if (player != null && SystemConstants.DEBUG_MODE) {
-        debugController = new DebugController(player);
+      debugController = new DebugController(player);
     }
   }
 
@@ -267,7 +274,7 @@ public class GameEngine {
         showInGameMenu();
         int maxChoice = SystemConstants.DEBUG_MODE ? 99 : 13;
         int choice = InputValidator.getIntInput("선택: ", 1, maxChoice);
-        
+
         switch (choice) {
           case 1:
             handleExploration();
@@ -319,9 +326,9 @@ public class GameEngine {
           case 99:
             // 디버그 메뉴 진입 (DEBUG_MODE가 true일 때만)
             if (SystemConstants.DEBUG_MODE && debugController != null) {
-                debugController.showDebugMenu();
+              debugController.showDebugMenu();
             } else {
-                System.out.println("디버그 모드가 비활성화되어 있습니다.");
+              System.out.println("디버그 모드가 비활성화되어 있습니다.");
             }
             break;
 
@@ -369,10 +376,10 @@ public class GameEngine {
     System.out.println(ConsoleColors.colorize("10. 📁 저장 관리", ConsoleColors.PURPLE));
     System.out.println(ConsoleColors.colorize("11. 🚪 게임 종료", ConsoleColors.RED));
     System.out.println(ConsoleColors.colorize("12. ❓ 도움말", ConsoleColors.WHITE));
-    System.out.println("13. 🎨 "+ConsoleColors.rainbow("색깔테스트"));
+    System.out.println("13. 🎨 " + ConsoleColors.rainbow("색깔테스트"));
     // 디버그 모드가 활성화된 경우에만 디버그 메뉴 표시
     if (SystemConstants.DEBUG_MODE) {
-        System.out.println(ConsoleColors.colorize("99. 🔧 디버그 메뉴", ConsoleColors.GOLD_FALLBACK));
+      System.out.println(ConsoleColors.colorize("99. 🔧 디버그 메뉴", ConsoleColors.GOLD_FALLBACK));
     }
     System.out.println(ConsoleColors.CYAN + "==================" + ConsoleColors.RESET);
   }
@@ -772,12 +779,110 @@ public class GameEngine {
   }
 
   /**
-   * 탐험을 처리합니다.
+   * 탐험을 처리합니다. (개선된 버전)
    */
   private void handleExploration() {
-    ExploreEngine.ExploreResult result = exploreController.startExploration(player);
+    while (true) {
+      showExplorationMenu();
+      int choice = InputValidator.getIntInput("선택: ", 0, getAvailableLocationCount(player.getLevel()));
 
-    // 탐험 결과에 따른 추가 처리
+      if (choice == 0) {
+        System.out.println("🏠 마을로 돌아갑니다.");
+        break;
+      }
+
+      String selectedLocation = getLocationByChoice(choice, player.getLevel());
+      if (selectedLocation != null) {
+        exploreSpecificLocation(selectedLocation);
+      }
+    }
+  }
+
+  /**
+   * 탐험 메뉴를 표시합니다.
+   */
+  private void showExplorationMenu() {
+    System.out.println("\n" + ConsoleColors.BOLD + ConsoleColors.BRIGHT_CYAN + "=== 🗡️ 탐험 메뉴 ===" + ConsoleColors.RESET);
+    System.out.println(ConsoleColors.CYAN + "(갈 수 있는 지역이 레벨별 추천에 맞춰서 정렬되어 보임)" + ConsoleColors.RESET);
+    System.out.println(ConsoleColors.YELLOW + "현재 레벨: " + player.getLevel() + ConsoleColors.RESET);
+
+    List<LocationInfo> availableLocations = getAvailableLocations(player.getLevel());
+
+    for (int i = 0; i < availableLocations.size(); i++) {
+      LocationInfo location = availableLocations.get(i);
+      String difficultyColor = getDifficultyColor(location.getDifficulty());
+      String recommendationText = getRecommendationText(location.getDifficulty(), player.getLevel());
+
+      System.out.printf("%s%d. %s %s%s %s%n", difficultyColor, i + 1, location.getIcon(), location.getName(), ConsoleColors.RESET,
+          recommendationText);
+    }
+
+    System.out.println(ConsoleColors.WHITE + "0. 🏠 마을로 돌아가기" + ConsoleColors.RESET);
+    System.out.println(ConsoleColors.CYAN + "==================" + ConsoleColors.RESET);
+  }
+
+  /**
+   * 플레이어 레벨에 따라 갈 수 있는 지역 목록을 반환합니다.
+   */
+  private List<LocationInfo> getAvailableLocations(int playerLevel) {
+    List<LocationInfo> allLocations =
+        Arrays.asList(new LocationInfo("숲속 깊은 곳", "🌲", 1, 3, "평화로운 숲, 초보자에게 적합"), new LocationInfo("어두운 동굴", "🕳️", 2, 5, "어둠이 깊은 동굴, 보물이 있을 수 있음"),
+            new LocationInfo("험준한 산길", "⛰️", 4, 7, "험한 산길, 강한 몬스터 서식"), new LocationInfo("마법의 숲", "🌟", 5, 8, "신비한 마법의 기운이 흐르는 숲"),
+            new LocationInfo("신비한 호수", "🏞️", 6, 10, "신비로운 호수, 물속 생물들 주의"), new LocationInfo("폐허가 된 성", "🏰", 8, 12, "오래된 성터, 망령들이 떠돎"),
+            new LocationInfo("고대 유적", "🏛️", 10, 15, "고대 문명의 유적, 강력한 수호자"), new LocationInfo("용암 동굴", "🌋", 15, 99, "위험한 용암 지대, 최고 난이도"));
+
+    // 플레이어 레벨에 따라 접근 가능한 지역 필터링 및 정렬
+    return allLocations.stream().filter(location -> playerLevel >= location.getMinLevel()) // 최소 레벨 충족
+        .sorted((l1, l2) -> {
+          // 현재 레벨에 적합한 지역을 우선 정렬
+          int score1 = getLocationPriority(l1, playerLevel);
+          int score2 = getLocationPriority(l2, playerLevel);
+          return Integer.compare(score2, score1); // 내림차순
+        }).collect(Collectors.toList());
+  }
+
+  /**
+   * 지역의 우선순위를 계산합니다. (높을수록 상위에 표시)
+   */
+  private int getLocationPriority(LocationInfo location, int playerLevel) {
+    if (playerLevel >= location.getMinLevel() && playerLevel <= location.getMaxLevel()) {
+      return 100; // 적정 레벨 지역 - 최우선
+    } else if (playerLevel < location.getMaxLevel() + 3) {
+      return 50; // 약간 높은 레벨 지역 - 도전적
+    } else {
+      return 10; // 너무 낮은 레벨 지역 - 낮은 우선순위
+    }
+  }
+
+  /**
+   * 선택된 번호에 해당하는 지역을 반환합니다.
+   */
+  private String getLocationByChoice(int choice, int playerLevel) {
+    List<LocationInfo> availableLocations = getAvailableLocations(playerLevel);
+
+    if (choice > 0 && choice <= availableLocations.size()) {
+      return availableLocations.get(choice - 1).getName();
+    }
+
+    return null;
+  }
+
+  /**
+   * 특정 지역으로 탐험을 진행합니다.
+   */
+  private void exploreSpecificLocation(String locationName) {
+    System.out.println("\n🚀 " + locationName + "(으)로 향합니다!");
+
+    // 현재 위치 설정
+    gameState.setCurrentLocation(locationName);
+
+    // 지역별 설명 표시
+    showLocationDescription(locationName);
+
+    // 해당 지역에서의 탐험 진행 (기존 ExploreEngine 메서드 재사용)
+    ExploreEngine.ExploreResult result = exploreController.exploreLocation(player, locationName);
+
+    // 탐험 결과 처리 (기존 handleExploration의 결과 처리 로직과 동일)
     switch (result.getType()) {
       case BATTLE_DEFEAT -> {
         if (!player.isAlive()) {
@@ -794,6 +899,42 @@ public class GameEngine {
         questController.updateLevelProgress(player);
       }
     }
+
+    // 탐험 후 잠시 대기
+    InputValidator.waitForAnyKey("\n계속하려면 Enter를 누르세요...");
+  }
+
+  /**
+   * 난이도에 따른 색상을 반환합니다.
+   */
+  private String getDifficultyColor(String difficulty) {
+    return switch (difficulty.toLowerCase()) {
+      case "쉬움", "매우 쉬움" -> ConsoleColors.GREEN;
+      case "보통", "적정" -> ConsoleColors.YELLOW;
+      case "어려움" -> ConsoleColors.BRIGHT_RED;
+      case "매우 어려움", "위험" -> ConsoleColors.RED;
+      default -> ConsoleColors.WHITE;
+    };
+  }
+
+  /**
+   * 추천 텍스트를 생성합니다.
+   */
+  private String getRecommendationText(String difficulty, int playerLevel) {
+    return switch (difficulty.toLowerCase()) {
+      case "쉬움", "매우 쉬움" -> ConsoleColors.GREEN + "[추천]" + ConsoleColors.RESET;
+      case "보통", "적정" -> ConsoleColors.YELLOW + "[적정]" + ConsoleColors.RESET;
+      case "어려움" -> ConsoleColors.BRIGHT_RED + "[도전적]" + ConsoleColors.RESET;
+      case "매우 어려움", "위험" -> ConsoleColors.RED + "[위험]" + ConsoleColors.RESET;
+      default -> "";
+    };
+  }
+
+  /**
+   * 가용한 지역 수를 반환합니다.
+   */
+  private int getAvailableLocationCount(int playerLevel) {
+    return getAvailableLocations(playerLevel).size();
   }
 
   /**
@@ -946,4 +1087,54 @@ public class GameEngine {
     }
   }
 
+  /**
+   * 지역 정보를 담는 내부 클래스
+   */
+  private static class LocationInfo {
+    private final String name;
+    private final String icon;
+    private final int minLevel;
+    private final int maxLevel;
+    private final String description;
+
+    public LocationInfo(String name, String icon, int minLevel, int maxLevel, String description) {
+      this.name = name;
+      this.icon = icon;
+      this.minLevel = minLevel;
+      this.maxLevel = maxLevel;
+      this.description = description;
+    }
+
+    public String getName() {
+      return name;
+    }
+
+    public String getIcon() {
+      return icon;
+    }
+
+    public int getMinLevel() {
+      return minLevel;
+    }
+
+    public int getMaxLevel() {
+      return maxLevel;
+    }
+
+    public String getDescription() {
+      return description;
+    }
+
+    public String getDifficulty() {
+      int levelRange = maxLevel - minLevel;
+      if (levelRange <= 3)
+        return "쉬움";
+      else if (levelRange <= 5)
+        return "보통";
+      else if (levelRange <= 8)
+        return "어려움";
+      else
+        return "매우 어려움";
+    }
+  }
 }
