@@ -25,7 +25,8 @@ import rpg.shared.persistence.SaveGameController;
 import rpg.shared.util.ConsoleColors;
 
 /**
- * 리팩토링된 메인 게임 컨트롤러 각 기능별 Controller들을 조율하는 역할
+ * 리팩토링된 메인 게임 컨트롤러
+ * 각 기능별 Controller들을 조율하는 역할
  */
 public class GameEngine {
   private static final Logger logger = LoggerFactory.getLogger(GameEngine.class);
@@ -71,7 +72,7 @@ public class GameEngine {
       exploreController = new ExploreEngine(battleController, null, inventoryController, gameState); // 임시로 null
 
       saveGameController = new SaveGameController();
-
+      debugController = new DebugController(player);
       logger.debug("모든 컨트롤러 초기화 완료");
     } catch (Exception e) {
       logger.error("컨트롤러 초기화 실패", e);
@@ -249,6 +250,10 @@ public class GameEngine {
     battleController = new BattleEngine(questManager, gameState);
     exploreController = new ExploreEngine(battleController, questController, inventoryController, gameState);
 
+    // 디버그 컨트롤러 초기화 (플레이어가 있을 때만)
+    if (player != null && SystemConstants.DEBUG_MODE) {
+        debugController = new DebugController(player);
+    }
   }
 
   /**
@@ -260,12 +265,9 @@ public class GameEngine {
     while (inGameLoop && player.isAlive()) {
       try {
         showInGameMenu();
-        int choice = 0;
-        if (!SystemConstants.DEBUG_MODE) {
-          choice = InputValidator.getIntInput("선택: ", 1, 12);
-        } else {
-          choice = InputValidator.getIntInput("선택: ", 1, 99);
-        }
+        int maxChoice = SystemConstants.DEBUG_MODE ? 99 : 13;
+        int choice = InputValidator.getIntInput("선택: ", 1, maxChoice);
+        
         switch (choice) {
           case 1:
             handleExploration();
@@ -314,17 +316,12 @@ public class GameEngine {
           case 13:
             ConsoleColors.testColors();
             break;
-          case 21:
-          case 22:
-          case 23:
-          case 24:
-          case 25:
-          case 26:
-          case 27:
-          case 28:
-          case 29:
-            if (debugController != null) {
-              debugController.showDebugMenu();
+          case 99:
+            // 디버그 메뉴 진입 (DEBUG_MODE가 true일 때만)
+            if (SystemConstants.DEBUG_MODE && debugController != null) {
+                debugController.showDebugMenu();
+            } else {
+                System.out.println("디버그 모드가 비활성화되어 있습니다.");
             }
             break;
 
@@ -373,7 +370,10 @@ public class GameEngine {
     System.out.println(ConsoleColors.colorize("11. 🚪 게임 종료", ConsoleColors.RED));
     System.out.println(ConsoleColors.colorize("12. ❓ 도움말", ConsoleColors.WHITE));
     System.out.println("13. 🎨 "+ConsoleColors.rainbow("색깔테스트"));
-
+    // 디버그 모드가 활성화된 경우에만 디버그 메뉴 표시
+    if (SystemConstants.DEBUG_MODE) {
+        System.out.println(ConsoleColors.colorize("99. 🔧 디버그 메뉴", ConsoleColors.GOLD_FALLBACK));
+    }
     System.out.println(ConsoleColors.CYAN + "==================" + ConsoleColors.RESET);
   }
 

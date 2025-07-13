@@ -10,11 +10,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rpg.application.factory.GameEffectFactory;
 import rpg.application.factory.GameItemFactory;
 import rpg.application.factory.JsonBasedQuestFactory;
+import rpg.application.factory.SkillFactory;
 import rpg.application.validator.InputValidator;
 import rpg.core.engine.GameEngine;
 import rpg.domain.item.GameItem;
@@ -22,11 +24,13 @@ import rpg.domain.item.ItemRarity;
 import rpg.domain.item.effect.GameEffect;
 import rpg.domain.player.Player;
 import rpg.domain.quest.Quest;
+import rpg.domain.skill.Skill;
 import rpg.infrastructure.data.loader.QuestTemplateLoader;
 import rpg.shared.constant.SystemConstants;
 
 /**
- * 디버그 및 테스트 기능을 전담하는 컨트롤러 GameEngine에서 분리된 모든 디버그/테스트 메서드들을 포함
+ * 디버그 및 테스트 기능을 전담하는 컨트롤러
+ * GameEngine에서 분리된 모든 디버그/테스트 메서드들을 포함
  */
 public class DebugController {
   private static final Logger logger = LoggerFactory.getLogger(DebugController.class);
@@ -53,16 +57,17 @@ public class DebugController {
       System.out.println("2. 🎲 랜덤 아이템 테스트");
       System.out.println("3. 📋 퀘스트 템플릿 테스트");
       System.out.println("4. 🎯 퀘스트 시스템 테스트");
-      System.out.println("5. 🔧 전체 데이터 리로드");
-      System.out.println("6. 📈 몬스터 통계");
-      System.out.println("7. 🎁 아이템 통계");
-      System.out.println("8. 🧪 테스트 몬스터 생성");
-      System.out.println("9. 🎒 테스트 아이템 생성");
-      System.out.println("10. 🛠️ 전체 시스템 진단");
-      System.out.println("11. 📖 도움말 메뉴");
+      System.out.println("5. ⚔️ 스킬 팩토리 테스트");
+      System.out.println("6. 🔧 전체 데이터 리로드");
+      System.out.println("7. 📈 몬스터 통계");
+      System.out.println("8. 🎁 아이템 통계");
+      System.out.println("9. 🧪 테스트 몬스터 생성");
+      System.out.println("10. 🎒 테스트 아이템 생성");
+      System.out.println("11. 🛠️ 전체 시스템 진단");
+      System.out.println("12. 📖 도움말 메뉴");
       System.out.println("0. 🔙 돌아가기");
 
-      int choice = InputValidator.getIntInput("선택 (0-11): ", 0, 11);
+      int choice = InputValidator.getIntInput("선택 (0-12): ", 0, 12);
 
       switch (choice) {
         case 1:
@@ -78,24 +83,27 @@ public class DebugController {
           testQuestSystem();
           break;
         case 5:
-          reloadAllGameData();
+          testSkillFactory();
           break;
         case 6:
-          showMonsterStatistics();
+          reloadAllGameData();
           break;
         case 7:
-          showItemStatistics();
+          showMonsterStatistics();
           break;
         case 8:
-          testMonsterGeneration();
+          showItemStatistics();
           break;
         case 9:
-          testItemGeneration();
+          testMonsterGeneration();
           break;
         case 10:
-          runFullSystemDiagnostics();
+          testItemGeneration();
           break;
         case 11:
+          runFullSystemDiagnostics();
+          break;
+        case 12:
           showHelpMenu();
           break;
         case 0:
@@ -157,30 +165,37 @@ public class DebugController {
       // 기본 테스트 실행
       factory.testRandomGeneration();
 
-      // 인터랙티브 테스트
-      System.out.println("\n🎯 인터랙티브 테스트:");
-      System.out.println("1. 특정 희귀도 아이템 생성");
-      System.out.println("2. 레벨별 아이템 생성");
-      System.out.println("3. 특수 상황별 아이템 생성");
-      System.out.println("4. 통계 보기");
+      boolean continueTest = true;
+      while (continueTest) {
+        // 인터랙티브 테스트
+        System.out.println("\n🎯 인터랙티브 테스트:");
+        System.out.println("1. 특정 희귀도 아이템 생성");
+        System.out.println("2. 레벨별 아이템 생성");
+        System.out.println("3. 특수 상황별 아이템 생성");
+        System.out.println("4. 통계 보기");
+        System.out.println("0. 🔙 돌아가기");
 
-      int choice = InputValidator.getIntInput("선택 (1-4): ", 1, 4);
+        int choice = InputValidator.getIntInput("선택 (0-4): ", 0, 4);
 
-      switch (choice) {
-        case 1:
-          testRarityBasedGeneration(factory);
-          break;
-        case 2:
-          testLevelBasedGeneration(factory);
-          break;
-        case 3:
-          testSpecialGeneration(factory);
-          break;
-        case 4:
-          factory.printRandomGenerationStats();
-          break;
+        switch (choice) {
+          case 1:
+            testRarityBasedGeneration(factory);
+            break;
+          case 2:
+            testLevelBasedGeneration(factory);
+            break;
+          case 3:
+            testSpecialGeneration(factory);
+            break;
+          case 4:
+            factory.printRandomGenerationStats();
+            break;
+          case 0:
+            continueTest = false;
+            System.out.println("🔙 랜덤 아이템 테스트를 종료합니다.");
+            break;
+        }
       }
-
     } catch (Exception e) {
       System.out.println("❌ 랜덤 아이템 테스트 중 오류: " + e.getMessage());
       logger.error("랜덤 아이템 테스트 실패", e);
@@ -1149,6 +1164,265 @@ public class DebugController {
 
     } catch (Exception e) {
       System.out.println("     (로그 미리보기 실패: " + e.getMessage() + ")");
+    }
+  }
+
+  /**
+   * SkillFactory를 테스트합니다.
+   */
+  private void testSkillFactory() {
+    System.out.println("\n=== ⚔️ SkillFactory 테스트 ===");
+
+    try {
+      // SkillFactory 초기화 확인
+      System.out.println("🔍 SkillFactory 초기화 확인:");
+      if (!SkillFactory.isInitialized()) {
+        System.out.println("   🔄 SkillFactory 초기화 중...");
+        SkillFactory.initialize();
+      }
+      System.out.println("   ✅ SkillFactory 초기화 완료");
+
+      // JSON 파일 읽기 상태 확인
+      int skillCount = SkillFactory.getSkillCount();
+      System.out.printf("   📦 로드된 스킬 수: %d개\n", skillCount);
+
+      if (skillCount == 0) {
+        System.out.println("   ❌ 스킬이 로드되지 않았습니다.");
+        System.out.println("   💡 skills.json 파일을 확인해주세요.");
+        return;
+      }
+
+      // 전체 스킬 목록 표시
+      showAllSkills();
+
+      // 스킬 선택하여 상세정보 보기
+      if (InputValidator.getConfirmation("\n🔍 특정 스킬의 상세정보를 보시겠습니까?")) {
+        selectAndShowSkillDetail();
+      }
+
+    } catch (Exception e) {
+      System.out.println("❌ SkillFactory 테스트 중 오류: " + e.getMessage());
+      logger.error("SkillFactory 테스트 실패", e);
+
+      System.out.println("\n🔧 확인사항:");
+      System.out.println("1. resources/config/skills.json 파일이 존재하는지 확인");
+      System.out.println("2. JSON 파일 형식이 올바른지 확인");
+      System.out.println("3. SystemConstants.SKILLS_CONFIG 경로가 정확한지 확인");
+    }
+
+    InputValidator.waitForAnyKey("계속하려면 Enter를 누르세요...");
+  }
+
+  /**
+   * 전체 스킬 목록을 레벨별로 정렬하여 표시합니다.
+   */
+  private void showAllSkills() {
+    System.out.println("\n📋 로드된 스킬 목록 (레벨순 정렬):");
+    System.out.println("=====================================");
+
+    try {
+      List<String> allSkillIds = SkillFactory.getAllSkillIds();
+
+      if (allSkillIds.isEmpty()) {
+        System.out.println("   로드된 스킬이 없습니다.");
+        return;
+      }
+
+      // 스킬 정보와 함께 저장할 클래스
+      class SkillInfo {
+        String id;
+        String name;
+        int level;
+        String type;
+
+        SkillInfo(String id, String name, int level, String type) {
+          this.id = id;
+          this.name = name;
+          this.level = level;
+          this.type = type;
+        }
+      }
+
+      // 스킬 정보를 수집하고 레벨별로 정렬
+      List<SkillInfo> skillInfos = new ArrayList<>();
+
+      for (String skillId : allSkillIds) {
+        Map<String, Object> info = SkillFactory.getSkillInfo(skillId);
+        if (info != null) {
+          String name = (String) info.get("name");
+          int level = info.get("requiredLevel") != null ? (Integer) info.get("requiredLevel") : 0;
+          String type = (String) info.get("type");
+
+          skillInfos.add(new SkillInfo(skillId, name != null ? name : skillId, level, type != null ? type : "UNKNOWN"));
+        } else {
+          skillInfos.add(new SkillInfo(skillId, skillId, 0, "UNKNOWN"));
+        }
+      }
+
+      // 레벨순으로 정렬 (레벨이 같으면 이름순)
+      skillInfos.sort((a, b) -> {
+        int levelCompare = Integer.compare(a.level, b.level);
+        if (levelCompare != 0) {
+          return levelCompare;
+        }
+        return a.name.compareTo(b.name);
+      });
+
+      // 정렬된 목록 출력
+      for (int i = 0; i < skillInfos.size(); i++) {
+        SkillInfo skill = skillInfos.get(i);
+        System.out.printf("%2d. %-20s (레벨 %-2d, %s)\n", i + 1, skill.name, skill.level, skill.type);
+      }
+
+      System.out.println("=====================================");
+
+    } catch (Exception e) {
+      System.out.println("   ❌ 스킬 목록 조회 실패: " + e.getMessage());
+    }
+  }
+
+  /**
+   * 스킬을 선택하여 상세정보를 표시합니다.
+   */
+  private void selectAndShowSkillDetail() {
+    try {
+      List<String> allSkillIds = SkillFactory.getAllSkillIds();
+
+      if (allSkillIds.isEmpty()) {
+        System.out.println("선택할 수 있는 스킬이 없습니다.");
+        return;
+      }
+
+      // 레벨별로 정렬된 스킬 ID 목록 생성
+      List<String> sortedSkillIds = getSortedSkillIds(allSkillIds);
+
+      int maxIndex = sortedSkillIds.size();
+      int selectedIndex = InputValidator.getIntInput(String.format("스킬 번호 선택 (1-%d): ", maxIndex), 1, maxIndex) - 1;
+
+      String selectedSkillId = sortedSkillIds.get(selectedIndex);
+      showSkillDetail(selectedSkillId);
+
+    } catch (Exception e) {
+      System.out.println("❌ 스킬 선택 중 오류: " + e.getMessage());
+    }
+  }
+
+  /**
+   * 스킬 ID 목록을 레벨별로 정렬하여 반환합니다.
+   */
+  private List<String> getSortedSkillIds(List<String> skillIds) {
+    return skillIds.stream().sorted((id1, id2) -> {
+      Map<String, Object> info1 = SkillFactory.getSkillInfo(id1);
+      Map<String, Object> info2 = SkillFactory.getSkillInfo(id2);
+
+      int level1 = info1 != null && info1.get("requiredLevel") != null ? (Integer) info1.get("requiredLevel") : 0;
+      int level2 = info2 != null && info2.get("requiredLevel") != null ? (Integer) info2.get("requiredLevel") : 0;
+
+      int levelCompare = Integer.compare(level1, level2);
+      if (levelCompare != 0) {
+        return levelCompare;
+      }
+
+      // 레벨이 같으면 이름순 정렬
+      String name1 = info1 != null ? (String) info1.get("name") : id1;
+      String name2 = info2 != null ? (String) info2.get("name") : id2;
+      return (name1 != null ? name1 : id1).compareTo(name2 != null ? name2 : id2);
+    }).collect(Collectors.toList());
+  }
+
+  /**
+   * 특정 스킬의 상세정보를 표시합니다.
+   */
+  private void showSkillDetail(String skillId) {
+    System.out.printf("\n🔍 스킬 상세정보: %s\n", skillId);
+    System.out.println("=====================================");
+
+    try {
+      // 스킬 정보 조회
+      Map<String, Object> skillInfo = SkillFactory.getSkillInfo(skillId);
+
+      if (skillInfo == null) {
+        System.out.println("❌ 스킬 정보를 찾을 수 없습니다.");
+        return;
+      }
+
+      // 정보 출력 (null 값 처리 개선)
+      System.out.printf("ID           : %s\n", skillId);
+      System.out.printf("이름         : %s\n", getValueOrDefault(skillInfo, "name", "알 수 없음"));
+      System.out.printf("설명         : %s\n", getValueOrDefault(skillInfo, "description", "설명 없음"));
+      System.out.printf("타입         : %s\n", getValueOrDefault(skillInfo, "type", "알 수 없음"));
+      System.out.printf("필요 레벨    : %s\n", getValueOrDefault(skillInfo, "requiredLevel", "0"));
+      System.out.printf("마나 비용    : %s\n", getValueOrDefault(skillInfo, "manaCost", "0"));
+      System.out.printf("쿨다운       : %s턴\n", getValueOrDefault(skillInfo, "cooldown", "0"));
+
+      // 숫자 필드들은 0이면 표시하지 않음
+      Object damageMultiplier = skillInfo.get("damageMultiplier");
+      if (damageMultiplier != null && !damageMultiplier.equals(0.0)) {
+        System.out.printf("데미지 배율  : %.2f\n", damageMultiplier);
+      }
+
+      Object healAmount = skillInfo.get("healAmount");
+      if (healAmount != null && !healAmount.equals(0)) {
+        System.out.printf("힐량         : %s\n", healAmount);
+      }
+
+      Object buffDuration = skillInfo.get("buffDuration");
+      if (buffDuration != null && !buffDuration.equals(0)) {
+        System.out.printf("버프 지속시간: %s턴\n", buffDuration);
+      }
+
+      // 추가 정보가 있다면 표시
+      if (skillInfo.containsKey("category") && skillInfo.get("category") != null) {
+        System.out.printf("카테고리     : %s\n", skillInfo.get("category"));
+      }
+      if (skillInfo.containsKey("rarity") && skillInfo.get("rarity") != null) {
+        System.out.printf("희귀도       : %s\n", skillInfo.get("rarity"));
+      }
+      if (skillInfo.containsKey("targetType") && skillInfo.get("targetType") != null) {
+        System.out.printf("대상 타입    : %s\n", skillInfo.get("targetType"));
+      }
+
+      System.out.println("=====================================");
+
+      // 실제 스킬 인스턴스 생성 테스트
+      if (InputValidator.getConfirmation("스킬 인스턴스 생성을 테스트해보시겠습니까?")) {
+        testSkillCreation(skillId);
+      }
+
+    } catch (Exception e) {
+      System.out.println("❌ 스킬 정보 조회 실패: " + e.getMessage());
+    }
+  }
+
+  /**
+   * Map에서 값을 가져오되, null이면 기본값을 반환하는 헬퍼 메서드
+   */
+  private Object getValueOrDefault(Map<String, Object> map, String key, Object defaultValue) {
+    Object value = map.get(key);
+    return value != null ? value : defaultValue;
+  }
+
+  /**
+   * 스킬 생성을 테스트합니다.
+   */
+  private void testSkillCreation(String skillId) {
+    System.out.printf("\n🧪 스킬 생성 테스트: %s\n", skillId);
+
+    try {
+      Skill skill = SkillFactory.createSkill(skillId);
+
+      if (skill != null) {
+        System.out.println("✅ 스킬 생성 성공!");
+        System.out.printf("   생성된 스킬: %s\n", skill.getName());
+        System.out.printf("   타입: %s\n", skill.getType());
+        System.out.printf("   레벨: %d\n", skill.getRequiredLevel());
+        System.out.printf("   마나: %d\n", skill.getManaCost());
+      } else {
+        System.out.println("❌ 스킬 생성 실패");
+      }
+
+    } catch (Exception e) {
+      System.out.println("❌ 스킬 생성 중 오류: " + e.getMessage());
     }
   }
 }
