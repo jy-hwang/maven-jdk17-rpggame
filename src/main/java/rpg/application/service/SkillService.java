@@ -45,10 +45,8 @@ public class SkillService {
    * 저장된 데이터로 SkillService 생성자 (기본 스킬 초기화 안함)
    */
   @JsonCreator
-  public SkillService(
-    @JsonProperty("learnedSkillIds") List<String> learnedSkillIds,
-    @JsonProperty("skillCooldowns") Map<String, Integer> skillCooldowns
-  ) {
+  public SkillService(@JsonProperty("learnedSkillIds") List<String> learnedSkillIds,
+      @JsonProperty("skillCooldowns") Map<String, Integer> skillCooldowns) {
     this.learnedSkillIds = learnedSkillIds != null ? new ArrayList<>(learnedSkillIds) : new ArrayList<>();
     this.skillCooldowns = skillCooldowns != null ? new HashMap<>(skillCooldowns) : new HashMap<>();
     this.defaultSkillsInitialized = true; // 저장된 데이터에서 로드할 때는 기본 스킬 초기화 안함
@@ -67,7 +65,7 @@ public class SkillService {
 
     // Factory에서 기본 스킬 ID 목록 가져오기
     List<String> defaultSkillIds = SkillFactory.getDefaultSkillIds();
-    
+
     for (String skillId : defaultSkillIds) {
       learnSkillIfNotExists(skillId);
     }
@@ -131,7 +129,7 @@ public class SkillService {
       if (!hasSkillId(skillId)) {
         learnedSkillIds.add(skillId);
         newSkillIds.add(skillId);
-        
+
         // 스킬 정보 로그
         Map<String, Object> skillInfo = SkillFactory.getSkillInfo(skillId);
         if (skillInfo != null) {
@@ -227,7 +225,7 @@ public class SkillService {
     if (skillId == null) {
       return new SkillResult(false, "해당 이름의 스킬을 찾을 수 없습니다.", 0);
     }
-    
+
     return useSkill(skillId, caster, target);
   }
 
@@ -243,11 +241,8 @@ public class SkillService {
    * 사용 가능한 스킬 목록을 반환합니다.
    */
   public List<Skill> getAvailableSkills(Player character) {
-    return learnedSkillIds.stream()
-      .filter(skillId -> canUseSkill(skillId, character))
-      .map(SkillFactory::createSkill)
-      .filter(skill -> skill != null)
-      .collect(Collectors.toList());
+    return learnedSkillIds.stream().filter(skillId -> canUseSkill(skillId, character)).map(SkillFactory::createSkill).filter(skill -> skill != null)
+        .collect(Collectors.toList());
   }
 
   /**
@@ -263,13 +258,14 @@ public class SkillService {
     for (int i = 0; i < learnedSkillIds.size(); i++) {
       String skillId = learnedSkillIds.get(i);
       Map<String, Object> skillInfo = SkillFactory.getSkillInfo(skillId);
-      
-      if (skillInfo == null) continue;
-      
+
+      if (skillInfo == null)
+        continue;
+
       String name = (String) skillInfo.get("name");
       int requiredLevel = (Integer) skillInfo.get("requiredLevel");
       int manaCost = (Integer) skillInfo.get("manaCost");
-      
+
       String status = "";
       if (requiredLevel > character.getLevel()) {
         status = " (레벨 부족)";
@@ -328,9 +324,7 @@ public class SkillService {
    * 중복 스킬 ID를 제거합니다. (데이터 정리용)
    */
   public void removeDuplicateSkills() {
-    List<String> uniqueSkillIds = learnedSkillIds.stream()
-      .distinct()
-      .collect(Collectors.toList());
+    List<String> uniqueSkillIds = learnedSkillIds.stream().distinct().collect(Collectors.toList());
 
     int removedCount = learnedSkillIds.size() - uniqueSkillIds.size();
     learnedSkillIds = uniqueSkillIds;
@@ -344,10 +338,7 @@ public class SkillService {
    * 학습한 스킬 인스턴스 목록 반환 (하위 호환성)
    */
   public List<Skill> getLearnedSkills() {
-    return learnedSkillIds.stream()
-      .map(SkillFactory::createSkill)
-      .filter(skill -> skill != null)
-      .collect(Collectors.toList());
+    return learnedSkillIds.stream().map(SkillFactory::createSkill).filter(skill -> skill != null).collect(Collectors.toList());
   }
 
   /**
@@ -374,9 +365,8 @@ public class SkillService {
         String skillId = learnedSkillIds.get(i);
         Map<String, Object> skillInfo = SkillFactory.getSkillInfo(skillId);
         if (skillInfo != null) {
-          logger.debug("{}. {} ({}) - 레벨: {}, 마나: {}", 
-            i + 1, skillInfo.get("name"), skillId, 
-            skillInfo.get("requiredLevel"), skillInfo.get("manaCost"));
+          logger.debug("{}. {} ({}) - 레벨: {}, 마나: {}", i + 1, skillInfo.get("name"), skillId, skillInfo.get("requiredLevel"),
+              skillInfo.get("manaCost"));
         }
       }
       logger.debug("총 {}개 스킬", learnedSkillIds.size());
@@ -390,7 +380,7 @@ public class SkillService {
     Map<String, Integer> stats = new HashMap<>();
     stats.put("totalLearnedSkills", learnedSkillIds.size());
     stats.put("activeCooldowns", skillCooldowns.size());
-    
+
     // 타입별 통계 (Factory에서 정보 가져오기)
     Map<String, Integer> typeStats = new HashMap<>();
     for (String skillId : learnedSkillIds) {
@@ -401,7 +391,7 @@ public class SkillService {
       }
     }
     stats.putAll(typeStats);
-    
+
     return stats;
   }
 }

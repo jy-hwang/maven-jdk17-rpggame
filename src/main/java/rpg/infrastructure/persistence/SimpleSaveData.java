@@ -193,8 +193,7 @@ public class SimpleSaveData {
       player.setSkillManager(skillManager);
       player.setQuestManager(questManager);
 
-      logger.info("Player 복원 완료: {} (레벨: {}, 스킬: {}개)", 
-                  playerName, level, learnedSkillIds.size());
+      logger.info("Player 복원 완료: {} (레벨: {}, 스킬: {}개)", playerName, level, learnedSkillIds.size());
       return player;
 
     } catch (Exception e) {
@@ -519,9 +518,7 @@ public class SimpleSaveData {
    */
   private static List<String> extractLearnedSkillIds(SkillService skillManager) {
     try {
-      // TODO: SkillService에서 스킬 ID 목록 반환 메서드 필요
-      // List<String> skillIds = skillManager.getLearnedSkillIds();
-      List<String> skillIds = new ArrayList<>();
+      List<String> skillIds = skillManager.getLearnedSkillIds();
 
       logger.debug("학습 스킬 ID 추출 완료: {}개", skillIds.size());
       return skillIds;
@@ -537,9 +534,7 @@ public class SimpleSaveData {
    */
   private static Map<String, Integer> extractSkillCooldowns(SkillService skillManager) {
     try {
-      // TODO: SkillService에서 쿨다운 정보 반환 메서드 필요
-      // Map<String, Integer> cooldowns = skillManager.getAllCooldowns();
-      Map<String, Integer> cooldowns = new HashMap<>();
+      Map<String, Integer> cooldowns = skillManager.getSkillCooldowns();
 
       logger.debug("스킬 쿨다운 추출 완료: {}개", cooldowns.size());
       return cooldowns;

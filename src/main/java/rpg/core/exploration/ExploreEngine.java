@@ -22,8 +22,7 @@ import rpg.infrastructure.data.loader.ItemDataLoader;
 import rpg.infrastructure.data.loader.MonsterDataLoader;
 import rpg.presentation.controller.InventoryController;
 import rpg.presentation.controller.QuestController;
-import rpg.shared.constant.BattleConstants;
-import rpg.shared.constant.GameConstants;
+import rpg.shared.constant.SystemConstants;
 
 /**
  * 탐험 시스템을 전담하는 컨트롤러
@@ -62,7 +61,7 @@ public class ExploreEngine {
       logger.info("JSON에서 몬스터 데이터 로드 완료: {}종류", monsterData.size());
 
       // 개발 모드에서 몬스터 통계 출력
-      if (logger.isDebugEnabled()) {
+      if (SystemConstants.DEBUG_MODE) {
         MonsterDataLoader.printMonsterStatistics();
       }
 

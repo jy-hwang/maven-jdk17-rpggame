@@ -46,7 +46,7 @@ public class SystemConstants {
   public static final String MAGIC_SKILLS_CONFIG = "/config/skills/magic-skills.json";
   public static final String PASSIVE_SKILLS_CONFIG = "/config/skills/passive-skills.json";
   public static final String ULTIMATE_SKILLS_CONFIG = "/config/skills/ultimate-skills.json";
-  
+
   // === 퀘스트 시스템 설정 ===
   public static final int MAX_ACTIVE_QUESTS = 10; // 동시 진행 가능한 퀘스트 수
   public static final int MAX_DAILY_QUESTS = 3; // 일일 퀘스트 최대 개수

@@ -1,7 +1,6 @@
 package rpg.shared.dto.quest;
 
 import java.util.List;
-import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import rpg.shared.dto.item.ItemRewardDto;
 

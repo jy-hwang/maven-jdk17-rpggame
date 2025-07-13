@@ -1,7 +1,6 @@
 package rpg.domain.item;
 
 import rpg.shared.constant.ItemConstants;
-import rpg.shared.constant.ItemConstants;
 
 /**
  * 아이템 등급 enum (최신 버전) 이모지, 색상 코드, 확률 등 포함
