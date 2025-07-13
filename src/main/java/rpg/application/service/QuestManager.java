@@ -33,10 +33,13 @@ public class QuestManager {
   private List<Quest> activeQuests;
   private List<Quest> completedQuests;
 
+  private List<String> claimedRewardIds; // 보상 수령한 퀘스트 ID 목록
+
   // 팩토리 인스턴스
   private final GameItemFactory itemFactory;
 
   private final GameQuestFactory gameQuestFactory;
+
   @JsonCreator
   public QuestManager() {
     this.gameQuestFactory = GameQuestFactory.getInstance();
@@ -44,6 +47,7 @@ public class QuestManager {
     this.availableQuests = new ArrayList<>();
     this.activeQuests = new ArrayList<>();
     this.completedQuests = new ArrayList<>();
+    this.claimedRewardIds = new ArrayList<>();
     initializeQuests();
     logger.info("QuestManager 초기화 완료 (GameItemFactory 통합)");
   }
@@ -55,6 +59,7 @@ public class QuestManager {
     questManager.availableQuests.clear();
     questManager.activeQuests.clear();
     questManager.completedQuests.clear();
+    questManager.claimedRewardIds.clear();
 
     logger.info("로드용 QuestManager 생성 완료 (기본 퀘스트 제거됨)");
     return questManager;
@@ -68,23 +73,22 @@ public class QuestManager {
 
     try {
       // 기본 퀘스트들을 팩토리에서 생성
-      List<String> basicQuestIds = List.of(
-          "quest_001", // 슬라임 사냥꾼
+      List<String> basicQuestIds = List.of("quest_001", // 슬라임 사냥꾼
           "quest_002", // 고블린 소탕
           "quest_003", // 오크 토벌
           "quest_004", // 드래곤 슬레이어
           "quest_005", // 성장하는 모험가
-          "quest_006"  // 물약 수집가
+          "quest_006" // 물약 수집가
       );
 
       for (String questId : basicQuestIds) {
-          Quest quest = gameQuestFactory.createQuest(questId);
-          if (quest != null) {
-              availableQuests.add(quest);
-              logger.debug("퀘스트 생성 완료: {} - {}", questId, quest.getTitle());
-          } else {
-              logger.warn("퀘스트 생성 실패: {}", questId);
-          }
+        Quest quest = gameQuestFactory.createQuest(questId);
+        if (quest != null) {
+          availableQuests.add(quest);
+          logger.debug("퀘스트 생성 완료: {} - {}", questId, quest.getTitle());
+        } else {
+          logger.warn("퀘스트 생성 실패: {}", questId);
+        }
       }
 
       // 일일 퀘스트 몇 개 추가
@@ -97,53 +101,54 @@ public class QuestManager {
       createFallbackQuests();
     }
   }
+
   /**
    * 일일 퀘스트 추가
    */
   private void addDailyQuests() {
-      try {
-          // 일일 사냥 퀘스트
-          Quest dailyKillQuest = gameQuestFactory.createDailyQuest(Quest.QuestType.KILL);
-          if (dailyKillQuest != null) {
-              availableQuests.add(dailyKillQuest);
-              logger.debug("일일 사냥 퀘스트 생성: {}", dailyKillQuest.getTitle());
-          }
-
-          // 일일 수집 퀘스트
-          Quest dailyCollectQuest = gameQuestFactory.createDailyQuest(Quest.QuestType.COLLECT);
-          if (dailyCollectQuest != null) {
-              availableQuests.add(dailyCollectQuest);
-              logger.debug("일일 수집 퀘스트 생성: {}", dailyCollectQuest.getTitle());
-          }
-
-      } catch (Exception e) {
-          logger.warn("일일 퀘스트 생성 실패", e);
+    try {
+      // 일일 사냥 퀘스트
+      Quest dailyKillQuest = gameQuestFactory.createDailyQuest(Quest.QuestType.KILL);
+      if (dailyKillQuest != null) {
+        availableQuests.add(dailyKillQuest);
+        logger.debug("일일 사냥 퀘스트 생성: {}", dailyKillQuest.getTitle());
       }
+
+      // 일일 수집 퀘스트
+      Quest dailyCollectQuest = gameQuestFactory.createDailyQuest(Quest.QuestType.COLLECT);
+      if (dailyCollectQuest != null) {
+        availableQuests.add(dailyCollectQuest);
+        logger.debug("일일 수집 퀘스트 생성: {}", dailyCollectQuest.getTitle());
+      }
+
+    } catch (Exception e) {
+      logger.warn("일일 퀘스트 생성 실패", e);
+    }
   }
 
   /**
    * 플레이어 레벨에 맞는 동적 퀘스트 생성
    */
   public void generateLevelAppropriateQuests(Player player) {
-      logger.info("플레이어 레벨 {}에 맞는 동적 퀘스트 생성 중...", player.getLevel());
+    logger.info("플레이어 레벨 {}에 맞는 동적 퀘스트 생성 중...", player.getLevel());
 
-      try {
-          // 현재 레벨에 맞는 퀘스트가 부족한 경우에만 생성
-          List<Quest> availableForPlayer = getAvailableQuests(player);
-          
-          if (availableForPlayer.size() < 3) { // 최소 3개의 퀘스트 유지
-              Quest dynamicQuest = gameQuestFactory.createLevelAppropriateQuest(player.getLevel());
-              if (dynamicQuest != null) {
-                  availableQuests.add(dynamicQuest);
-                  logger.info("동적 퀘스트 생성: {} (레벨 {})", dynamicQuest.getTitle(), player.getLevel());
-              }
-          }
+    try {
+      // 현재 레벨에 맞는 퀘스트가 부족한 경우에만 생성
+      List<Quest> availableForPlayer = getAvailableQuests(player);
 
-      } catch (Exception e) {
-          logger.error("동적 퀘스트 생성 실패", e);
+      if (availableForPlayer.size() < 3) { // 최소 3개의 퀘스트 유지
+        Quest dynamicQuest = gameQuestFactory.createLevelAppropriateQuest(player.getLevel());
+        if (dynamicQuest != null) {
+          availableQuests.add(dynamicQuest);
+          logger.info("동적 퀘스트 생성: {} (레벨 {})", dynamicQuest.getTitle(), player.getLevel());
+        }
       }
+
+    } catch (Exception e) {
+      logger.error("동적 퀘스트 생성 실패", e);
+    }
   }
-  
+
   /**
    * 기본 퀘스트만 초기화 (중복 방지용)
    */
@@ -459,20 +464,6 @@ public class QuestManager {
     logger.info("퀘스트 완료: {}", quest.getTitle());
   }
 
-  /**
-   * 완료된 퀘스트의 보상을 수령합니다.
-   */
-  public boolean claimQuestReward(String questId, Player character) {
-    Quest quest = findQuestById(questId, completedQuests);
-    if (quest != null && quest.getStatus() == Quest.QuestStatus.COMPLETED) {
-      if (quest.claimReward(character)) {
-        logger.info("퀘스트 보상 수령: {} (캐릭터: {})", quest.getTitle(), character.getName());
-        return true;
-      }
-    }
-    return false;
-  }
-
   // ==================== 동적 퀘스트 생성 시스템 ====================
 
   /**
@@ -631,7 +622,7 @@ public class QuestManager {
   // ==================== 유틸리티 메서드들 ====================
 
   /**
-   * ID로 퀘스트를 찾습니다.
+   * ID로 퀘스트 찾기 (private 메서드가 이미 있는지 확인)
    */
   private Quest findQuestById(String questId, List<Quest> questList) {
     return questList.stream().filter(quest -> quest.getId().equals(questId)).findFirst().orElse(null);
@@ -882,10 +873,15 @@ public class QuestManager {
     if (completedQuests == null) {
       completedQuests = new ArrayList<>();
     }
+    if (claimedRewardIds == null) {
+      claimedRewardIds = new ArrayList<>();
+    }
 
     // 잘못된 상태의 퀘스트 정리
     activeQuests.removeIf(quest -> quest == null || quest.getStatus() != Quest.QuestStatus.ACTIVE);
     completedQuests.removeIf(quest -> quest == null);
+    claimedRewardIds.removeIf(id -> id == null || id.trim().isEmpty());
+
 
     // 🔥 로드된 데이터가 비어있으면 기본 퀘스트만 추가 (중복 방지)
     if (availableQuests.isEmpty() && activeQuests.isEmpty() && completedQuests.isEmpty()) {
@@ -893,13 +889,16 @@ public class QuestManager {
       initializeDefaultQuestsOnly();
     }
 
-    logger.info("퀘스트 데이터 검증 완료: 사용가능 {}개, 활성 {}개, 완료 {}개", availableQuests.size(), activeQuests.size(), completedQuests.size());
+    logger.info("퀘스트 데이터 검증 완료: 사용가능 {}개, 활성 {}개, 완료 {}개, 보상수령 {}개", availableQuests.size(), activeQuests.size(), completedQuests.size(),
+        claimedRewardIds.size());
+
   }
 
   /**
    * 🔥 로드용 전용: 모든 퀘스트를 제거하고 로드된 데이터로 교체
    */
-  public void replaceAllQuestsForLoad(List<Quest> newAvailable, List<Quest> newActive, List<Quest> newCompleted) {
+  public void replaceAllQuestsForLoad(List<Quest> newAvailable, List<Quest> newActive, List<Quest> newCompleted, List<String> newClaimedIds) {
+
     logger.debug("퀘스트 데이터 교체 시작");
 
     // 기존 데이터 완전 제거
@@ -921,7 +920,13 @@ public class QuestManager {
       completedQuests = new ArrayList<>();
     }
 
-    // 로드된 데이터로 교체
+    if (claimedRewardIds != null) {
+      claimedRewardIds.clear();
+    } else {
+      claimedRewardIds = new ArrayList<>();
+    }
+
+    // 새 데이터로 교체
     if (newAvailable != null) {
       availableQuests.addAll(newAvailable);
     }
@@ -931,8 +936,14 @@ public class QuestManager {
     if (newCompleted != null) {
       completedQuests.addAll(newCompleted);
     }
+    if (newClaimedIds != null) {
+      claimedRewardIds.addAll(newClaimedIds);
+    }
 
-    logger.debug("퀘스트 데이터 교체 완료: 사용가능 {}개, 활성 {}개, 완료 {}개", availableQuests.size(), activeQuests.size(), completedQuests.size());
+
+    logger.debug("퀘스트 데이터 교체 완료: 사용가능 {}개, 활성 {}개, 완료 {}개, 보상수령 {}개", availableQuests.size(), activeQuests.size(), completedQuests.size(),
+        claimedRewardIds.size());
+
   }
 
   /**
@@ -965,6 +976,65 @@ public class QuestManager {
       quest.setCurrentProgress(progress);
     }
   }
+
+
+  /**
+   * ⭐ 누락된 메서드 1: 보상 수령 상태 마킹
+   */
+  public void markRewardAsClaimed(String questId) {
+    if (questId != null && !claimedRewardIds.contains(questId)) {
+      claimedRewardIds.add(questId);
+      logger.debug("퀘스트 보상 수령 상태 마킹: {}", questId);
+
+      // 해당 퀘스트의 상태도 CLAIMED로 변경
+      Quest quest = findQuestById(questId, completedQuests);
+      if (quest != null) {
+        quest.setStatus(Quest.QuestStatus.CLAIMED);
+        logger.debug("퀘스트 상태 CLAIMED로 변경: {}", questId);
+      }
+    }
+  }
+
+  /**
+   * ⭐ 누락된 메서드 2: 보상 수령한 퀘스트 ID 목록 반환
+   */
+  public List<String> getClaimedRewardIds() {
+    return new ArrayList<>(claimedRewardIds);
+  }
+
+  /**
+   * 보상 수령 여부 확인
+   */
+  public boolean isRewardClaimed(String questId) {
+    return claimedRewardIds.contains(questId);
+  }
+
+  /**
+   * ⭐ 기존 claimQuestReward 메서드 수정 (보상 수령 시 상태 추적)
+   */
+  public boolean claimQuestReward(String questId, Player character) {
+    Quest quest = findQuestById(questId, completedQuests);
+    if (quest != null && quest.getStatus() == Quest.QuestStatus.COMPLETED) {
+      if (quest.claimReward(character)) {
+        // ⭐ 보상 수령 상태 추가
+        markRewardAsClaimed(questId);
+
+        logger.info("퀘스트 보상 수령: {} (캐릭터: {})", quest.getTitle(), character.getName());
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * SimpleSaveData 로드 시 보상 수령 상태 복원
+   */
+  public void setClaimedRewardIds(List<String> claimedIds) {
+    this.claimedRewardIds = claimedIds != null ? new ArrayList<>(claimedIds) : new ArrayList<>();
+    logger.debug("보상 수령 상태 복원: {}개", this.claimedRewardIds.size());
+  }
+
+
 
   // ==================== Getters ====================
 
@@ -1030,7 +1100,7 @@ public class QuestManager {
       return String.format("QuestStatistics{available=%d, active=%d, claimable=%d, claimed=%d, completion=%.1f%%}", availableCount, activeCount,
           claimableCount, claimedCount, getCompletionRate());
     }
-
-
   }
+
+
 }

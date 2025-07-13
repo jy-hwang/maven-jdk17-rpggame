@@ -91,7 +91,7 @@ public class QuestManagerMapper {
       }
 
       // 한 번에 모든 데이터 교체
-      questManager.replaceAllQuestsForLoad(availableQuests, activeQuests, completedQuests);
+      //questManager.replaceAllQuestsForLoad(availableQuests, activeQuests, completedQuests);
 
       // 데이터 검증
       questManager.validateQuestData();
