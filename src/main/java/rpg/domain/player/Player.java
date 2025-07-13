@@ -7,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import rpg.application.service.QuestManager;
 import rpg.application.service.SkillService;
-import rpg.application.validator.InputValidator;
 import rpg.domain.inventory.PlayerInventory;
 import rpg.shared.constant.GameConstants;
 
@@ -184,7 +183,7 @@ public class Player {
       restoreMana += GameConstants.LEVEL_UP_RESTORE_MANA;
 
       // 체력과 마나 완전 회복
-      hp = maxHp;
+      hp = getTotalMaxHp();
       mana = maxMana;
 
       System.out.println("🎉 레벨업! 새로운 레벨: " + level);
@@ -220,11 +219,10 @@ public class Player {
       logger.warn("음수 체력 회복 시도: {}", amount);
       throw new IllegalArgumentException("회복량은 " + GameConstants.NUMBER_ZERO + " 이상이어야 합니다.");
     }
-
     int oldHp = this.hp;
-    this.hp = Math.min(hp + amount, maxHp);
+    this.hp = Math.min(hp + amount, getTotalMaxHp());
 
-    logger.debug("{} 체력 회복: {} -> {} (+{})", name, oldHp, this.hp, amount);
+    logger.debug("{} 체력 회복: {} -> {} (+{}), 최대HP: {}", name, oldHp, this.hp, amount, getTotalMaxHp());
   }
 
   /**
@@ -240,6 +238,18 @@ public class Player {
     this.mana = Math.min(mana + amount, maxMana);
 
     logger.debug("{} 마나 회복: {} -> {} (+{})", name, oldMana, this.mana, amount);
+  }
+
+  /**
+   * 완전 회복 메서드도 추가 (필요시)
+   */
+  public void fullHeal() {
+    int oldHp = this.hp;
+    this.hp = getTotalMaxHp(); // 장비 보너스 포함한 최대 체력으로 회복
+    this.mana = maxMana;
+
+    logger.info("{} 완전 회복: HP {} -> {}, MP {} -> {}", name, oldHp, this.hp, mana, maxMana);
+    System.out.println("💚 체력과 마나가 완전 회복되었습니다!");
   }
 
   /**

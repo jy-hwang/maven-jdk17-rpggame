@@ -32,15 +32,11 @@ public class Quest {
 
   @JsonCreator
   public Quest(
-// @fotmatter:off
-  @JsonProperty("id") String id
-, @JsonProperty("title") String title
-, @JsonProperty("description") String description
-, @JsonProperty("type") QuestType type
-, @JsonProperty("requiredLevel") int requiredLevel
-, @JsonProperty("objectives") Map<String, Integer> objectives
-, @JsonProperty("reward") QuestReward reward
-// @fotmatter:on
+      // @fotmatter:off
+      @JsonProperty("id") String id, @JsonProperty("title") String title, @JsonProperty("description") String description,
+      @JsonProperty("type") QuestType type, @JsonProperty("requiredLevel") int requiredLevel,
+      @JsonProperty("objectives") Map<String, Integer> objectives, @JsonProperty("reward") QuestReward reward
+  // @fotmatter:on
   ) {
     this.id = id;
     this.title = title;

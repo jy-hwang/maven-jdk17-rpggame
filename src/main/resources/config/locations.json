@@ -1,0 +1,246 @@
+{
+  "locations": [
+    {
+      "id": "deep_forest",
+      "nameKo": "숲속 깊은 곳",
+      "nameEn": "Deep Forest",
+      "icon": "🌲",
+      "description": "울창한 숲에서 작은 소리들이 들려옵니다. 초보자에게 적합한 곳입니다.",
+      "minLevel": 1,
+      "maxLevel": 3,
+      "dangerLevel": "EASY",
+      "eventChance": 40,
+      "properties": {
+        "biome": "forest",
+        "climate": "temperate",
+        "visibility": "good",
+        "shelter": true
+      }
+    },
+    {
+      "id": "dark_cave",
+      "nameKo": "어두운 동굴",
+      "nameEn": "Dark Cave",
+      "icon": "🕳️",
+      "description": "어둠이 깊게 드리워진 동굴입니다. 위험하지만 보물이 있을 수 있습니다.",
+      "minLevel": 2,
+      "maxLevel": 5,
+      "dangerLevel": "NORMAL",
+      "eventChance": 25,
+      "properties": {
+        "biome": "cave",
+        "climate": "cold",
+        "visibility": "poor",
+        "shelter": true
+      }
+    },
+    {
+      "id": "rugged_mountain",
+      "nameKo": "험준한 산길",
+      "nameEn": "Rugged Mountain Path",
+      "icon": "⛰️",
+      "description": "험준한 산길이 이어집니다. 강한 몬스터들이 서식하고 있습니다.",
+      "minLevel": 4,
+      "maxLevel": 7,
+      "dangerLevel": "HARD",
+      "eventChance": 20,
+      "properties": {
+        "biome": "mountain",
+        "climate": "cold",
+        "visibility": "good",
+        "shelter": false
+      }
+    },
+    {
+      "id": "magical_forest",
+      "nameKo": "마법의 숲",
+      "nameEn": "Magical Forest",
+      "icon": "🌟",
+      "description": "마법의 기운이 흐르는 숲입니다. 신비한 존재들이 살고 있습니다.",
+      "minLevel": 5,
+      "maxLevel": 8,
+      "dangerLevel": "NORMAL",
+      "eventChance": 35,
+      "properties": {
+        "biome": "magical_forest",
+        "climate": "mystical",
+        "visibility": "good",
+        "magical": true
+      }
+    },
+    {
+      "id": "mystic_lake",
+      "nameKo": "신비한 호수",
+      "nameEn": "Mystic Lake",
+      "icon": "🏞️",
+      "description": "신비로운 기운이 감도는 호수입니다. 물속에서 무언가가 움직입니다.",
+      "minLevel": 6,
+      "maxLevel": 10,
+      "dangerLevel": "NORMAL",
+      "eventChance": 30,
+      "properties": {
+        "biome": "lake",
+        "climate": "humid",
+        "visibility": "good",
+        "water": true
+      }
+    },
+    {
+      "id": "ruined_castle",
+      "nameKo": "폐허가 된 성",
+      "nameEn": "Ruined Castle",
+      "icon": "🏰",
+      "description": "오래된 성의 폐허입니다. 망령들의 기운이 느껴집니다.",
+      "minLevel": 8,
+      "maxLevel": 12,
+      "dangerLevel": "HARD",
+      "eventChance": 15,
+      "properties": {
+        "biome": "ruins",
+        "climate": "eerie",
+        "visibility": "poor",
+        "haunted": true
+      }
+    },
+    {
+      "id": "ancient_ruins",
+      "nameKo": "고대 유적",
+      "nameEn": "Ancient Ruins",
+      "icon": "🏛️",
+      "description": "고대 문명의 유적입니다. 시간을 초월한 강력한 존재들이 지키고 있습니다.",
+      "minLevel": 10,
+      "maxLevel": 15,
+      "dangerLevel": "VERY_HARD",
+      "eventChance": 25,
+      "properties": {
+        "biome": "ruins",
+        "climate": "ancient",
+        "visibility": "good",
+        "ancient": true
+      }
+    },
+    {
+      "id": "lava_cave",
+      "nameKo": "용암 동굴",
+      "nameEn": "Lava Cave",
+      "icon": "🌋",
+      "description": "뜨거운 용암이 흐르는 위험한 동굴입니다. 최고 수준의 위험 지역입니다.",
+      "minLevel": 15,
+      "maxLevel": 99,
+      "dangerLevel": "EXTREME",
+      "eventChance": 10,
+      "properties": {
+        "biome": "volcanic",
+        "climate": "hot",
+        "visibility": "poor",
+        "hazardous": true
+      }
+    },
+    {
+      "id": "frozen_wasteland",
+      "nameKo": "얼어붙은 황무지",
+      "nameEn": "Frozen Wasteland",
+      "icon": "🧊",
+      "description": "끝없이 펼쳐진 얼음 평원입니다. 혹독한 추위와 얼음 몬스터들이 기다리고 있습니다.",
+      "minLevel": 12,
+      "maxLevel": 18,
+      "dangerLevel": "VERY_HARD",
+      "eventChance": 20,
+      "properties": {
+        "biome": "frozen",
+        "climate": "freezing",
+        "visibility": "poor",
+        "hazardous": true
+      }
+    },
+    {
+      "id": "sky_fortress",
+      "nameKo": "하늘 요새",
+      "nameEn": "Sky Fortress",
+      "icon": "☁️",
+      "description": "구름 위에 떠있는 고대의 요새입니다. 하늘을 지배하는 존재들의 영역입니다.",
+      "minLevel": 18,
+      "maxLevel": 25,
+      "dangerLevel": "EXTREME",
+      "eventChance": 15,
+      "properties": {
+        "biome": "aerial",
+        "climate": "windy",
+        "visibility": "excellent",
+        "floating": true
+      }
+    },
+    {
+      "id": "deep_ocean",
+      "nameKo": "심해",
+      "nameEn": "Deep Ocean",
+      "icon": "🌊",
+      "description": "태양빛이 닿지 않는 바다 깊숙한 곳입니다. 거대한 바다 괴물들이 서식하고 있습니다.",
+      "minLevel": 20,
+      "maxLevel": 30,
+      "dangerLevel": "EXTREME",
+      "eventChance": 25,
+      "properties": {
+        "biome": "ocean",
+        "climate": "underwater",
+        "visibility": "very_poor",
+        "water": true,
+        "pressure": true
+      }
+    },
+    {
+      "id": "shadow_realm",
+      "nameKo": "그림자 영역",
+      "nameEn": "Shadow Realm",
+      "icon": "🌑",
+      "description": "현실과 환상의 경계가 모호한 어둠의 세계입니다. 그림자 속에서 무엇인가 꿈틀거립니다.",
+      "minLevel": 25,
+      "maxLevel": 35,
+      "dangerLevel": "NIGHTMARE",
+      "eventChance": 30,
+      "properties": {
+        "biome": "shadow",
+        "climate": "void",
+        "visibility": "distorted",
+        "dimensional": true,
+        "nightmare": true
+      }
+    },
+    {
+      "id": "celestial_garden",
+      "nameKo": "천상의 정원",
+      "nameEn": "Celestial Garden",
+      "icon": "🌸",
+      "description": "신들이 거닐었다는 전설의 정원입니다. 성스러운 기운과 함께 강력한 수호자들이 있습니다.",
+      "minLevel": 30,
+      "maxLevel": 40,
+      "dangerLevel": "DIVINE",
+      "eventChance": 40,
+      "properties": {
+        "biome": "divine",
+        "climate": "blessed",
+        "visibility": "radiant",
+        "holy": true,
+        "healing": true
+      }
+    },
+    {
+      "id": "void_chasm",
+      "nameKo": "공허의 틈",
+      "nameEn": "Void Chasm",
+      "icon": "⚫",
+      "description": "모든 것을 삼켜버리는 공허의 균열입니다. 이곳에서는 현실의 법칙이 통하지 않습니다.",
+      "minLevel": 35,
+      "maxLevel": 50,
+      "dangerLevel": "IMPOSSIBLE",
+      "eventChance": 10,
+      "properties": {
+        "biome": "void",
+        "climate": "null",
+        "visibility": "impossible",
+        "reality_break": true,
+        "instant_death": true
+      }
+    }
+  ]
+}

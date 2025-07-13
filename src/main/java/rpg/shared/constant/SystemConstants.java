@@ -2,7 +2,7 @@ package rpg.shared.constant;
 
 public class SystemConstants {
   // === 게임 버전 ===
-  public static final double GAME_VERSION = 1.6; // 몬스터 JSON 시스템 추가로 버전 업
+  public static final double GAME_VERSION = 1.7; // 지역 확장
 
   // === 저장관련 ===
   public static final int MAX_SAVE_SLOTS = 5;
@@ -22,14 +22,10 @@ public class SystemConstants {
   public static final String EXPLORE_DROP = "/config/items/drop_items.json";
 
   // === 몬스터 JSON 설정 파일 경로 ===
-  public static final String MONSTERS_CONFIG = "/config/monsters/monsters.json";
-  public static final String FOREST_MONSTERS_CONFIG = "/config/monsters/forest_monsters.json";
-  public static final String CAVE_MONSTERS_CONFIG = "/config/monsters/cave_monsters.json";
-  public static final String MOUNTAIN_MONSTERS_CONFIG = "/config/monsters/mountain_monsters.json";
-  public static final String SPECIAL_MONSTERS_CONFIG = "/config/monsters/special_monsters.json";
-  public static final String WATER_MONSTERS_CONFIG = "/config/monsters/water_monsters.json";
-  public static final String RUINS_MONSTERS_CONFIG = "/config/monsters/ruins_monsters.json";
-  public static final String LAVA_MONSTERS_CONFIG = "/config/monsters/lava_monsters.json";
+  public static final String UNIFIED_MONSTERS_CONFIG = "/config/monsters.json";
+
+  // === 지역 JSON 설정 파일 경로 ===
+  public static final String LOCATIONS_CONFIG = "/config/locations.json";
 
   // === 퀘스트 JSON 설정 파일 경로 ===
   public static final String MAIN_QUESTS_CONFIG = "/config/quests/main-quests.json";

@@ -1,0 +1,680 @@
+{
+  "monsters": [
+    {
+      "id": "FOREST_SLIME",
+      "name": "숲 슬라임",
+      "description": "숲에서 자주 보이는 작은 슬라임. 초보자들이 처음 만나는 몬스터다.",
+      "stats": {
+        "hp": 25,
+        "attack": 6,
+        "defense": 2,
+        "speed": 4,
+        "criticalRate": 0.05
+      },
+      "rewards": {
+        "exp": 12,
+        "gold": 8,
+        "dropItems": [
+          {
+            "itemId": "SLIME_GEL",
+            "dropRate": 0.7,
+            "minQuantity": 1,
+            "maxQuantity": 2
+          }
+        ]
+      },
+      "locations": ["deep_forest", "magical_forest"],
+      "minLevel": 1,
+      "maxLevel": 4,
+      "spawnRate": 0.8,
+      "rarity": "COMMON",
+      "abilities": ["점프"],
+      "properties": {
+        "element": "none",
+        "peaceful": false
+      }
+    },
+    {
+      "id": "FOREST_WOLF",
+      "name": "숲늑대",
+      "description": "숲에서 사는 야생 늑대. 날카로운 이빨과 발톱을 가지고 있다.",
+      "stats": {
+        "hp": 32,
+        "attack": 9,
+        "defense": 4,
+        "speed": 8,
+        "criticalRate": 0.2
+      },
+      "rewards": {
+        "exp": 18,
+        "gold": 12,
+        "dropItems": [
+          {
+            "itemId": "WOLF_PELT",
+            "dropRate": 0.6,
+            "minQuantity": 1,
+            "maxQuantity": 1
+          },
+          {
+            "itemId": "SHARP_FANG",
+            "dropRate": 0.25,
+            "minQuantity": 1,
+            "maxQuantity": 2
+          }
+        ]
+      },
+      "locations": ["deep_forest", "magical_forest"],
+      "minLevel": 3,
+      "maxLevel": 7,
+      "spawnRate": 0.6,
+      "rarity": "COMMON",
+      "abilities": ["무리 사냥", "속도 증가"],
+      "properties": {
+        "element": "nature",
+        "packHunter": true
+      }
+    },
+    {
+      "id": "CAVE_BAT",
+      "name": "동굴 박쥐",
+      "description": "어두운 동굴에 서식하는 박쥐. 초음파로 길을 찾는다.",
+      "stats": {
+        "hp": 20,
+        "attack": 8,
+        "defense": 1,
+        "speed": 12,
+        "criticalRate": 0.15
+      },
+      "rewards": {
+        "exp": 15,
+        "gold": 10,
+        "dropItems": [
+          {
+            "itemId": "BAT_WING",
+            "dropRate": 0.5,
+            "minQuantity": 1,
+            "maxQuantity": 2
+          }
+        ]
+      },
+      "locations": ["dark_cave", "ruined_castle"],
+      "minLevel": 2,
+      "maxLevel": 6,
+      "spawnRate": 0.7,
+      "rarity": "COMMON",
+      "abilities": ["비행", "초음파"],
+      "properties": {
+        "element": "darkness",
+        "flying": true
+      }
+    },
+    {
+      "id": "STONE_GOLEM",
+      "name": "석재 골렘",
+      "description": "딱딱한 돌로 이루어진 거대한 골렘. 느리지만 강력하다.",
+      "stats": {
+        "hp": 80,
+        "attack": 15,
+        "defense": 12,
+        "speed": 2,
+        "criticalRate": 0.1
+      },
+      "rewards": {
+        "exp": 35,
+        "gold": 25,
+        "dropItems": [
+          {
+            "itemId": "STONE_FRAGMENT",
+            "dropRate": 0.8,
+            "minQuantity": 2,
+            "maxQuantity": 4
+          },
+          {
+            "itemId": "EARTH_ESSENCE",
+            "dropRate": 0.3,
+            "minQuantity": 1,
+            "maxQuantity": 1
+          }
+        ]
+      },
+      "locations": ["dark_cave", "rugged_mountain", "ancient_ruins"],
+      "minLevel": 5,
+      "maxLevel": 10,
+      "spawnRate": 0.3,
+      "rarity": "UNCOMMON",
+      "abilities": ["땅 흔들기", "돌 던지기"],
+      "properties": {
+        "element": "earth",
+        "construct": true,
+        "heavy": true
+      }
+    },
+    {
+      "id": "MOUNTAIN_BEAR",
+      "name": "산곰",
+      "description": "험준한 산에서 살아가는 거대한 곰. 영역 의식이 강하다.",
+      "stats": {
+        "hp": 65,
+        "attack": 18,
+        "defense": 8,
+        "speed": 6,
+        "criticalRate": 0.25
+      },
+      "rewards": {
+        "exp": 28,
+        "gold": 20,
+        "dropItems": [
+          {
+            "itemId": "BEAR_HIDE",
+            "dropRate": 0.7,
+            "minQuantity": 1,
+            "maxQuantity": 2
+          },
+          {
+            "itemId": "BEAR_CLAW",
+            "dropRate": 0.4,
+            "minQuantity": 1,
+            "maxQuantity": 3
+          }
+        ]
+      },
+      "locations": ["rugged_mountain", "frozen_wasteland"],
+      "minLevel": 6,
+      "maxLevel": 11,
+      "spawnRate": 0.4,
+      "rarity": "COMMON",
+      "abilities": ["곰 포효", "발톱 공격"],
+      "properties": {
+        "element": "nature",
+        "territorial": true,
+        "hibernation": false
+      }
+    },
+    {
+      "id": "TREE_SPIRIT",
+      "name": "나무정령",
+      "description": "고대의 나무에 깃든 정령. 자연의 힘을 조종한다.",
+      "stats": {
+        "hp": 45,
+        "attack": 11,
+        "defense": 6,
+        "speed": 4,
+        "criticalRate": 0.12
+      },
+      "rewards": {
+        "exp": 22,
+        "gold": 18,
+        "dropItems": [
+          {
+            "itemId": "NATURE_ESSENCE",
+            "dropRate": 0.4,
+            "minQuantity": 1,
+            "maxQuantity": 1
+          },
+          {
+            "itemId": "MYSTICAL_BARK",
+            "dropRate": 0.3,
+            "minQuantity": 1,
+            "maxQuantity": 2
+          }
+        ]
+      },
+      "locations": ["magical_forest", "celestial_garden"],
+      "minLevel": 4,
+      "maxLevel": 8,
+      "spawnRate": 0.4,
+      "rarity": "UNCOMMON",
+      "abilities": ["자연 치유", "뿌리 속박"],
+      "properties": {
+        "element": "nature",
+        "magical": true,
+        "regeneration": 5
+      }
+    },
+    {
+      "id": "WATER_ELEMENTAL",
+      "name": "물 정령",
+      "description": "신비한 호수에 서식하는 물의 정령. 유동적인 몸을 가지고 있다.",
+      "stats": {
+        "hp": 40,
+        "attack": 12,
+        "defense": 3,
+        "speed": 10,
+        "criticalRate": 0.18
+      },
+      "rewards": {
+        "exp": 25,
+        "gold": 22,
+        "dropItems": [
+          {
+            "itemId": "WATER_ESSENCE",
+            "dropRate": 0.6,
+            "minQuantity": 1,
+            "maxQuantity": 2
+          },
+          {
+            "itemId": "PURE_WATER",
+            "dropRate": 0.4,
+            "minQuantity": 1,
+            "maxQuantity": 1
+          }
+        ]
+      },
+      "locations": ["mystic_lake", "deep_ocean"],
+      "minLevel": 7,
+      "maxLevel": 12,
+      "spawnRate": 0.5,
+      "rarity": "UNCOMMON",
+      "abilities": ["물 분사", "치유의 물"],
+      "properties": {
+        "element": "water",
+        "fluid": true,
+        "healing": true
+      }
+    },
+    {
+      "id": "SKELETON_WARRIOR",
+      "name": "해골 전사",
+      "description": "죽음을 초월한 불멸의 전사. 녹슨 검과 방패를 들고 있다.",
+      "stats": {
+        "hp": 55,
+        "attack": 16,
+        "defense": 10,
+        "speed": 5,
+        "criticalRate": 0.15
+      },
+      "rewards": {
+        "exp": 30,
+        "gold": 28,
+        "dropItems": [
+          {
+            "itemId": "BONE_FRAGMENT",
+            "dropRate": 0.8,
+            "minQuantity": 1,
+            "maxQuantity": 3
+          },
+          {
+            "itemId": "RUSTY_SWORD",
+            "dropRate": 0.2,
+            "minQuantity": 1,
+            "maxQuantity": 1
+          }
+        ]
+      },
+      "locations": ["ruined_castle", "ancient_ruins"],
+      "minLevel": 8,
+      "maxLevel": 13,
+      "spawnRate": 0.6,
+      "rarity": "COMMON",
+      "abilities": ["검술", "불멸"],
+      "properties": {
+        "element": "undead",
+        "undead": true,
+        "fearless": true
+      }
+    },
+    {
+      "id": "FIRE_SALAMANDER",
+      "name": "화염 도롱뇽",
+      "description": "용암 속에서 살아가는 도롱뇽. 뜨거운 화염을 뿜어낸다.",
+      "stats": {
+        "hp": 70,
+        "attack": 22,
+        "defense": 8,
+        "speed": 8,
+        "criticalRate": 0.2
+      },
+      "rewards": {
+        "exp": 45,
+        "gold": 35,
+        "dropItems": [
+          {
+            "itemId": "FIRE_ESSENCE",
+            "dropRate": 0.7,
+            "minQuantity": 1,
+            "maxQuantity": 2
+          },
+          {
+            "itemId": "SALAMANDER_SCALE",
+            "dropRate": 0.5,
+            "minQuantity": 1,
+            "maxQuantity": 3
+          }
+        ]
+      },
+      "locations": ["lava_cave"],
+      "minLevel": 15,
+      "maxLevel": 20,
+      "spawnRate": 0.4,
+      "rarity": "RARE",
+      "abilities": ["화염 숨결", "열 저항"],
+      "properties": {
+        "element": "fire",
+        "heat_immune": true,
+        "burn_attack": true
+      }
+    },
+    {
+      "id": "ANCIENT_GUARDIAN",
+      "name": "고대 수호자",
+      "description": "고대 유적을 지키는 강력한 수호자. 시간을 초월한 힘을 가지고 있다.",
+      "stats": {
+        "hp": 120,
+        "attack": 25,
+        "defense": 18,
+        "speed": 4,
+        "criticalRate": 0.3
+      },
+      "rewards": {
+        "exp": 80,
+        "gold": 60,
+        "dropItems": [
+          {
+            "itemId": "ANCIENT_RUNE",
+            "dropRate": 0.8,
+            "minQuantity": 1,
+            "maxQuantity": 2
+          },
+          {
+            "itemId": "GUARDIAN_CORE",
+            "dropRate": 0.3,
+            "minQuantity": 1,
+            "maxQuantity": 1
+          }
+        ]
+      },
+      "locations": ["ancient_ruins"],
+      "minLevel": 12,
+      "maxLevel": 18,
+      "spawnRate": 0.2,
+      "rarity": "RARE",
+      "abilities": ["고대 마법", "시간 정지", "재생"],
+      "properties": {
+        "element": "ancient",
+        "magical": true,
+        "boss": true,
+        "regeneration": 10
+      }
+    },
+    {
+      "id": "ICE_WRAITH",
+      "name": "얼음 망령",
+      "description": "얼어붙은 황무지를 떠도는 망령. 차가운 기운으로 모든 것을 얼린다.",
+      "stats": {
+        "hp": 85,
+        "attack": 28,
+        "defense": 5,
+        "speed": 12,
+        "criticalRate": 0.25
+      },
+      "rewards": {
+        "exp": 55,
+        "gold": 45,
+        "dropItems": [
+          {
+            "itemId": "ICE_SHARD",
+            "dropRate": 0.8,
+            "minQuantity": 2,
+            "maxQuantity": 4
+          },
+          {
+            "itemId": "FROZEN_SOUL",
+            "dropRate": 0.3,
+            "minQuantity": 1,
+            "maxQuantity": 1
+          }
+        ]
+      },
+      "locations": ["frozen_wasteland"],
+      "minLevel": 13,
+      "maxLevel": 19,
+      "spawnRate": 0.5,
+      "rarity": "UNCOMMON",
+      "abilities": ["얼음 숨결", "공포", "순간이동"],
+      "properties": {
+        "element": "ice",
+        "undead": true,
+        "phase_through": true,
+        "freeze_attack": true
+      }
+    },
+    {
+      "id": "SKY_DRAGON",
+      "name": "하늘 드래곤",
+      "description": "하늘 요새의 지배자. 구름을 가르며 날아다니는 거대한 용.",
+      "stats": {
+        "hp": 200,
+        "attack": 35,
+        "defense": 25,
+        "speed": 15,
+        "criticalRate": 0.4
+      },
+      "rewards": {
+        "exp": 150,
+        "gold": 120,
+        "dropItems": [
+          {
+            "itemId": "DRAGON_SCALE",
+            "dropRate": 0.9,
+            "minQuantity": 3,
+            "maxQuantity": 5
+          },
+          {
+            "itemId": "WIND_ESSENCE",
+            "dropRate": 0.7,
+            "minQuantity": 2,
+            "maxQuantity": 3
+          },
+          {
+            "itemId": "DRAGON_HEART",
+            "dropRate": 0.1,
+            "minQuantity": 1,
+            "maxQuantity": 1
+          }
+        ]
+      },
+      "locations": ["sky_fortress"],
+      "minLevel": 20,
+      "maxLevel": 28,
+      "spawnRate": 0.1,
+      "rarity": "LEGENDARY",
+      "abilities": ["용의 숨결", "번개 소환", "비행", "마법 저항"],
+      "properties": {
+        "element": "wind",
+        "dragon": true,
+        "flying": true,
+        "boss": true,
+        "magic_resist": 50
+      }
+    },
+    {
+      "id": "KRAKEN",
+      "name": "크라켄",
+      "description": "심해의 지배자. 거대한 촉수로 바다를 지배하는 바다 괴물.",
+      "stats": {
+        "hp": 300,
+        "attack": 40,
+        "defense": 20,
+        "speed": 8,
+        "criticalRate": 0.35
+      },
+      "rewards": {
+        "exp": 200,
+        "gold": 150,
+        "dropItems": [
+          {
+            "itemId": "KRAKEN_TENTACLE",
+            "dropRate": 0.8,
+            "minQuantity": 2,
+            "maxQuantity": 4
+          },
+          {
+            "itemId": "DEEP_SEA_PEARL",
+            "dropRate": 0.6,
+            "minQuantity": 1,
+            "maxQuantity": 3
+          },
+          {
+            "itemId": "KRAKEN_INK",
+            "dropRate": 0.4,
+            "minQuantity": 1,
+            "maxQuantity": 2
+          }
+        ]
+      },
+      "locations": ["deep_ocean"],
+      "minLevel": 22,
+      "maxLevel": 32,
+      "spawnRate": 0.05,
+      "rarity": "LEGENDARY",
+      "abilities": ["촉수 공격", "물의 소용돌이", "압력 공격", "재생"],
+      "properties": {
+        "element": "water",
+        "sea_monster": true,
+        "giant": true,
+        "boss": true,
+        "regeneration": 15
+      }
+    },
+    {
+      "id": "SHADOW_ASSASSIN",
+      "name": "그림자 암살자",
+      "description": "그림자 영역에서 온 암살자. 현실과 환상 사이를 오간다.",
+      "stats": {
+        "hp": 150,
+        "attack": 45,
+        "defense": 10,
+        "speed": 20,
+        "criticalRate": 0.6
+      },
+      "rewards": {
+        "exp": 180,
+        "gold": 140,
+        "dropItems": [
+          {
+            "itemId": "SHADOW_ESSENCE",
+            "dropRate": 0.8,
+            "minQuantity": 2,
+            "maxQuantity": 4
+          },
+          {
+            "itemId": "VOID_BLADE",
+            "dropRate": 0.2,
+            "minQuantity": 1,
+            "maxQuantity": 1
+          }
+        ]
+      },
+      "locations": ["shadow_realm"],
+      "minLevel": 26,
+      "maxLevel": 36,
+      "spawnRate": 0.3,
+      "rarity": "EPIC",
+      "abilities": ["그림자 은신", "치명타", "차원 이동", "분신술"],
+      "properties": {
+        "element": "shadow",
+        "assassin": true,
+        "stealth": true,
+        "dimensional": true
+      }
+    },
+    {
+      "id": "CELESTIAL_ANGEL",
+      "name": "천상의 천사",
+      "description": "신들의 정원을 지키는 천사. 신성한 힘을 가지고 있다.",
+      "stats": {
+        "hp": 250,
+        "attack": 30,
+        "defense": 30,
+        "speed": 12,
+        "criticalRate": 0.3
+      },
+      "rewards": {
+        "exp": 220,
+        "gold": 180,
+        "dropItems": [
+          {
+            "itemId": "HOLY_ESSENCE",
+            "dropRate": 0.9,
+            "minQuantity": 2,
+            "maxQuantity": 3
+          },
+          {
+            "itemId": "ANGEL_FEATHER",
+            "dropRate": 0.6,
+            "minQuantity": 1,
+            "maxQuantity": 2
+          },
+          {
+            "itemId": "DIVINE_CRYSTAL",
+            "dropRate": 0.3,
+            "minQuantity": 1,
+            "maxQuantity": 1
+          }
+        ]
+      },
+      "locations": ["celestial_garden"],
+      "minLevel": 32,
+      "maxLevel": 42,
+      "spawnRate": 0.2,
+      "rarity": "LEGENDARY",
+      "abilities": ["신성한 빛", "치유", "정화", "축복"],
+      "properties": {
+        "element": "holy",
+        "divine": true,
+        "healing": true,
+        "purification": true,
+        "boss": true
+      }
+    },
+    {
+      "id": "VOID_HORROR",
+      "name": "공허의 공포",
+      "description": "공허에서 온 형언할 수 없는 존재. 현실을 왜곡시키는 힘을 가지고 있다.",
+      "stats": {
+        "hp": 500,
+        "attack": 60,
+        "defense": 40,
+        "speed": 5,
+        "criticalRate": 0.5
+      },
+      "rewards": {
+        "exp": 500,
+        "gold": 400,
+        "dropItems": [
+          {
+            "itemId": "VOID_FRAGMENT",
+            "dropRate": 1.0,
+            "minQuantity": 3,
+            "maxQuantity": 5
+          },
+          {
+            "itemId": "REALITY_SHARD",
+            "dropRate": 0.5,
+            "minQuantity": 1,
+            "maxQuantity": 2
+          },
+          {
+            "itemId": "CHAOS_ORB",
+            "dropRate": 0.1,
+            "minQuantity": 1,
+            "maxQuantity": 1
+          }
+        ]
+      },
+      "locations": ["void_chasm"],
+      "minLevel": 40,
+      "maxLevel": 50,
+      "spawnRate": 0.05,
+      "rarity": "MYTHICAL",
+      "abilities": ["현실 왜곡", "공포", "차원 붕괴", "무효화"],
+      "properties": {
+        "element": "void",
+        "eldritch": true,
+        "reality_break": true,
+        "boss": true,
+        "sanity_damage": true
+      }
+    }
+  ]
+}

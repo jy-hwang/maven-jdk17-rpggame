@@ -22,10 +22,12 @@ public class QuestController {
 
   private final QuestManager questManager;
   private final GameState gameState;
+  private final Player currentPlayer;
 
-  public QuestController(QuestManager questManager, GameState gameState) {
+  public QuestController(QuestManager questManager, GameState gameState, Player player) {
     this.questManager = questManager;
     this.gameState = gameState;
+    this.currentPlayer = player;
     logger.debug("QuestController 초기화 완료");
   }
 
@@ -472,6 +474,191 @@ public class QuestController {
     }
 
     return summary.toString();
+  }
+
+  /**
+   * 범용 퀘스트 진행도 업데이트 메서드
+   * 
+   * @param progressType 진행도 타입 ("treasure", "merchant", "explore" 등)
+   * @param amount 진행 수량
+   */
+  public void updateProgress(String progressType, int amount) {
+    updateProgress(progressType, null, amount);
+  }
+
+  /**
+   * 범용 퀘스트 진행도 업데이트 메서드 (상세 버전)
+   * 
+   * @param progressType 진행도 타입
+   * @param target 대상 (아이템명, 몬스터명 등, null 가능)
+   * @param amount 진행 수량
+   */
+  public void updateProgress(String progressType, String target, int amount) {
+    try {
+      switch (progressType.toLowerCase()) {
+        case "treasure" -> updateTreasureProgress(amount);
+        case "merchant" -> updateMerchantProgress(amount);
+        case "explore" -> updateExploreProgress(target, amount);
+        case "kill" -> {
+          if (target != null) {
+            updateKillProgress(target);
+          }
+        }
+        case "collect" -> {
+          if (target != null) {
+            updateCollectionProgress(getCurrentPlayer(), target, amount);
+          }
+        }
+        case "level" -> updateLevelProgress(getCurrentPlayer());
+        case "delivery" -> updateDeliveryProgress(target, amount);
+        case "craft" -> updateCraftProgress(target, amount);
+        case "purchase" -> updatePurchaseProgress(target, amount);
+        default -> {
+          logger.warn("알 수 없는 퀘스트 진행도 타입: {}", progressType);
+          // 커스텀 진행도 처리 시도
+          updateCustomProgress(progressType, target, amount);
+        }
+      }
+
+      logger.debug("퀘스트 진행도 업데이트: {} {} x{}", progressType, target != null ? target : "", amount);
+
+    } catch (Exception e) {
+      logger.error("퀘스트 진행도 업데이트 실패: {} {} x{}", progressType, target, amount, e);
+    }
+  }
+
+  // === 2. 구체적인 진행도 업데이트 메서드들 ===
+
+  /**
+   * 보물 발견 퀘스트 진행도 업데이트
+   */
+  public void updateTreasureProgress(int amount) {
+    questManager.updateCustomProgress("find_treasure", amount);
+    logger.debug("보물 발견 퀘스트 진행도 업데이트: {}개", amount);
+  }
+
+  /**
+   * 상인 조우 퀘스트 진행도 업데이트
+   */
+  public void updateMerchantProgress(int amount) {
+    questManager.updateCustomProgress("meet_merchant", amount);
+    logger.debug("상인 조우 퀘스트 진행도 업데이트: {}회", amount);
+  }
+
+  /**
+   * 탐험 퀘스트 진행도 업데이트
+   */
+  public void updateExploreProgress(String locationName, int amount) {
+    if (locationName != null) {
+      // 특정 지역 탐험 퀘스트
+      questManager.updateCustomProgress("explore_" + locationName.toLowerCase().replace(" ", "_"), amount);
+    }
+    // 일반 탐험 퀘스트
+    questManager.updateCustomProgress("explore_any", amount);
+    logger.debug("탐험 퀘스트 진행도 업데이트: {} {}회", locationName != null ? locationName : "일반", amount);
+  }
+
+  /**
+   * 배달 퀘스트 진행도 업데이트
+   */
+  public void updateDeliveryProgress(String npcName, int amount) {
+    if (npcName != null) {
+      questManager.updateCustomProgress("delivery_" + npcName.toLowerCase(), amount);
+    }
+    questManager.updateCustomProgress("delivery_any", amount);
+    logger.debug("배달 퀘스트 진행도 업데이트: {} {}개", npcName != null ? npcName : "일반", amount);
+  }
+
+  /**
+   * 제작 퀘스트 진행도 업데이트
+   */
+  public void updateCraftProgress(String itemName, int amount) {
+    if (itemName != null) {
+      questManager.updateCustomProgress("craft_" + itemName.toLowerCase(), amount);
+    }
+    questManager.updateCustomProgress("craft_any", amount);
+    logger.debug("제작 퀘스트 진행도 업데이트: {} {}개", itemName != null ? itemName : "일반", amount);
+  }
+
+  /**
+   * 구매 퀘스트 진행도 업데이트
+   */
+  public void updatePurchaseProgress(String itemName, int amount) {
+    if (itemName != null) {
+      questManager.updateCustomProgress("purchase_" + itemName.toLowerCase(), amount);
+    }
+    questManager.updateCustomProgress("purchase_any", amount);
+    logger.debug("구매 퀘스트 진행도 업데이트: {} {}개", itemName != null ? itemName : "일반", amount);
+  }
+
+  /**
+   * 커스텀 퀘스트 진행도 업데이트
+   */
+  public void updateCustomProgress(String progressKey, String target, int amount) {
+    String fullKey = target != null ? progressKey + "_" + target.toLowerCase() : progressKey;
+    questManager.updateCustomProgress(fullKey, amount);
+    logger.debug("커스텀 퀘스트 진행도 업데이트: {} {}개", fullKey, amount);
+  }
+
+  /**
+   * 현재 플레이어 반환 (다른 메서드에서 사용)
+   */
+  private Player getCurrentPlayer() {
+    return currentPlayer;
+  }
+
+  /**
+   * 지역별 탐험 완료 시 호출
+   */
+  public void onLocationExplored(String locationName) {
+    updateExploreProgress(locationName, 1);
+
+    // 특정 지역 관련 특별 퀘스트 체크
+    checkSpecialLocationQuests(locationName);
+  }
+
+  /**
+   * 상인과의 거래 완료 시 호출
+   */
+  public void onMerchantTradeCompleted(String merchantName, String itemName, int quantity) {
+    updateMerchantProgress(1);
+    updatePurchaseProgress(itemName, quantity);
+
+    // 특정 상인 관련 퀘스트 체크
+    checkMerchantQuests(merchantName);
+  }
+
+  /**
+   * 보물 발견 시 호출
+   */
+  public void onTreasureFound(String treasureName, String locationName) {
+    updateTreasureProgress(1);
+
+    // 특정 보물이나 지역 관련 퀘스트 체크
+    if (treasureName != null) {
+      updateCustomProgress("find_specific_treasure", treasureName, 1);
+    }
+    if (locationName != null) {
+      updateCustomProgress("find_treasure_in_location", locationName, 1);
+    }
+  }
+
+  // === 4. 특별 퀘스트 체크 메서드들 ===
+
+  /**
+   * 특정 지역 관련 특별 퀘스트 확인
+   */
+  private void checkSpecialLocationQuests(String locationName) {
+    // 특정 지역 연속 탐험, 지역 정복 등의 퀘스트 체크
+    questManager.checkLocationBasedQuests(locationName);
+  }
+
+  /**
+   * 상인 관련 특별 퀘스트 확인
+   */
+  private void checkMerchantQuests(String merchantName) {
+    // 특정 상인과의 우호도, 거래 횟수 등 관련 퀘스트 체크
+    questManager.checkMerchantBasedQuests(merchantName);
   }
 }
 

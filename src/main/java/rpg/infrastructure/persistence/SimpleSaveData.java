@@ -381,27 +381,11 @@ public class SimpleSaveData {
    */
   private SkillService restoreSkillManagerWithFactory() {
     try {
-      logger.debug("스킬 매니저 복원 시작");
+      // ⭐ 저장된 데이터로 SkillService 생성 (기본 스킬 초기화 안함)
+      SkillService skillManager = new SkillService(learnedSkillIds, skillCooldowns);
 
-      SkillService skillManager = new SkillService();
-
-      // TODO: 스킬 팩토리 패턴이 구현되면 여기서 활용
-      // for (String skillId : learnedSkillIds) {
-      // Skill skill = SkillFactory.createSkill(skillId);
-      // if (skill != null) {
-      // skillManager.learnSkill(skill);
-      // }
-      // }
-
-      // 스킬 쿨다운 복원
-      for (Map.Entry<String, Integer> entry : skillCooldowns.entrySet()) {
-        // skillManager.setCooldown(entry.getKey(), entry.getValue());
-      }
-
-      logger.debug("스킬 매니저 복원 완료: 학습 스킬 {}개, 쿨다운 {}개", learnedSkillIds.size(), skillCooldowns.size());
-
+      logger.info("스킬 매니저 복원 완료: {}개 스킬", learnedSkillIds.size());
       return skillManager;
-
     } catch (Exception e) {
       logger.error("스킬 매니저 복원 중 오류", e);
       return new SkillService();

@@ -1263,5 +1263,29 @@ public class QuestManager {
     System.out.println("=".repeat(50));
   }
 
+  /**
+   * 커스텀 퀘스트 진행도 업데이트
+   */
+  public void updateCustomProgress(String objectiveKey, int amount) {
+    for (Quest quest : new ArrayList<>(activeQuests)) {
+      if (quest.updateProgress(objectiveKey, amount)) {
+        completeQuest(quest);
+        break;
+      }
+    }
+  }
 
+  /**
+   * 지역 기반 퀘스트 확인
+   */
+  public void checkLocationBasedQuests(String locationName) {
+    // TODO
+  }
+
+  /**
+   * 상인 기반 퀘스트 확인
+   */
+  public void checkMerchantBasedQuests(String merchantName) {
+    // TODO
+  }
 }

@@ -51,7 +51,7 @@ public class ConsoleColors {
   public static final String LEGENDARY_FALLBACK = BOLD + YELLOW; // 굵은 노란색
   public static final String WARNING_FALLBACK = RED; // 빨간색으로 대체
   public static final String GOLD_FALLBACK = BOLD + YELLOW; // 굵은 노란색
-  
+
   // === RGB 색상 (True Color 지원 터미널용) ===
 
   /**
