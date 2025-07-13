@@ -57,7 +57,8 @@ public class GameConsumable extends GameItem {
    * @deprecated GameEffect 시스템을 사용하는 생성자를 권장
    */
   @Deprecated
-  public GameConsumable(String id, String name, String description, int value, ItemRarity rarity, int hpRestore, int mpRestore, int expGain, boolean stackable) {
+  public GameConsumable(String id, String name, String description, int value, ItemRarity rarity, int hpRestore, int mpRestore, int expGain,
+      boolean stackable) {
     super(id, name, description, value, rarity);
     this.cooldown = GameConstants.NUMBER_ZERO;
 

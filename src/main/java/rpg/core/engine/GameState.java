@@ -60,25 +60,13 @@ public class GameState {
   }
 
   /**
-   * 게임 상태를 표시합니다.
-   */
-  public void displayGameState() {
-    System.out.println("\n=== 🎮 게임 상태 ===");
-    System.out.println("📍 현재 위치: " + currentLocation);
-    System.out.println("⚔️ 처치한 몬스터: " + monstersKilled + "마리");
-    System.out.println("📋 완료한 퀘스트: " + questsCompleted + "개");
-    System.out.println("⏰ 총 플레이 시간: " + totalPlayTime + "분");
-    System.out.println("==================");
-  }
-
-  /**
    * 게임 통계를 표시합니다. (기존 메서드와 동일할 수도 있음)
    */
 
   // 또는 더 자세한 통계가 필요하다면:
   public void displayGameStats() {
     System.out.println("\n=== 📊 게임 통계 ===");
-    System.out.println("📍 현재 위치: " + currentLocation);
+    System.out.println("📍 마지막 탐험 위치: " + currentLocation);
     System.out.println("⚔️ 처치한 몬스터: " + monstersKilled + "마리");
     System.out.println("📋 완료한 퀘스트: " + questsCompleted + "개");
     System.out.println("⏰ 총 플레이 시간: " + totalPlayTime + "분");

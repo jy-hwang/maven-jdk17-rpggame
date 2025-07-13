@@ -125,20 +125,20 @@ public class BattleEngine {
     System.out.println("\n" + ConsoleColors.BOLD + ConsoleColors.BRIGHT_RED + "--- ⚔️ 전투 상황 ---" + ConsoleColors.RESET);
 
     // 플레이어 상태 (하트 유지)
-    System.out.print("🧙 " + ConsoleColors.colorize(player.getName(), ConsoleColors.BRIGHT_CYAN) + ": ");
+    System.out.printf("🧙 " + ConsoleColors.colorize(player.getName(), ConsoleColors.BRIGHT_CYAN) + "\t: ");
 
     // 커스텀 진행률 바 (하트 포함, 중복 없음)
-    System.out.print(createHealthBar(player.getHp(), player.getTotalMaxHp(), 15, true)); // true = 하트 포함
+    System.out.print(createHealthBar(player.getHp(), player.getTotalMaxHp(), 10, true)); // true = 하트 포함
 
     // MP 표시
     System.out.print(" | " + ConsoleColors.colorize("💙 " + player.getMana() + "/" + player.getMaxMana(), ConsoleColors.MP_COLOR));
     System.out.println();
 
     // 몬스터 상태 (하트 유지)
-    System.out.print("👹 " + ConsoleColors.colorize(monster.getName(), ConsoleColors.BRIGHT_RED) + ": ");
+    System.out.printf("👹 " + ConsoleColors.colorize(monster.getName(), ConsoleColors.BRIGHT_RED) + "\t: ");
 
     // 몬스터 진행률 바 (하트 포함)
-    System.out.print(createHealthBar(monster.getHp(), monster.getMaxHp(), 15, true));
+    System.out.print(createHealthBar(monster.getHp(), monster.getMaxHp(), 10, true));
     System.out.println();
 
     System.out.println(ConsoleColors.BRIGHT_RED + "-------------------" + ConsoleColors.RESET);

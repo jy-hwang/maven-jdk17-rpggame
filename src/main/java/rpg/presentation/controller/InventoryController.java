@@ -12,7 +12,6 @@ import rpg.domain.item.GameEquipment;
 import rpg.domain.item.GameItem;
 import rpg.domain.item.ItemRarity;
 import rpg.domain.player.Player;
-import rpg.shared.constant.BaseConstant;
 import rpg.shared.constant.GameConstants;
 
 /**

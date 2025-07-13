@@ -301,7 +301,8 @@ public class ItemDataLoader {
         }
       }
 
-      return new GameConsumable(itemData.getId(), itemData.getName(), itemData.getDescription(), itemData.getValue(), itemData.getRarity(), effects, cooldown);
+      return new GameConsumable(itemData.getId(), itemData.getName(), itemData.getDescription(), itemData.getValue(), itemData.getRarity(), effects,
+          cooldown);
     } catch (Exception e) {
       logger.error("소비 아이템 생성 실패: {}", itemData.getName(), e);
 
@@ -310,8 +311,8 @@ public class ItemDataLoader {
       int mpRestore = extractEffectValue(itemData, "HEAL_MP");
 
       @SuppressWarnings("deprecation")
-      GameConsumable fallback = new GameConsumable(itemData.getId(), itemData.getName(), itemData.getDescription(), itemData.getValue(), itemData.getRarity(),
-          hpRestore, mpRestore, 0, itemData.isStackable());
+      GameConsumable fallback = new GameConsumable(itemData.getId(), itemData.getName(), itemData.getDescription(), itemData.getValue(),
+          itemData.getRarity(), hpRestore, mpRestore, 0, itemData.isStackable());
 
       return fallback;
     }
@@ -349,8 +350,8 @@ public class ItemDataLoader {
     int defense = stats.getOrDefault("defense", 0);
     int magic = stats.getOrDefault("magic", 0);
 
-    return new GameEquipment(itemData.getId(), itemData.getName(), itemData.getDescription(), itemData.getValue(), itemData.getRarity(), equipType, attack, defense,
-        magic);
+    return new GameEquipment(itemData.getId(), itemData.getName(), itemData.getDescription(), itemData.getValue(), itemData.getRarity(), equipType,
+        attack, defense, magic);
   }
 
   private static int extractEffectValue(GameItemData itemData, String effectType) {
@@ -404,6 +405,6 @@ public class ItemDataLoader {
   private static GameItem createFallbackDropItem() {
     logger.warn("폴백 드롭 아이템 생성");
     return new GameConsumable("HEALTH_POTION", "기본 물약", "HP를 50 회복합니다", 30, ItemRarity.COMMON, 50, 0, 0, true);
-    
+
   }
 }
