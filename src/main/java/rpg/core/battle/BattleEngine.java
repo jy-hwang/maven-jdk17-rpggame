@@ -263,7 +263,7 @@ public class BattleEngine {
       return false;
 
     Skill skill = availableSkills.get(skillIndex);
-    SkillResult result = player.getSkillManager().useSkill(skill.getName(), player, monster);
+    SkillResult result = skill.useSkill(player, monster);
 
     System.out.println("✨ " + result.getMessage());
 
