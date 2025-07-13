@@ -1,4 +1,7 @@
 {
+  "version": "1.8",
+  "lastUpdated": "2025-07-13",
+  "description": "확장된 RPG 몬스터 데이터 - 지역별 다양한 몬스터 50+ 종",
   "monsters": [
     {
       "id": "FOREST_SLIME",
@@ -23,12 +26,17 @@
           }
         ]
       },
-      "locations": ["deep_forest", "magical_forest"],
+      "locations": [
+        "deep_forest",
+        "magical_forest"
+      ],
       "minLevel": 1,
       "maxLevel": 4,
       "spawnRate": 0.8,
       "rarity": "COMMON",
-      "abilities": ["점프"],
+      "abilities": [
+        "점프"
+      ],
       "properties": {
         "element": "none",
         "peaceful": false
@@ -63,12 +71,18 @@
           }
         ]
       },
-      "locations": ["deep_forest", "magical_forest"],
+      "locations": [
+        "deep_forest",
+        "magical_forest"
+      ],
       "minLevel": 3,
       "maxLevel": 7,
       "spawnRate": 0.6,
       "rarity": "COMMON",
-      "abilities": ["무리 사냥", "속도 증가"],
+      "abilities": [
+        "무리 사냥",
+        "속도 증가"
+      ],
       "properties": {
         "element": "nature",
         "packHunter": true
@@ -97,12 +111,18 @@
           }
         ]
       },
-      "locations": ["dark_cave", "ruined_castle"],
+      "locations": [
+        "dark_cave",
+        "ruined_castle"
+      ],
       "minLevel": 2,
       "maxLevel": 6,
       "spawnRate": 0.7,
       "rarity": "COMMON",
-      "abilities": ["비행", "초음파"],
+      "abilities": [
+        "비행",
+        "초음파"
+      ],
       "properties": {
         "element": "darkness",
         "flying": true
@@ -137,12 +157,19 @@
           }
         ]
       },
-      "locations": ["dark_cave", "rugged_mountain", "ancient_ruins"],
+      "locations": [
+        "dark_cave",
+        "rugged_mountain",
+        "ancient_ruins"
+      ],
       "minLevel": 5,
       "maxLevel": 10,
       "spawnRate": 0.3,
       "rarity": "UNCOMMON",
-      "abilities": ["땅 흔들기", "돌 던지기"],
+      "abilities": [
+        "땅 흔들기",
+        "돌 던지기"
+      ],
       "properties": {
         "element": "earth",
         "construct": true,
@@ -178,12 +205,18 @@
           }
         ]
       },
-      "locations": ["rugged_mountain", "frozen_wasteland"],
+      "locations": [
+        "rugged_mountain",
+        "frozen_wasteland"
+      ],
       "minLevel": 6,
       "maxLevel": 11,
       "spawnRate": 0.4,
       "rarity": "COMMON",
-      "abilities": ["곰 포효", "발톱 공격"],
+      "abilities": [
+        "곰 포효",
+        "발톱 공격"
+      ],
       "properties": {
         "element": "nature",
         "territorial": true,
@@ -219,12 +252,18 @@
           }
         ]
       },
-      "locations": ["magical_forest", "celestial_garden"],
+      "locations": [
+        "magical_forest",
+        "celestial_garden"
+      ],
       "minLevel": 4,
       "maxLevel": 8,
       "spawnRate": 0.4,
       "rarity": "UNCOMMON",
-      "abilities": ["자연 치유", "뿌리 속박"],
+      "abilities": [
+        "자연 치유",
+        "뿌리 속박"
+      ],
       "properties": {
         "element": "nature",
         "magical": true,
@@ -260,12 +299,18 @@
           }
         ]
       },
-      "locations": ["mystic_lake", "deep_ocean"],
+      "locations": [
+        "mystic_lake",
+        "deep_ocean"
+      ],
       "minLevel": 7,
       "maxLevel": 12,
       "spawnRate": 0.5,
       "rarity": "UNCOMMON",
-      "abilities": ["물 분사", "치유의 물"],
+      "abilities": [
+        "물 분사",
+        "치유의 물"
+      ],
       "properties": {
         "element": "water",
         "fluid": true,
@@ -301,12 +346,18 @@
           }
         ]
       },
-      "locations": ["ruined_castle", "ancient_ruins"],
+      "locations": [
+        "ruined_castle",
+        "ancient_ruins"
+      ],
       "minLevel": 8,
       "maxLevel": 13,
       "spawnRate": 0.6,
       "rarity": "COMMON",
-      "abilities": ["검술", "불멸"],
+      "abilities": [
+        "검술",
+        "불멸"
+      ],
       "properties": {
         "element": "undead",
         "undead": true,
@@ -342,12 +393,17 @@
           }
         ]
       },
-      "locations": ["lava_cave"],
+      "locations": [
+        "lava_cave"
+      ],
       "minLevel": 15,
       "maxLevel": 20,
       "spawnRate": 0.4,
       "rarity": "RARE",
-      "abilities": ["화염 숨결", "열 저항"],
+      "abilities": [
+        "화염 숨결",
+        "열 저항"
+      ],
       "properties": {
         "element": "fire",
         "heat_immune": true,
@@ -383,12 +439,18 @@
           }
         ]
       },
-      "locations": ["ancient_ruins"],
+      "locations": [
+        "ancient_ruins"
+      ],
       "minLevel": 12,
       "maxLevel": 18,
       "spawnRate": 0.2,
       "rarity": "RARE",
-      "abilities": ["고대 마법", "시간 정지", "재생"],
+      "abilities": [
+        "고대 마법",
+        "시간 정지",
+        "재생"
+      ],
       "properties": {
         "element": "ancient",
         "magical": true,
@@ -425,12 +487,18 @@
           }
         ]
       },
-      "locations": ["frozen_wasteland"],
+      "locations": [
+        "frozen_wasteland"
+      ],
       "minLevel": 13,
       "maxLevel": 19,
       "spawnRate": 0.5,
       "rarity": "UNCOMMON",
-      "abilities": ["얼음 숨결", "공포", "순간이동"],
+      "abilities": [
+        "얼음 숨결",
+        "공포",
+        "순간이동"
+      ],
       "properties": {
         "element": "ice",
         "undead": true,
@@ -473,12 +541,19 @@
           }
         ]
       },
-      "locations": ["sky_fortress"],
+      "locations": [
+        "sky_fortress"
+      ],
       "minLevel": 20,
       "maxLevel": 28,
       "spawnRate": 0.1,
       "rarity": "LEGENDARY",
-      "abilities": ["용의 숨결", "번개 소환", "비행", "마법 저항"],
+      "abilities": [
+        "용의 숨결",
+        "번개 소환",
+        "비행",
+        "마법 저항"
+      ],
       "properties": {
         "element": "wind",
         "dragon": true,
@@ -522,12 +597,19 @@
           }
         ]
       },
-      "locations": ["deep_ocean"],
+      "locations": [
+        "deep_ocean"
+      ],
       "minLevel": 22,
       "maxLevel": 32,
       "spawnRate": 0.05,
       "rarity": "LEGENDARY",
-      "abilities": ["촉수 공격", "물의 소용돌이", "압력 공격", "재생"],
+      "abilities": [
+        "촉수 공격",
+        "물의 소용돌이",
+        "압력 공격",
+        "재생"
+      ],
       "properties": {
         "element": "water",
         "sea_monster": true,
@@ -565,12 +647,19 @@
           }
         ]
       },
-      "locations": ["shadow_realm"],
+      "locations": [
+        "shadow_realm"
+      ],
       "minLevel": 26,
       "maxLevel": 36,
       "spawnRate": 0.3,
       "rarity": "EPIC",
-      "abilities": ["그림자 은신", "치명타", "차원 이동", "분신술"],
+      "abilities": [
+        "그림자 은신",
+        "치명타",
+        "차원 이동",
+        "분신술"
+      ],
       "properties": {
         "element": "shadow",
         "assassin": true,
@@ -613,12 +702,19 @@
           }
         ]
       },
-      "locations": ["celestial_garden"],
+      "locations": [
+        "celestial_garden"
+      ],
       "minLevel": 32,
       "maxLevel": 42,
       "spawnRate": 0.2,
       "rarity": "LEGENDARY",
-      "abilities": ["신성한 빛", "치유", "정화", "축복"],
+      "abilities": [
+        "신성한 빛",
+        "치유",
+        "정화",
+        "축복"
+      ],
       "properties": {
         "element": "holy",
         "divine": true,
@@ -662,18 +758,1512 @@
           }
         ]
       },
-      "locations": ["void_chasm"],
+      "locations": [
+        "void_chasm"
+      ],
       "minLevel": 40,
       "maxLevel": 50,
       "spawnRate": 0.05,
       "rarity": "MYTHICAL",
-      "abilities": ["현실 왜곡", "공포", "차원 붕괴", "무효화"],
+      "abilities": [
+        "현실 왜곡",
+        "공포",
+        "차원 붕괴",
+        "무효화"
+      ],
       "properties": {
         "element": "void",
         "eldritch": true,
         "reality_break": true,
         "boss": true,
         "sanity_damage": true
+      }
+    },
+    {
+      "id": "forest_goblin",
+      "name": "숲 고블린",
+      "description": "숲속에 서식하는 작은 녹색 도깨비. 날쌔고 교활하다.",
+      "stats": {
+        "hp": 45,
+        "attack": 12,
+        "defense": 8,
+        "speed": 15,
+        "criticalRate": 0.05
+      },
+      "rewards": {
+        "exp": 18,
+        "gold": 8
+      },
+      "locations": [
+        "deep_forest"
+      ],
+      "minLevel": 1,
+      "maxLevel": 3,
+      "spawnRate": 0.3,
+      "rarity": "COMMON",
+      "abilities": [
+        "도망치기",
+        "기습공격"
+      ],
+      "properties": {
+        "element": "earth",
+        "canDrop": [
+          "나뭇가지",
+          "고블린 귀"
+        ]
+      }
+    },
+    {
+      "id": "wild_boar",
+      "name": "멧돼지",
+      "description": "거친 야생의 멧돼지. 화가 나면 돌진한다.",
+      "stats": {
+        "hp": 70,
+        "attack": 16,
+        "defense": 12,
+        "speed": 10,
+        "criticalRate": 0.08
+      },
+      "rewards": {
+        "exp": 25,
+        "gold": 12
+      },
+      "locations": [
+        "deep_forest"
+      ],
+      "minLevel": 2,
+      "maxLevel": 4,
+      "spawnRate": 0.25,
+      "rarity": "COMMON",
+      "abilities": [
+        "돌진",
+        "분노"
+      ],
+      "properties": {
+        "element": "earth",
+        "canDrop": [
+          "멧돼지 가죽",
+          "야생 고기"
+        ]
+      }
+    },
+    {
+      "id": "forest_spider",
+      "name": "숲 거미",
+      "description": "큰 몸집의 독을 가진 거미. 거미줄로 먹이를 사냥한다.",
+      "stats": {
+        "hp": 35,
+        "attack": 14,
+        "defense": 6,
+        "speed": 18,
+        "criticalRate": 0.12
+      },
+      "rewards": {
+        "exp": 22,
+        "gold": 10
+      },
+      "locations": [
+        "deep_forest"
+      ],
+      "minLevel": 2,
+      "maxLevel": 5,
+      "spawnRate": 0.2,
+      "rarity": "UNCOMMON",
+      "abilities": [
+        "독침",
+        "거미줄 덫"
+      ],
+      "properties": {
+        "element": "poison",
+        "canDrop": [
+          "거미 독",
+          "질긴 거미줄"
+        ]
+      }
+    },
+    {
+      "id": "forest_ent",
+      "name": "숲 정령",
+      "description": "숲을 지키는 고대 나무 정령. 매우 강력하다.",
+      "stats": {
+        "hp": 120,
+        "attack": 22,
+        "defense": 18,
+        "speed": 8,
+        "criticalRate": 0.1
+      },
+      "rewards": {
+        "exp": 45,
+        "gold": 25
+      },
+      "locations": [
+        "deep_forest"
+      ],
+      "minLevel": 3,
+      "maxLevel": 6,
+      "spawnRate": 0.1,
+      "rarity": "RARE",
+      "abilities": [
+        "나무뿌리 공격",
+        "자연의 치유"
+      ],
+      "properties": {
+        "element": "nature",
+        "canDrop": [
+          "신성한 나뭇잎",
+          "정령의 눈물"
+        ]
+      }
+    },
+    {
+      "id": "cave_bat",
+      "name": "동굴 박쥐",
+      "description": "어둠 속에서 초음파로 사냥하는 박쥐 무리.",
+      "stats": {
+        "hp": 25,
+        "attack": 10,
+        "defense": 4,
+        "speed": 22,
+        "criticalRate": 0.15
+      },
+      "rewards": {
+        "exp": 15,
+        "gold": 6
+      },
+      "locations": [
+        "dark_cave"
+      ],
+      "minLevel": 1,
+      "maxLevel": 4,
+      "spawnRate": 0.35,
+      "rarity": "COMMON",
+      "abilities": [
+        "초음파",
+        "날개 공격"
+      ],
+      "properties": {
+        "element": "dark",
+        "canDrop": [
+          "박쥐 날개",
+          "야광석"
+        ]
+      }
+    },
+    {
+      "id": "cave_troll",
+      "name": "동굴 트롤",
+      "description": "거대한 몸집의 동굴 거주 트롤. 느리지만 강력하다.",
+      "stats": {
+        "hp": 150,
+        "attack": 28,
+        "defense": 20,
+        "speed": 6,
+        "criticalRate": 0.05
+      },
+      "rewards": {
+        "exp": 50,
+        "gold": 30
+      },
+      "locations": [
+        "dark_cave"
+      ],
+      "minLevel": 4,
+      "maxLevel": 7,
+      "spawnRate": 0.15,
+      "rarity": "UNCOMMON",
+      "abilities": [
+        "박치기",
+        "돌 던지기"
+      ],
+      "properties": {
+        "element": "earth",
+        "canDrop": [
+          "트롤 가죽",
+          "단단한 뼈"
+        ]
+      }
+    },
+    {
+      "id": "crystal_golem",
+      "name": "수정 골렘",
+      "description": "동굴의 수정으로 만들어진 마법 생명체.",
+      "stats": {
+        "hp": 100,
+        "attack": 20,
+        "defense": 25,
+        "speed": 5,
+        "criticalRate": 0.03
+      },
+      "rewards": {
+        "exp": 40,
+        "gold": 35
+      },
+      "locations": [
+        "dark_cave"
+      ],
+      "minLevel": 3,
+      "maxLevel": 6,
+      "spawnRate": 0.12,
+      "rarity": "RARE",
+      "abilities": [
+        "수정 발사",
+        "견고함"
+      ],
+      "properties": {
+        "element": "crystal",
+        "canDrop": [
+          "수정 조각",
+          "마나 크리스탈"
+        ]
+      }
+    },
+    {
+      "id": "mountain_eagle",
+      "name": "산독수리",
+      "description": "높은 산에서 내려다보는 날카로운 독수리.",
+      "stats": {
+        "hp": 55,
+        "attack": 18,
+        "defense": 10,
+        "speed": 25,
+        "criticalRate": 0.18
+      },
+      "rewards": {
+        "exp": 28,
+        "gold": 15
+      },
+      "locations": [
+        "rocky_mountain"
+      ],
+      "minLevel": 3,
+      "maxLevel": 6,
+      "spawnRate": 0.25,
+      "rarity": "COMMON",
+      "abilities": [
+        "급강하",
+        "날카로운 발톱"
+      ],
+      "properties": {
+        "element": "air",
+        "canDrop": [
+          "독수리 깃털",
+          "날카로운 발톱"
+        ]
+      }
+    },
+    {
+      "id": "rock_lizard",
+      "name": "바위 도마뱀",
+      "description": "바위와 같은 색깔의 거대한 도마뱀.",
+      "stats": {
+        "hp": 85,
+        "attack": 22,
+        "defense": 18,
+        "speed": 12,
+        "criticalRate": 0.08
+      },
+      "rewards": {
+        "exp": 35,
+        "gold": 20
+      },
+      "locations": [
+        "rocky_mountain"
+      ],
+      "minLevel": 4,
+      "maxLevel": 7,
+      "spawnRate": 0.2,
+      "rarity": "UNCOMMON",
+      "abilities": [
+        "위장",
+        "꼬리 채찍"
+      ],
+      "properties": {
+        "element": "earth",
+        "canDrop": [
+          "바위 비늘",
+          "도마뱀 꼬리"
+        ]
+      }
+    },
+    {
+      "id": "mountain_giant",
+      "name": "산악 거인",
+      "description": "산의 주인이라 불리는 거대한 거인.",
+      "stats": {
+        "hp": 200,
+        "attack": 35,
+        "defense": 22,
+        "speed": 8,
+        "criticalRate": 0.1
+      },
+      "rewards": {
+        "exp": 70,
+        "gold": 50
+      },
+      "locations": [
+        "rocky_mountain"
+      ],
+      "minLevel": 6,
+      "maxLevel": 9,
+      "spawnRate": 0.08,
+      "rarity": "RARE",
+      "abilities": [
+        "지진 일으키기",
+        "거대한 주먹"
+      ],
+      "properties": {
+        "element": "earth",
+        "canDrop": [
+          "거인의 심장",
+          "신성한 돌"
+        ]
+      }
+    },
+    {
+      "id": "water_sprite",
+      "name": "물의 정령",
+      "description": "호수에 서식하는 아름다운 물의 정령.",
+      "stats": {
+        "hp": 50,
+        "attack": 16,
+        "defense": 12,
+        "speed": 20,
+        "criticalRate": 0.12
+      },
+      "rewards": {
+        "exp": 25,
+        "gold": 18
+      },
+      "locations": [
+        "mystic_lake"
+      ],
+      "minLevel": 2,
+      "maxLevel": 5,
+      "spawnRate": 0.3,
+      "rarity": "COMMON",
+      "abilities": [
+        "물대포",
+        "치유의 물"
+      ],
+      "properties": {
+        "element": "water",
+        "canDrop": [
+          "정화된 물",
+          "물의 구슬"
+        ]
+      }
+    },
+    {
+      "id": "giant_fish",
+      "name": "거대한 물고기",
+      "description": "호수 깊은 곳에 사는 거대한 육식 물고기.",
+      "stats": {
+        "hp": 90,
+        "attack": 24,
+        "defense": 15,
+        "speed": 16,
+        "criticalRate": 0.1
+      },
+      "rewards": {
+        "exp": 38,
+        "gold": 25
+      },
+      "locations": [
+        "mystic_lake"
+      ],
+      "minLevel": 4,
+      "maxLevel": 7,
+      "spawnRate": 0.18,
+      "rarity": "UNCOMMON",
+      "abilities": [
+        "물줄기",
+        "강력한 턱"
+      ],
+      "properties": {
+        "element": "water",
+        "canDrop": [
+          "신선한 생선",
+          "물고기 비늘"
+        ]
+      }
+    },
+    {
+      "id": "lake_dragon",
+      "name": "호수 드래곤",
+      "description": "호수를 지배하는 전설의 물 드래곤.",
+      "stats": {
+        "hp": 250,
+        "attack": 40,
+        "defense": 28,
+        "speed": 18,
+        "criticalRate": 0.15
+      },
+      "rewards": {
+        "exp": 100,
+        "gold": 80
+      },
+      "locations": [
+        "mystic_lake"
+      ],
+      "minLevel": 8,
+      "maxLevel": 12,
+      "spawnRate": 0.05,
+      "rarity": "LEGENDARY",
+      "abilities": [
+        "용의 숨결",
+        "물의 지배",
+        "재생"
+      ],
+      "properties": {
+        "element": "water",
+        "canDrop": [
+          "드래곤 비늘",
+          "용의 눈물",
+          "물의 정수"
+        ]
+      }
+    },
+    {
+      "id": "skeleton_warrior",
+      "name": "해골 전사",
+      "description": "고대 전사의 해골이 되살아난 언데드.",
+      "stats": {
+        "hp": 65,
+        "attack": 20,
+        "defense": 15,
+        "speed": 12,
+        "criticalRate": 0.08
+      },
+      "rewards": {
+        "exp": 30,
+        "gold": 20
+      },
+      "locations": [
+        "ancient_ruins"
+      ],
+      "minLevel": 3,
+      "maxLevel": 6,
+      "spawnRate": 0.28,
+      "rarity": "COMMON",
+      "abilities": [
+        "검술",
+        "언데드의 저항"
+      ],
+      "properties": {
+        "element": "dark",
+        "canDrop": [
+          "오래된 뼈",
+          "낡은 검"
+        ]
+      }
+    },
+    {
+      "id": "ghost_mage",
+      "name": "유령 마법사",
+      "description": "유적에 갇힌 고대 마법사의 영혼.",
+      "stats": {
+        "hp": 45,
+        "attack": 25,
+        "defense": 8,
+        "speed": 15,
+        "criticalRate": 0.15
+      },
+      "rewards": {
+        "exp": 35,
+        "gold": 25
+      },
+      "locations": [
+        "ancient_ruins"
+      ],
+      "minLevel": 4,
+      "maxLevel": 7,
+      "spawnRate": 0.2,
+      "rarity": "UNCOMMON",
+      "abilities": [
+        "어둠의 마법",
+        "영혼 흡수"
+      ],
+      "properties": {
+        "element": "dark",
+        "canDrop": [
+          "마법 구슬",
+          "고대 두루마리"
+        ]
+      }
+    },
+    {
+      "id": "ancient_guardian",
+      "name": "고대 수호자",
+      "description": "유적을 지키는 강력한 골렘 수호자.",
+      "stats": {
+        "hp": 180,
+        "attack": 32,
+        "defense": 25,
+        "speed": 8,
+        "criticalRate": 0.05
+      },
+      "rewards": {
+        "exp": 65,
+        "gold": 45
+      },
+      "locations": [
+        "ancient_ruins"
+      ],
+      "minLevel": 6,
+      "maxLevel": 9,
+      "spawnRate": 0.1,
+      "rarity": "RARE",
+      "abilities": [
+        "마법 방벽",
+        "고대의 힘"
+      ],
+      "properties": {
+        "element": "magic",
+        "canDrop": [
+          "고대 보석",
+          "수호자의 파편"
+        ]
+      }
+    },
+    {
+      "id": "fire_salamander",
+      "name": "불 도롱뇽",
+      "description": "용암 속에서 자라난 불의 도롱뇽.",
+      "stats": {
+        "hp": 60,
+        "attack": 22,
+        "defense": 12,
+        "speed": 14,
+        "criticalRate": 0.12
+      },
+      "rewards": {
+        "exp": 32,
+        "gold": 22
+      },
+      "locations": [
+        "lava_fields"
+      ],
+      "minLevel": 4,
+      "maxLevel": 7,
+      "spawnRate": 0.25,
+      "rarity": "COMMON",
+      "abilities": [
+        "화염 숨결",
+        "열기 발산"
+      ],
+      "properties": {
+        "element": "fire",
+        "canDrop": [
+          "화염 선",
+          "뜨거운 비늘"
+        ]
+      }
+    },
+    {
+      "id": "lava_golem",
+      "name": "용암 골렘",
+      "description": "용암으로 만들어진 거대한 골렘.",
+      "stats": {
+        "hp": 140,
+        "attack": 30,
+        "defense": 22,
+        "speed": 6,
+        "criticalRate": 0.08
+      },
+      "rewards": {
+        "exp": 55,
+        "gold": 35
+      },
+      "locations": [
+        "lava_fields"
+      ],
+      "minLevel": 6,
+      "maxLevel": 9,
+      "spawnRate": 0.15,
+      "rarity": "UNCOMMON",
+      "abilities": [
+        "용암 분출",
+        "열기 파동"
+      ],
+      "properties": {
+        "element": "fire",
+        "canDrop": [
+          "용암석",
+          "화염의 핵"
+        ]
+      }
+    },
+    {
+      "id": "fire_elemental",
+      "name": "화염 정령",
+      "description": "순수한 화염의 힘으로 이루어진 정령.",
+      "stats": {
+        "hp": 80,
+        "attack": 35,
+        "defense": 10,
+        "speed": 20,
+        "criticalRate": 0.18
+      },
+      "rewards": {
+        "exp": 48,
+        "gold": 30
+      },
+      "locations": [
+        "lava_fields"
+      ],
+      "minLevel": 5,
+      "maxLevel": 8,
+      "spawnRate": 0.18,
+      "rarity": "UNCOMMON",
+      "abilities": [
+        "화염구",
+        "불의 폭풍"
+      ],
+      "properties": {
+        "element": "fire",
+        "canDrop": [
+          "화염의 정수",
+          "불타는 보석"
+        ]
+      }
+    },
+    {
+      "id": "magma_dragon",
+      "name": "마그마 드래곤",
+      "description": "용암 지대의 절대 지배자인 화염 드래곤.",
+      "stats": {
+        "hp": 300,
+        "attack": 45,
+        "defense": 30,
+        "speed": 16,
+        "criticalRate": 0.2
+      },
+      "rewards": {
+        "exp": 120,
+        "gold": 100
+      },
+      "locations": [
+        "lava_fields"
+      ],
+      "minLevel": 10,
+      "maxLevel": 15,
+      "spawnRate": 0.03,
+      "rarity": "LEGENDARY",
+      "abilities": [
+        "지옥의 숨결",
+        "용암 지진",
+        "화염 재생"
+      ],
+      "properties": {
+        "element": "fire",
+        "canDrop": [
+          "드래곤 심장",
+          "마그마 크리스탈",
+          "화염의 왕관"
+        ]
+      }
+    },
+    {
+      "id": "ice_spider",
+      "name": "얼음 거미",
+      "description": "차가운 얼음 동굴에 서식하는 거미.",
+      "stats": {
+        "hp": 40,
+        "attack": 16,
+        "defense": 12,
+        "speed": 18,
+        "criticalRate": 0.1
+      },
+      "rewards": {
+        "exp": 24,
+        "gold": 16
+      },
+      "locations": [
+        "ice_cavern"
+      ],
+      "minLevel": 3,
+      "maxLevel": 6,
+      "spawnRate": 0.3,
+      "rarity": "COMMON",
+      "abilities": [
+        "냉기 독",
+        "얼음 거미줄"
+      ],
+      "properties": {
+        "element": "ice",
+        "canDrop": [
+          "얼음 거미줄",
+          "차가운 독"
+        ]
+      }
+    },
+    {
+      "id": "frost_wolf",
+      "name": "서리 늑대",
+      "description": "얼음처럼 차가운 늑대. 무리를 지어 사냥한다.",
+      "stats": {
+        "hp": 75,
+        "attack": 24,
+        "defense": 16,
+        "speed": 22,
+        "criticalRate": 0.15
+      },
+      "rewards": {
+        "exp": 36,
+        "gold": 24
+      },
+      "locations": [
+        "ice_cavern"
+      ],
+      "minLevel": 4,
+      "maxLevel": 7,
+      "spawnRate": 0.22,
+      "rarity": "UNCOMMON",
+      "abilities": [
+        "냉기 숨결",
+        "무리 사냥"
+      ],
+      "properties": {
+        "element": "ice",
+        "canDrop": [
+          "서리 늑대 가죽",
+          "얼음 이빨"
+        ]
+      }
+    },
+    {
+      "id": "ice_giant",
+      "name": "얼음 거인",
+      "description": "고대의 얼음으로 만들어진 거대한 거인.",
+      "stats": {
+        "hp": 220,
+        "attack": 38,
+        "defense": 26,
+        "speed": 8,
+        "criticalRate": 0.08
+      },
+      "rewards": {
+        "exp": 75,
+        "gold": 55
+      },
+      "locations": [
+        "ice_cavern"
+      ],
+      "minLevel": 7,
+      "maxLevel": 10,
+      "spawnRate": 0.08,
+      "rarity": "RARE",
+      "abilities": [
+        "얼음 주먹",
+        "빙하 생성"
+      ],
+      "properties": {
+        "element": "ice",
+        "canDrop": [
+          "영원한 얼음",
+          "거인의 눈"
+        ]
+      }
+    },
+    {
+      "id": "sand_worm",
+      "name": "모래벌레",
+      "description": "황무지 모래 속에 숨어있는 거대한 벌레.",
+      "stats": {
+        "hp": 85,
+        "attack": 26,
+        "defense": 14,
+        "speed": 12,
+        "criticalRate": 0.1
+      },
+      "rewards": {
+        "exp": 38,
+        "gold": 25
+      },
+      "locations": [
+        "wasteland"
+      ],
+      "minLevel": 5,
+      "maxLevel": 8,
+      "spawnRate": 0.25,
+      "rarity": "COMMON",
+      "abilities": [
+        "모래 속으로",
+        "독침"
+      ],
+      "properties": {
+        "element": "earth",
+        "canDrop": [
+          "단단한 껍질",
+          "모래벌레 독"
+        ]
+      }
+    },
+    {
+      "id": "vulture",
+      "name": "독수리",
+      "description": "죽음의 냄새를 맡고 모여드는 검은 독수리.",
+      "stats": {
+        "hp": 50,
+        "attack": 20,
+        "defense": 8,
+        "speed": 25,
+        "criticalRate": 0.18
+      },
+      "rewards": {
+        "exp": 28,
+        "gold": 18
+      },
+      "locations": [
+        "wasteland"
+      ],
+      "minLevel": 4,
+      "maxLevel": 7,
+      "spawnRate": 0.3,
+      "rarity": "COMMON",
+      "abilities": [
+        "급강하",
+        "부패 독"
+      ],
+      "properties": {
+        "element": "dark",
+        "canDrop": [
+          "검은 깃털",
+          "날카로운 부리"
+        ]
+      }
+    },
+    {
+      "id": "desert_scorpion",
+      "name": "사막 전갈",
+      "description": "황무지에 서식하는 거대한 독 전갈.",
+      "stats": {
+        "hp": 70,
+        "attack": 28,
+        "defense": 18,
+        "speed": 14,
+        "criticalRate": 0.12
+      },
+      "rewards": {
+        "exp": 42,
+        "gold": 28
+      },
+      "locations": [
+        "wasteland"
+      ],
+      "minLevel": 6,
+      "maxLevel": 9,
+      "spawnRate": 0.18,
+      "rarity": "UNCOMMON",
+      "abilities": [
+        "맹독 침",
+        "집게 공격"
+      ],
+      "properties": {
+        "element": "poison",
+        "canDrop": [
+          "전갈 독",
+          "단단한 집게"
+        ]
+      }
+    },
+    {
+      "id": "shadow_wolf",
+      "name": "그림자 늑대",
+      "description": "어둠에 숨어 사냥하는 신비한 늑대.",
+      "stats": {
+        "hp": 80,
+        "attack": 25,
+        "defense": 14,
+        "speed": 24,
+        "criticalRate": 0.16
+      },
+      "rewards": {
+        "exp": 40,
+        "gold": 26
+      },
+      "locations": [
+        "dark_forest"
+      ],
+      "minLevel": 5,
+      "maxLevel": 8,
+      "spawnRate": 0.22,
+      "rarity": "UNCOMMON",
+      "abilities": [
+        "그림자 은신",
+        "어둠의 발톱"
+      ],
+      "properties": {
+        "element": "dark",
+        "canDrop": [
+          "그림자 털",
+          "어둠의 정수"
+        ]
+      }
+    },
+    {
+      "id": "dark_elf",
+      "name": "다크 엘프",
+      "description": "어둠에 타락한 엘프 전사.",
+      "stats": {
+        "hp": 90,
+        "attack": 30,
+        "defense": 16,
+        "speed": 20,
+        "criticalRate": 0.14
+      },
+      "rewards": {
+        "exp": 45,
+        "gold": 32
+      },
+      "locations": [
+        "dark_forest"
+      ],
+      "minLevel": 6,
+      "maxLevel": 9,
+      "spawnRate": 0.15,
+      "rarity": "UNCOMMON",
+      "abilities": [
+        "어둠의 화살",
+        "그림자 이동"
+      ],
+      "properties": {
+        "element": "dark",
+        "canDrop": [
+          "엘프 활",
+          "어둠의 보석"
+        ]
+      }
+    },
+    {
+      "id": "shadow_beast",
+      "name": "그림자 야수",
+      "description": "어둠의 힘으로 만들어진 무서운 야수.",
+      "stats": {
+        "hp": 130,
+        "attack": 35,
+        "defense": 20,
+        "speed": 18,
+        "criticalRate": 0.18
+      },
+      "rewards": {
+        "exp": 60,
+        "gold": 40
+      },
+      "locations": [
+        "dark_forest"
+      ],
+      "minLevel": 7,
+      "maxLevel": 10,
+      "spawnRate": 0.1,
+      "rarity": "RARE",
+      "abilities": [
+        "어둠의 포효",
+        "그림자 분신"
+      ],
+      "properties": {
+        "element": "dark",
+        "canDrop": [
+          "어둠의 심장",
+          "그림자 크리스탈"
+        ]
+      }
+    },
+    {
+      "id": "temple_guardian",
+      "name": "신전 수호자",
+      "description": "신전을 지키는 빛의 수호자.",
+      "stats": {
+        "hp": 100,
+        "attack": 28,
+        "defense": 22,
+        "speed": 15,
+        "criticalRate": 0.1
+      },
+      "rewards": {
+        "exp": 50,
+        "gold": 35
+      },
+      "locations": [
+        "holy_temple"
+      ],
+      "minLevel": 6,
+      "maxLevel": 9,
+      "spawnRate": 0.2,
+      "rarity": "UNCOMMON",
+      "abilities": [
+        "성스러운 빛",
+        "치유"
+      ],
+      "properties": {
+        "element": "light",
+        "canDrop": [
+          "성스러운 깃털",
+          "빛의 구슬"
+        ]
+      }
+    },
+    {
+      "id": "fallen_angel",
+      "name": "타락한 천사",
+      "description": "어둠에 물든 타락한 천사.",
+      "stats": {
+        "hp": 120,
+        "attack": 32,
+        "defense": 18,
+        "speed": 22,
+        "criticalRate": 0.15
+      },
+      "rewards": {
+        "exp": 65,
+        "gold": 45
+      },
+      "locations": [
+        "holy_temple"
+      ],
+      "minLevel": 8,
+      "maxLevel": 11,
+      "spawnRate": 0.08,
+      "rarity": "RARE",
+      "abilities": [
+        "타락한 빛",
+        "절망의 노래"
+      ],
+      "properties": {
+        "element": "dark",
+        "canDrop": [
+          "타락한 날개",
+          "절망의 눈물"
+        ]
+      }
+    },
+    {
+      "id": "magic_golem",
+      "name": "마법 골렘",
+      "description": "마법사가 만든 강력한 마법 골렘.",
+      "stats": {
+        "hp": 110,
+        "attack": 26,
+        "defense": 24,
+        "speed": 10,
+        "criticalRate": 0.08
+      },
+      "rewards": {
+        "exp": 55,
+        "gold": 38
+      },
+      "locations": [
+        "wizard_tower"
+      ],
+      "minLevel": 7,
+      "maxLevel": 10,
+      "spawnRate": 0.25,
+      "rarity": "UNCOMMON",
+      "abilities": [
+        "마법 미사일",
+        "마법 방벽"
+      ],
+      "properties": {
+        "element": "magic",
+        "canDrop": [
+          "마법 코어",
+          "골렘 부품"
+        ]
+      }
+    },
+    {
+      "id": "elemental_wisp",
+      "name": "원소 정령",
+      "description": "탑에 떠다니는 작은 원소 정령.",
+      "stats": {
+        "hp": 45,
+        "attack": 30,
+        "defense": 8,
+        "speed": 28,
+        "criticalRate": 0.2
+      },
+      "rewards": {
+        "exp": 35,
+        "gold": 25
+      },
+      "locations": [
+        "wizard_tower"
+      ],
+      "minLevel": 5,
+      "maxLevel": 8,
+      "spawnRate": 0.3,
+      "rarity": "COMMON",
+      "abilities": [
+        "원소 폭발",
+        "순간이동"
+      ],
+      "properties": {
+        "element": "magic",
+        "canDrop": [
+          "원소 정수",
+          "마법 가루"
+        ]
+      }
+    },
+    {
+      "id": "arcane_sentinel",
+      "name": "비전 감시자",
+      "description": "탑의 최상층을 지키는 강력한 감시자.",
+      "stats": {
+        "hp": 160,
+        "attack": 38,
+        "defense": 22,
+        "speed": 16,
+        "criticalRate": 0.12
+      },
+      "rewards": {
+        "exp": 80,
+        "gold": 60
+      },
+      "locations": [
+        "wizard_tower"
+      ],
+      "minLevel": 9,
+      "maxLevel": 12,
+      "spawnRate": 0.1,
+      "rarity": "RARE",
+      "abilities": [
+        "비전 광선",
+        "마법 흡수"
+      ],
+      "properties": {
+        "element": "magic",
+        "canDrop": [
+          "비전 크리스탈",
+          "고대 지식서"
+        ]
+      }
+    },
+    {
+      "id": "dungeon_rat",
+      "name": "던전 쥐",
+      "description": "지하에서 자란 거대한 쥐.",
+      "stats": {
+        "hp": 30,
+        "attack": 12,
+        "defense": 6,
+        "speed": 20,
+        "criticalRate": 0.1
+      },
+      "rewards": {
+        "exp": 18,
+        "gold": 10
+      },
+      "locations": [
+        "underground_dungeon"
+      ],
+      "minLevel": 2,
+      "maxLevel": 5,
+      "spawnRate": 0.4,
+      "rarity": "COMMON",
+      "abilities": [
+        "빠른 이빨",
+        "질병 전파"
+      ],
+      "properties": {
+        "element": "dark",
+        "canDrop": [
+          "쥐 꼬리",
+          "더러운 털"
+        ]
+      }
+    },
+    {
+      "id": "orc_warrior",
+      "name": "오크 전사",
+      "description": "지하 던전에 숨어사는 강인한 오크.",
+      "stats": {
+        "hp": 95,
+        "attack": 28,
+        "defense": 18,
+        "speed": 12,
+        "criticalRate": 0.1
+      },
+      "rewards": {
+        "exp": 45,
+        "gold": 30
+      },
+      "locations": [
+        "underground_dungeon"
+      ],
+      "minLevel": 5,
+      "maxLevel": 8,
+      "spawnRate": 0.2,
+      "rarity": "UNCOMMON",
+      "abilities": [
+        "야만적 공격",
+        "전투 함성"
+      ],
+      "properties": {
+        "element": "earth",
+        "canDrop": [
+          "오크 무기",
+          "야만의 장신구"
+        ]
+      }
+    },
+    {
+      "id": "dungeon_lord",
+      "name": "던전 군주",
+      "description": "지하 던전을 지배하는 강력한 마왕.",
+      "stats": {
+        "hp": 280,
+        "attack": 42,
+        "defense": 28,
+        "speed": 14,
+        "criticalRate": 0.18
+      },
+      "rewards": {
+        "exp": 110,
+        "gold": 85
+      },
+      "locations": [
+        "underground_dungeon"
+      ],
+      "minLevel": 10,
+      "maxLevel": 15,
+      "spawnRate": 0.05,
+      "rarity": "LEGENDARY",
+      "abilities": [
+        "어둠의 지배",
+        "절망의 오라",
+        "마왕의 분노"
+      ],
+      "properties": {
+        "element": "dark",
+        "canDrop": [
+          "마왕의 왕관",
+          "절망의 보석",
+          "어둠의 심장"
+        ]
+      }
+    },
+    {
+      "id": "ancient_dragon",
+      "name": "고대 드래곤",
+      "description": "세상에서 가장 오래되고 강력한 드래곤.",
+      "stats": {
+        "hp": 500,
+        "attack": 60,
+        "defense": 40,
+        "speed": 20,
+        "criticalRate": 0.25
+      },
+      "rewards": {
+        "exp": 200,
+        "gold": 150
+      },
+      "locations": [
+        "rocky_mountain",
+        "ancient_ruins",
+        "lava_fields"
+      ],
+      "minLevel": 15,
+      "maxLevel": 20,
+      "spawnRate": 0.01,
+      "rarity": "LEGENDARY",
+      "abilities": [
+        "고대의 숨결",
+        "용의 위압",
+        "시간 조작",
+        "완전 재생"
+      ],
+      "properties": {
+        "element": "ancient",
+        "canDrop": [
+          "고대 드래곤 비늘",
+          "시간의 구슬",
+          "용의 영혼"
+        ]
+      }
+    },
+    {
+      "id": "demon_king",
+      "name": "마왕",
+      "description": "모든 악의 근원인 절대 마왕.",
+      "stats": {
+        "hp": 666,
+        "attack": 66,
+        "defense": 46,
+        "speed": 26,
+        "criticalRate": 0.3
+      },
+      "rewards": {
+        "exp": 300,
+        "gold": 200
+      },
+      "locations": [
+        "underground_dungeon",
+        "dark_forest",
+        "ancient_ruins"
+      ],
+      "minLevel": 18,
+      "maxLevel": 25,
+      "spawnRate": 0.005,
+      "rarity": "LEGENDARY",
+      "abilities": [
+        "지옥의 화염",
+        "절망의 오라",
+        "영혼 흡수",
+        "악마 소환"
+      ],
+      "properties": {
+        "element": "demon",
+        "canDrop": [
+          "마왕의 왕관",
+          "지옥의 검",
+          "악마의 계약서"
+        ]
+      }
+    },
+    {
+      "id": "mimic_chest",
+      "name": "미믹 상자",
+      "description": "보물상자로 위장한 교활한 몬스터.",
+      "stats": {
+        "hp": 80,
+        "attack": 25,
+        "defense": 20,
+        "speed": 8,
+        "criticalRate": 0.15
+      },
+      "rewards": {
+        "exp": 50,
+        "gold": 100
+      },
+      "locations": [
+        "ancient_ruins",
+        "wizard_tower",
+        "underground_dungeon"
+      ],
+      "minLevel": 3,
+      "maxLevel": 10,
+      "spawnRate": 0.02,
+      "rarity": "RARE",
+      "abilities": [
+        "위장",
+        "보물 유혹"
+      ],
+      "properties": {
+        "element": "magic",
+        "canDrop": [
+          "희귀 보물",
+          "미믹의 이빨",
+          "가짜 열쇠"
+        ]
+      }
+    },
+    {
+      "id": "wandering_merchant",
+      "name": "떠돌이 상인",
+      "description": "위험한 지역을 돌아다니는 신비한 상인.",
+      "stats": {
+        "hp": 150,
+        "attack": 20,
+        "defense": 30,
+        "speed": 25,
+        "criticalRate": 0.05
+      },
+      "rewards": {
+        "exp": 0,
+        "gold": 0
+      },
+      "locations": [
+        "deep_forest",
+        "wasteland",
+        "rocky_mountain"
+      ],
+      "minLevel": 1,
+      "maxLevel": 20,
+      "spawnRate": 0.01,
+      "rarity": "SPECIAL",
+      "abilities": [
+        "도망치기",
+        "상품 판매"
+      ],
+      "properties": {
+        "element": "neutral",
+        "canDrop": [],
+        "special": "전투 시 특별 상점 개방"
+      }
+    },
+    {
+      "id": "night_phantom",
+      "name": "밤의 유령",
+      "description": "밤에만 나타나는 신비한 유령.",
+      "stats": {
+        "hp": 60,
+        "attack": 28,
+        "defense": 5,
+        "speed": 30,
+        "criticalRate": 0.2
+      },
+      "rewards": {
+        "exp": 40,
+        "gold": 30
+      },
+      "locations": [
+        "dark_forest",
+        "ancient_ruins",
+        "holy_temple"
+      ],
+      "minLevel": 4,
+      "maxLevel": 8,
+      "spawnRate": 0.15,
+      "rarity": "UNCOMMON",
+      "abilities": [
+        "투명화",
+        "공포 유발"
+      ],
+      "properties": {
+        "element": "ghost",
+        "canDrop": [
+          "유령의 정수",
+          "밤의 장막"
+        ],
+        "timeRestriction": "night_only"
+      }
+    },
+    {
+      "id": "dawn_sprite",
+      "name": "새벽 요정",
+      "description": "새벽 시간에만 볼 수 있는 아름다운 요정.",
+      "stats": {
+        "hp": 40,
+        "attack": 18,
+        "defense": 12,
+        "speed": 35,
+        "criticalRate": 0.12
+      },
+      "rewards": {
+        "exp": 30,
+        "gold": 25
+      },
+      "locations": [
+        "mystic_lake",
+        "holy_temple",
+        "deep_forest"
+      ],
+      "minLevel": 2,
+      "maxLevel": 6,
+      "spawnRate": 0.1,
+      "rarity": "RARE",
+      "abilities": [
+        "치유의 빛",
+        "축복"
+      ],
+      "properties": {
+        "element": "light",
+        "canDrop": [
+          "요정 가루",
+          "새벽의 이슬"
+        ],
+        "timeRestriction": "dawn_only"
       }
     }
   ]
