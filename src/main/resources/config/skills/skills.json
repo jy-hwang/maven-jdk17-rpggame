@@ -1,0 +1,209 @@
+{
+  "skills": [
+    {
+      "id": "POWER_STRIKE",
+      "name": "강타",
+      "description": "강력한 공격을 가합니다",
+      "type": "ATTACK",
+      "requiredLevel": 1,
+      "manaCost": 5,
+      "cooldown": 2,
+      "damageMultiplier": 1.5,
+      "healAmount": 0,
+      "buffDuration": 0,
+      "category": "BASIC",
+      "rarity": "COMMON",
+      "targetType": "ENEMY",
+      "effect": {
+        "type": "DAMAGE",
+        "value": 1.5,
+        "duration": 0
+      }
+    },
+    {
+      "id": "HEAL",
+      "name": "치유",
+      "description": "체력을 회복합니다",
+      "type": "HEAL",
+      "requiredLevel": 1,
+      "manaCost": 8,
+      "cooldown": 3,
+      "damageMultiplier": 0,
+      "healAmount": 30,
+      "buffDuration": 0,
+      "category": "BASIC",
+      "rarity": "COMMON",
+      "targetType": "SELF",
+      "effect": {
+        "type": "HEAL",
+        "value": 30,
+        "duration": 0
+      }
+    },
+    {
+      "id": "FIREBALL",
+      "name": "화염구",
+      "description": "불타는 화염구를 던집니다",
+      "type": "ATTACK",
+      "requiredLevel": 3,
+      "manaCost": 12,
+      "cooldown": 4,
+      "damageMultiplier": 2.0,
+      "healAmount": 0,
+      "buffDuration": 0,
+      "category": "MAGIC",
+      "rarity": "UNCOMMON",
+      "targetType": "ENEMY",
+      "effect": {
+        "type": "DAMAGE",
+        "value": 2.0,
+        "duration": 0,
+        "element": "FIRE"
+      }
+    },
+    {
+      "id": "DEFENSE_BOOST",
+      "name": "방어 강화",
+      "description": "일시적으로 방어력을 증가시킵니다",
+      "type": "BUFF",
+      "requiredLevel": 5,
+      "manaCost": 10,
+      "cooldown": 5,
+      "damageMultiplier": 0,
+      "healAmount": 0,
+      "buffDuration": 3,
+      "category": "BUFF",
+      "rarity": "COMMON",
+      "targetType": "SELF",
+      "effect": {
+        "type": "BUFF_DEFENSE",
+        "value": 1.5,
+        "duration": 3
+      }
+    },
+    {
+      "id": "GREAT_HEAL",
+      "name": "대치유",
+      "description": "강력한 치유 마법입니다",
+      "type": "HEAL",
+      "requiredLevel": 7,
+      "manaCost": 20,
+      "cooldown": 5,
+      "damageMultiplier": 0,
+      "healAmount": 80,
+      "buffDuration": 0,
+      "category": "MAGIC",
+      "rarity": "RARE",
+      "targetType": "SELF",
+      "effect": {
+        "type": "HEAL",
+        "value": 80,
+        "duration": 0
+      }
+    },
+    {
+      "id": "CHAIN_LIGHTNING",
+      "name": "연쇄 번개",
+      "description": "강력한 번개 공격입니다",
+      "type": "ATTACK",
+      "requiredLevel": 10,
+      "manaCost": 25,
+      "cooldown": 6,
+      "damageMultiplier": 3.0,
+      "healAmount": 0,
+      "buffDuration": 0,
+      "category": "MAGIC",
+      "rarity": "RARE",
+      "targetType": "ENEMY",
+      "effect": {
+        "type": "DAMAGE",
+        "value": 3.0,
+        "duration": 0,
+        "element": "LIGHTNING"
+      }
+    },
+    {
+      "id": "MANA_SHIELD",
+      "name": "마나 실드",
+      "description": "마나로 데미지를 흡수하는 보호막을 생성합니다",
+      "type": "BUFF",
+      "requiredLevel": 6,
+      "manaCost": 15,
+      "cooldown": 8,
+      "damageMultiplier": 0,
+      "healAmount": 0,
+      "buffDuration": 5,
+      "category": "MAGIC",
+      "rarity": "UNCOMMON",
+      "targetType": "SELF",
+      "effect": {
+        "type": "MANA_SHIELD",
+        "value": 0.5,
+        "duration": 5
+      }
+    },
+    {
+      "id": "POISON_STRIKE",
+      "name": "독성 공격",
+      "description": "독을 입힌 공격을 합니다",
+      "type": "ATTACK",
+      "requiredLevel": 8,
+      "manaCost": 18,
+      "cooldown": 4,
+      "damageMultiplier": 1.8,
+      "healAmount": 0,
+      "buffDuration": 0,
+      "category": "DEBUFF",
+      "rarity": "UNCOMMON",
+      "targetType": "ENEMY",
+      "effect": {
+        "type": "DAMAGE_WITH_DOT",
+        "value": 1.8,
+        "duration": 3,
+        "dotDamage": 10
+      }
+    },
+    {
+      "id": "REGENERATION",
+      "name": "재생",
+      "description": "시간에 따라 체력을 회복합니다",
+      "type": "BUFF",
+      "requiredLevel": 9,
+      "manaCost": 22,
+      "cooldown": 10,
+      "damageMultiplier": 0,
+      "healAmount": 0,
+      "buffDuration": 5,
+      "category": "HEAL",
+      "rarity": "RARE",
+      "targetType": "SELF",
+      "effect": {
+        "type": "REGENERATION",
+        "value": 15,
+        "duration": 5
+      }
+    },
+    {
+      "id": "METEOR",
+      "name": "메테오",
+      "description": "하늘에서 거대한 운석을 떨어뜨립니다",
+      "type": "ATTACK",
+      "requiredLevel": 15,
+      "manaCost": 40,
+      "cooldown": 8,
+      "damageMultiplier": 4.0,
+      "healAmount": 0,
+      "buffDuration": 0,
+      "category": "ULTIMATE",
+      "rarity": "LEGENDARY",
+      "targetType": "ENEMY",
+      "effect": {
+        "type": "DAMAGE",
+        "value": 4.0,
+        "duration": 0,
+        "element": "FIRE",
+        "areaEffect": true
+      }
+    }
+  ]
+}

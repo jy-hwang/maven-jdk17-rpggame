@@ -1,5 +1,6 @@
 package rpg.domain.player;
 
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -8,7 +9,6 @@ import rpg.application.service.QuestManager;
 import rpg.application.service.SkillService;
 import rpg.domain.inventory.PlayerInventory;
 import rpg.domain.skill.Skill;
-import rpg.shared.constant.BaseConstant;
 import rpg.shared.constant.GameConstants;
 
 /**
@@ -191,11 +191,11 @@ public class Player {
       System.out.println("💚 체력과 마나가 완전 회복되었습니다!");
 
       // 새로운 스킬 학습 확인
-      var newSkills = skillManager.checkAndLearnNewSkills(level);
+      List<String> newSkills = skillManager.checkAndLearnNewSkills(level);
       if (!newSkills.isEmpty()) {
         System.out.println("✨ 새로운 스킬을 학습했습니다!");
-        for (Skill skill : newSkills) {
-          System.out.println("- " + skill.getName());
+        for (String skill : newSkills) {
+          System.out.println("- " + skill);
         }
       }
 
@@ -424,12 +424,24 @@ public class Player {
     return inventory;
   }
 
+  public void setInventory(PlayerInventory inventory) {
+    this.inventory = inventory;
+  }
+
   public SkillService getSkillManager() {
     return skillManager;
+  }
+  
+  public void setSkillManager(SkillService skillManager) {
+    this.skillManager = skillManager;
   }
 
   public PlayerStatusCondition getPlayerStatusCondition() {
     return playerStatusCondition;
+  }
+
+  public void setPlayerStatusCondition(PlayerStatusCondition playerStatusCondition) {
+    this.playerStatusCondition = playerStatusCondition;
   }
 
   public QuestManager getQuestManager() {

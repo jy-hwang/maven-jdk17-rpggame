@@ -4,47 +4,56 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import rpg.application.factory.SkillFactory;
 import rpg.domain.monster.Monster;
 import rpg.domain.player.Player;
 import rpg.domain.skill.Skill;
-import rpg.domain.skill.SkillType;
-import rpg.shared.constant.GameConstants;
-import rpg.shared.constant.ItemConstants;
+import rpg.domain.skill.SkillResult;
 
 /**
- * 캐릭터의 스킬 관리 클래스 (중복 학습 문제 수정)
+ * Factory 패턴을 활용한 스킬 관리 서비스
+ * - ID 기반 스킬 관리
+ * - JSON 템플릿에서 스킬 로드
+ * - 중복 방지 및 성능 최적화
  */
 public class SkillService {
   private static final Logger logger = LoggerFactory.getLogger(SkillService.class);
 
-  private List<Skill> learnedSkills;
-  private Map<String, Integer> skillCooldowns; // 스킬명 -> 남은 쿨다운
-  private boolean defaultSkillsInitialized; // 기본 스킬 초기화 여부
+  // 학습한 스킬 ID 목록 (Factory에서 인스턴스 생성)
+  private List<String> learnedSkillIds;
+  // 스킬 쿨다운 (스킬 ID -> 남은 쿨다운)
+  private Map<String, Integer> skillCooldowns;
+  // 기본 스킬 초기화 여부
+  private boolean defaultSkillsInitialized;
 
   /**
-   * 새로운 SkillManager 생성자 (기본 스킬 자동 초기화)
+   * 새로운 SkillService 생성자 (기본 스킬 자동 초기화)
    */
   public SkillService() {
-    this.learnedSkills = new ArrayList<>();
+    this.learnedSkillIds = new ArrayList<>();
     this.skillCooldowns = new HashMap<>();
     this.defaultSkillsInitialized = false;
     initializeDefaultSkills();
   }
 
   /**
-   * 저장된 데이터로 SkillManager 생성자 (기본 스킬 초기화 안함)
+   * 저장된 데이터로 SkillService 생성자 (기본 스킬 초기화 안함)
    */
   @JsonCreator
-  public SkillService(@JsonProperty("learnedSkills") List<Skill> learnedSkills, @JsonProperty("skillCooldowns") Map<String, Integer> skillCooldowns) {
-    this.learnedSkills = learnedSkills != null ? new ArrayList<>(learnedSkills) : new ArrayList<>();
+  public SkillService(
+    @JsonProperty("learnedSkillIds") List<String> learnedSkillIds,
+    @JsonProperty("skillCooldowns") Map<String, Integer> skillCooldowns
+  ) {
+    this.learnedSkillIds = learnedSkillIds != null ? new ArrayList<>(learnedSkillIds) : new ArrayList<>();
     this.skillCooldowns = skillCooldowns != null ? new HashMap<>(skillCooldowns) : new HashMap<>();
     this.defaultSkillsInitialized = true; // 저장된 데이터에서 로드할 때는 기본 스킬 초기화 안함
 
-    logger.debug("SkillManager 로드 완료: {}개 스킬", this.learnedSkills.size());
+    logger.debug("SkillService 로드 완료: {}개 스킬 ID", this.learnedSkillIds.size());
   }
 
   /**
@@ -56,113 +65,121 @@ public class SkillService {
       return;
     }
 
-    // 레벨 1 기본 스킬들
-    Skill powerStrike = new Skill("강타", "강력한 공격을 가합니다", SkillType.ATTACK, 1, 5, 2, 1.5, 0, 0);
-    Skill heal = new Skill("치유", "체력을 회복합니다", SkillType.HEAL, 1, 8, 3, 0, 30, 0);
-
-    // 중복 체크하면서 추가
-    learnSkillIfNotExists(powerStrike);
-    learnSkillIfNotExists(heal);
+    // Factory에서 기본 스킬 ID 목록 가져오기
+    List<String> defaultSkillIds = SkillFactory.getDefaultSkillIds();
+    
+    for (String skillId : defaultSkillIds) {
+      learnSkillIfNotExists(skillId);
+    }
 
     defaultSkillsInitialized = true;
-    logger.debug("기본 스킬 초기화 완료: {}개 스킬", learnedSkills.size());
+    logger.debug("기본 스킬 초기화 완료: {}개 스킬", learnedSkillIds.size());
   }
 
   /**
-   * 스킬이 존재하지 않을 때만 학습합니다. (중복 방지)
+   * 스킬 ID가 존재하지 않을 때만 학습합니다. (중복 방지)
    */
-  private void learnSkillIfNotExists(Skill skill) {
-    if (skill == null) {
-      logger.warn("null 스킬 학습 시도");
+  private void learnSkillIfNotExists(String skillId) {
+    if (skillId == null || skillId.trim().isEmpty()) {
+      logger.warn("null 또는 빈 스킬 ID 학습 시도");
       return;
     }
 
-    if (hasSkill(skill.getName())) {
-      logger.debug("스킬 이미 존재 - 건너뜀: {}", skill.getName());
+    if (hasSkillId(skillId)) {
+      logger.debug("스킬 ID 이미 존재 - 건너뜀: {}", skillId);
       return;
     }
 
-    learnedSkills.add(skill);
-    logger.debug("스킬 학습: {}", skill.getName());
+    // Factory에서 스킬 존재 여부 확인
+    if (!SkillFactory.hasSkill(skillId)) {
+      logger.warn("존재하지 않는 스킬 ID: {}", skillId);
+      return;
+    }
+
+    learnedSkillIds.add(skillId);
+    logger.debug("스킬 학습: {}", skillId);
   }
 
   /**
-   * 단일 스킬을 학습합니다. (중복 체크)
+   * 단일 스킬 ID로 학습합니다. (중복 체크)
    */
-  public void learnSkill(Skill skill) {
-    learnSkillIfNotExists(skill);
+  public void learnSkill(String skillId) {
+    learnSkillIfNotExists(skillId);
   }
 
   /**
-   * 여러 스킬을 학습합니다. (중복 체크)
+   * 여러 스킬 ID를 학습합니다. (중복 체크)
    */
-  public void learnSkills(List<Skill> skills) {
-    if (skills == null || skills.isEmpty()) {
+  public void learnSkills(List<String> skillIds) {
+    if (skillIds == null || skillIds.isEmpty()) {
       return;
     }
 
-    for (Skill skill : skills) {
-      learnSkillIfNotExists(skill);
+    for (String skillId : skillIds) {
+      learnSkillIfNotExists(skillId);
     }
   }
 
   /**
    * 레벨에 따라 새로운 스킬을 학습할 수 있는지 확인하고 학습합니다.
    */
-  public List<Skill> checkAndLearnNewSkills(int currentLevel) {
-    List<Skill> newSkills = new ArrayList<>();
+  public List<String> checkAndLearnNewSkills(int currentLevel) {
+    List<String> newSkillIds = new ArrayList<>();
+    List<String> availableSkillIds = SkillFactory.getAvailableSkillIds(currentLevel);
 
-    // 레벨별 스킬 해금 (중복 체크)
-    if (currentLevel >= ItemConstants.BEGINNER_LEVEL && !hasSkill("화염구")) {
-      Skill fireball = new Skill("화염구", "불타는 화염구를 던집니다", SkillType.ATTACK, 3, 12, 4, 2.0, 0, 0);
-      learnedSkills.add(fireball);
-      newSkills.add(fireball);
-      logger.debug("레벨업 스킬 학습: {}", fireball.getName());
+    for (String skillId : availableSkillIds) {
+      if (!hasSkillId(skillId)) {
+        learnedSkillIds.add(skillId);
+        newSkillIds.add(skillId);
+        
+        // 스킬 정보 로그
+        Map<String, Object> skillInfo = SkillFactory.getSkillInfo(skillId);
+        if (skillInfo != null) {
+          logger.debug("레벨업 스킬 학습: {} ({})", skillId, skillInfo.get("name"));
+        }
+      }
     }
 
-    if (currentLevel >= GameConstants.NUMBER_FIVE && !hasSkill("방어 강화")) {
-      Skill defenseBoost = new Skill("방어 강화", "일시적으로 방어력을 증가시킵니다", SkillType.BUFF, 5, 10, 5, 0, 0, 3);
-      learnedSkills.add(defenseBoost);
-      newSkills.add(defenseBoost);
-      logger.debug("레벨업 스킬 학습: {}", defenseBoost.getName());
+    if (!newSkillIds.isEmpty()) {
+      logger.info("레벨 {} 달성으로 새로운 스킬 {}개 학습", currentLevel, newSkillIds.size());
     }
 
-    if (currentLevel >= ItemConstants.INTERMEDIATE_LEVEL && !hasSkill("대치유")) {
-      Skill greatHeal = new Skill("대치유", "강력한 치유 마법입니다", SkillType.HEAL, 7, 20, 5, 0, 80, 0);
-      learnedSkills.add(greatHeal);
-      newSkills.add(greatHeal);
-      logger.debug("레벨업 스킬 학습: {}", greatHeal.getName());
-    }
-
-    if (currentLevel >= GameConstants.NUMBER_TEN && !hasSkill("연쇄 번개")) {
-      Skill chainLightning = new Skill("연쇄 번개", "강력한 번개 공격입니다", SkillType.ATTACK, 10, 25, 6, 3.0, 0, 0);
-      learnedSkills.add(chainLightning);
-      newSkills.add(chainLightning);
-      logger.debug("레벨업 스킬 학습: {}", chainLightning.getName());
-    }
-
-    if (!newSkills.isEmpty()) {
-      logger.info("레벨 {} 달성으로 새로운 스킬 {}개 학습", currentLevel, newSkills.size());
-    }
-
-    return newSkills;
+    return newSkillIds;
   }
 
   /**
    * 스킬을 사용할 수 있는지 확인합니다.
    */
-  public boolean canUseSkill(Skill skill, Player character) {
-    if (skill == null || character == null) {
+  public boolean canUseSkill(String skillId, Player character) {
+    if (skillId == null || character == null) {
+      return false;
+    }
+
+    // 학습한 스킬인지 확인
+    if (!hasSkillId(skillId)) {
+      return false;
+    }
+
+    // Factory에서 스킬 정보 가져오기
+    Map<String, Object> skillInfo = SkillFactory.getSkillInfo(skillId);
+    if (skillInfo == null) {
+      return false;
+    }
+
+    // 레벨 확인
+    int requiredLevel = (Integer) skillInfo.get("requiredLevel");
+    if (character.getLevel() < requiredLevel) {
       return false;
     }
 
     // 쿨다운 확인
-    if (skillCooldowns.getOrDefault(skill.getName(), GameConstants.NUMBER_ZERO) > GameConstants.NUMBER_ZERO) {
+    if (skillCooldowns.getOrDefault(skillId, 0) > 0) {
       return false;
     }
 
     // 마나 확인
-    if (character.getMana() < skill.getManaCost()) {
+    int manaCost = (Integer) skillInfo.get("manaCost");
+    if (character.getMana() < manaCost) {
       return false;
     }
 
@@ -172,44 +189,65 @@ public class SkillService {
   /**
    * 스킬을 사용합니다.
    */
-  public Skill.SkillResult useSkill(String skillName, Player caster, Monster target) {
-    Skill skill = getSkillByName(skillName);
-    if (skill == null) {
-      return new Skill.SkillResult(false, "해당 스킬을 찾을 수 없습니다.", GameConstants.NUMBER_ZERO);
+  public SkillResult useSkill(String skillId, Player caster, Monster target) {
+    if (!hasSkillId(skillId)) {
+      return new SkillResult(false, "해당 스킬을 학습하지 않았습니다.", 0);
     }
 
-    if (!canUseSkill(skill, caster)) {
-      if (skillCooldowns.getOrDefault(skillName, GameConstants.NUMBER_ZERO) > GameConstants.NUMBER_ZERO) {
-        return new Skill.SkillResult(false, "스킬이 아직 쿨다운 중입니다.", GameConstants.NUMBER_ZERO);
+    if (!canUseSkill(skillId, caster)) {
+      if (skillCooldowns.getOrDefault(skillId, 0) > 0) {
+        return new SkillResult(false, "스킬이 아직 쿨다운 중입니다.", 0);
       } else {
-        return new Skill.SkillResult(false, "마나가 부족합니다.", GameConstants.NUMBER_ZERO);
+        return new SkillResult(false, "마나가 부족하거나 레벨이 부족합니다.", 0);
       }
     }
 
-    Skill.SkillResult result = skill.useSkill(caster, target);
+    // Factory에서 스킬 인스턴스 생성
+    Skill skill = SkillFactory.createSkill(skillId);
+    if (skill == null) {
+      return new SkillResult(false, "스킬을 생성할 수 없습니다.", 0);
+    }
+
+    // 스킬 사용
+    SkillResult result = skill.useSkill(caster, target);
     if (result.isSuccess()) {
       // 쿨다운 설정
-      skillCooldowns.put(skillName, skill.getCooldown());
-      logger.debug("스킬 사용: {} (쿨다운: {}턴)", skillName, skill.getCooldown());
+      skillCooldowns.put(skillId, skill.getCooldown());
+      logger.debug("스킬 사용: {} (쿨다운: {}턴)", skillId, skill.getCooldown());
     }
 
     return result;
   }
 
   /**
+   * 스킬 이름으로 사용 (하위 호환성)
+   */
+  public SkillResult useSkillByName(String skillName, Player caster, Monster target) {
+    String skillId = SkillFactory.getSkillIdByName(skillName);
+    if (skillId == null) {
+      return new SkillResult(false, "해당 이름의 스킬을 찾을 수 없습니다.", 0);
+    }
+    
+    return useSkill(skillId, caster, target);
+  }
+
+  /**
    * 턴이 끝날 때 쿨다운을 감소시킵니다.
    */
   public void reduceCooldowns() {
-    skillCooldowns.replaceAll((name, cooldown) -> Math.max(GameConstants.NUMBER_ZERO, cooldown - GameConstants.NUMBER_ONE));
-    skillCooldowns.entrySet().removeIf(entry -> entry.getValue() <= GameConstants.NUMBER_ZERO);
+    skillCooldowns.replaceAll((skillId, cooldown) -> Math.max(0, cooldown - 1));
+    skillCooldowns.entrySet().removeIf(entry -> entry.getValue() <= 0);
   }
 
   /**
    * 사용 가능한 스킬 목록을 반환합니다.
    */
   public List<Skill> getAvailableSkills(Player character) {
-    return learnedSkills.stream().filter(skill -> skill.getRequiredLevel() <= character.getLevel()).filter(skill -> canUseSkill(skill, character))
-        .toList();
+    return learnedSkillIds.stream()
+      .filter(skillId -> canUseSkill(skillId, character))
+      .map(SkillFactory::createSkill)
+      .filter(skill -> skill != null)
+      .collect(Collectors.toList());
   }
 
   /**
@@ -217,58 +255,62 @@ public class SkillService {
    */
   public void displaySkills(Player character) {
     System.out.println("\n=== 스킬 목록 ===");
-    if (learnedSkills.isEmpty()) {
+    if (learnedSkillIds.isEmpty()) {
       System.out.println("학습한 스킬이 없습니다.");
       return;
     }
 
-    for (int i = GameConstants.NUMBER_ZERO; i < learnedSkills.size(); i++) {
-      Skill skill = learnedSkills.get(i);
+    for (int i = 0; i < learnedSkillIds.size(); i++) {
+      String skillId = learnedSkillIds.get(i);
+      Map<String, Object> skillInfo = SkillFactory.getSkillInfo(skillId);
+      
+      if (skillInfo == null) continue;
+      
+      String name = (String) skillInfo.get("name");
+      int requiredLevel = (Integer) skillInfo.get("requiredLevel");
+      int manaCost = (Integer) skillInfo.get("manaCost");
+      
       String status = "";
-
-      if (skill.getRequiredLevel() > character.getLevel()) {
+      if (requiredLevel > character.getLevel()) {
         status = " (레벨 부족)";
-      } else if (skillCooldowns.getOrDefault(skill.getName(), GameConstants.NUMBER_ZERO) > GameConstants.NUMBER_ZERO) {
-        status = " (쿨다운: " + skillCooldowns.get(skill.getName()) + "턴)";
-      } else if (character.getMana() < skill.getManaCost()) {
+      } else if (skillCooldowns.getOrDefault(skillId, 0) > 0) {
+        status = " (쿨다운: " + skillCooldowns.get(skillId) + "턴)";
+      } else if (character.getMana() < manaCost) {
         status = " (마나 부족)";
       } else {
         status = " (사용 가능)";
       }
 
-      System.out.printf("%d. %s%s%n", i + GameConstants.NUMBER_ONE, skill.getName(), status);
+      System.out.printf("%d. %s%s%n", i + 1, name, status);
     }
     System.out.println("================");
   }
 
   /**
-   * 특정 스킬을 가지고 있는지 확인합니다.
+   * 특정 스킬 ID를 가지고 있는지 확인합니다.
    */
-  private boolean hasSkill(String skillName) {
-    if (skillName == null || skillName.trim().isEmpty()) {
+  public boolean hasSkillId(String skillId) {
+    if (skillId == null || skillId.trim().isEmpty()) {
       return false;
     }
-
-    return learnedSkills.stream().anyMatch(skill -> skillName.equals(skill.getName()));
+    return learnedSkillIds.contains(skillId);
   }
 
   /**
-   * 스킬 이름으로 스킬을 찾습니다.
+   * 스킬 이름으로 보유 여부 확인 (하위 호환성)
    */
-  private Skill getSkillByName(String name) {
-    if (name == null || name.trim().isEmpty()) {
-      return null;
-    }
-
-    return learnedSkills.stream().filter(skill -> name.equals(skill.getName())).findFirst().orElse(null);
+  public boolean hasSkillByName(String skillName) {
+    String skillId = SkillFactory.getSkillIdByName(skillName);
+    return skillId != null && hasSkillId(skillId);
   }
 
   /**
    * 인덱스로 스킬을 찾습니다.
    */
   public Skill getSkillByIndex(int index) {
-    if (index >= GameConstants.NUMBER_ZERO && index < learnedSkills.size()) {
-      return learnedSkills.get(index);
+    if (index >= 0 && index < learnedSkillIds.size()) {
+      String skillId = learnedSkillIds.get(index);
+      return SkillFactory.createSkill(skillId);
     }
     return null;
   }
@@ -276,10 +318,50 @@ public class SkillService {
   /**
    * 스킬 쿨다운을 설정합니다.
    */
-  public void setSkillCooldown(String skillName, int remainingTurns) {
-    if (skillName != null && remainingTurns > 0) {
-      skillCooldowns.put(skillName, remainingTurns);
+  public void setSkillCooldown(String skillId, int remainingTurns) {
+    if (skillId != null && remainingTurns > 0) {
+      skillCooldowns.put(skillId, remainingTurns);
     }
+  }
+
+  /**
+   * 중복 스킬 ID를 제거합니다. (데이터 정리용)
+   */
+  public void removeDuplicateSkills() {
+    List<String> uniqueSkillIds = learnedSkillIds.stream()
+      .distinct()
+      .collect(Collectors.toList());
+
+    int removedCount = learnedSkillIds.size() - uniqueSkillIds.size();
+    learnedSkillIds = uniqueSkillIds;
+
+    if (removedCount > 0) {
+      logger.info("중복 스킬 제거 완료: {}개 제거, {}개 스킬 남음", removedCount, learnedSkillIds.size());
+    }
+  }
+
+  /**
+   * 학습한 스킬 인스턴스 목록 반환 (하위 호환성)
+   */
+  public List<Skill> getLearnedSkills() {
+    return learnedSkillIds.stream()
+      .map(SkillFactory::createSkill)
+      .filter(skill -> skill != null)
+      .collect(Collectors.toList());
+  }
+
+  /**
+   * 학습한 스킬 ID 목록 반환
+   */
+  public List<String> getLearnedSkillIds() {
+    return new ArrayList<>(learnedSkillIds);
+  }
+
+  /**
+   * 스킬 쿨다운 정보 반환
+   */
+  public Map<String, Integer> getSkillCooldowns() {
+    return new HashMap<>(skillCooldowns);
   }
 
   /**
@@ -288,40 +370,38 @@ public class SkillService {
   public void debugPrintSkills() {
     if (logger.isDebugEnabled()) {
       logger.debug("=== 현재 스킬 목록 ===");
-      for (int i = 0; i < learnedSkills.size(); i++) {
-        Skill skill = learnedSkills.get(i);
-        logger.debug("{}. {} (레벨: {}, 마나: {})", i + 1, skill.getName(), skill.getRequiredLevel(), skill.getManaCost());
+      for (int i = 0; i < learnedSkillIds.size(); i++) {
+        String skillId = learnedSkillIds.get(i);
+        Map<String, Object> skillInfo = SkillFactory.getSkillInfo(skillId);
+        if (skillInfo != null) {
+          logger.debug("{}. {} ({}) - 레벨: {}, 마나: {}", 
+            i + 1, skillInfo.get("name"), skillId, 
+            skillInfo.get("requiredLevel"), skillInfo.get("manaCost"));
+        }
       }
-      logger.debug("총 {}개 스킬", learnedSkills.size());
+      logger.debug("총 {}개 스킬", learnedSkillIds.size());
     }
   }
 
   /**
-   * 중복 스킬을 제거합니다. (데이터 정리용)
+   * 통계 정보 반환
    */
-  public void removeDuplicateSkills() {
-    Map<String, Skill> uniqueSkills = new HashMap<>();
-
-    for (Skill skill : learnedSkills) {
-      if (!uniqueSkills.containsKey(skill.getName())) {
-        uniqueSkills.put(skill.getName(), skill);
-      } else {
-        logger.warn("중복 스킬 제거: {}", skill.getName());
+  public Map<String, Integer> getStatistics() {
+    Map<String, Integer> stats = new HashMap<>();
+    stats.put("totalLearnedSkills", learnedSkillIds.size());
+    stats.put("activeCooldowns", skillCooldowns.size());
+    
+    // 타입별 통계 (Factory에서 정보 가져오기)
+    Map<String, Integer> typeStats = new HashMap<>();
+    for (String skillId : learnedSkillIds) {
+      Map<String, Object> skillInfo = SkillFactory.getSkillInfo(skillId);
+      if (skillInfo != null) {
+        String type = (String) skillInfo.get("type");
+        typeStats.merge(type.toLowerCase() + "Skills", 1, Integer::sum);
       }
     }
-
-    learnedSkills.clear();
-    learnedSkills.addAll(uniqueSkills.values());
-
-    logger.info("중복 스킬 제거 완료: {}개 스킬 남음", learnedSkills.size());
-  }
-
-  // Getters
-  public List<Skill> getLearnedSkills() {
-    return new ArrayList<>(learnedSkills);
-  }
-
-  public Map<String, Integer> getSkillCooldowns() {
-    return new HashMap<>(skillCooldowns);
+    stats.putAll(typeStats);
+    
+    return stats;
   }
 }

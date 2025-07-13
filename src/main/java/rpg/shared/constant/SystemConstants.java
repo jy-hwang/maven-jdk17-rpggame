@@ -39,6 +39,14 @@ public class SystemConstants {
   public static final String EVENT_QUESTS_CONFIG = "/config/quests/event-quests.json";
   public static final String TUTORIAL_QUESTS_CONFIG = "/config/quests/tutorial-quests.json";
 
+  // === 스킬 JSON 설정 파일 경로 ===
+  public static final String SKILLS_CONFIG = "/config/skills/skills.json";
+  public static final String BASIC_SKILLS_CONFIG = "/config/skills/basic-skills.json";
+  public static final String COMBAT_SKILLS_CONFIG = "/config/skills/combat-skills.json";
+  public static final String MAGIC_SKILLS_CONFIG = "/config/skills/magic-skills.json";
+  public static final String PASSIVE_SKILLS_CONFIG = "/config/skills/passive-skills.json";
+  public static final String ULTIMATE_SKILLS_CONFIG = "/config/skills/ultimate-skills.json";
+  
   // === 퀘스트 시스템 설정 ===
   public static final int MAX_ACTIVE_QUESTS = 10; // 동시 진행 가능한 퀘스트 수
   public static final int MAX_DAILY_QUESTS = 3; // 일일 퀘스트 최대 개수
@@ -52,40 +60,50 @@ public class SystemConstants {
   public static final int WEEKLY_QUEST_RESET_TIME = 604800; // 7일
   public static final int DEFAULT_QUEST_TIMEOUT = 0; // 무제한 (0 = 제한 없음)
 
+  // === 🆕 스킬 시간 설정 ===
+  public static final int SKILL_COOLDOWN_TICK_INTERVAL = 1000; // 1초마다 쿨다운 체크
+  public static final int BUFF_DURATION_TICK_INTERVAL = 1000; // 1초마다 버프 지속시간 체크
+  public static final int MAX_BUFF_STACKS = 5; // 최대 버프 중첩 수
+
   // === JSON 파일 검증 관련 ===
   public static final boolean ENABLE_JSON_VALIDATION = true; // JSON 데이터 검증 활성화
   public static final boolean STRICT_VALIDATION = false; // 엄격한 검증 모드
   public static final boolean LOG_VALIDATION_ERRORS = true; // 검증 오류 로깅
 
-//=== 게임 플레이 개선 관련 ===
- public static final boolean SHOW_MONSTER_HINTS = true; // 몬스터 힌트 표시
- public static final boolean DETAILED_COMBAT_LOG = false; // 상세 전투 로그
- public static final boolean ENABLE_MONSTER_ABILITIES = true; // 몬스터 특수 능력 활성화
- public static final boolean SHOW_QUEST_HINTS = true; // 퀘스트 힌트 표시
- public static final boolean DETAILED_QUEST_LOG = true; // 상세 퀘스트 로그
+  // === 🆕 스킬 검증 관련 ===
+  public static final boolean ENABLE_SKILL_VALIDATION = true; // 스킬 데이터 검증 활성화
+  public static final boolean STRICT_SKILL_VALIDATION = true; // 엄격한 스킬 검증 모드
+  public static final boolean LOG_SKILL_ERRORS = true; // 스킬 오류 로깅
 
- // === 퀘스트 UI 관련 ===
- public static final boolean SHOW_QUEST_PROGRESS_BAR = true; // 진행률 바 표시
- public static final boolean SHOW_QUEST_REWARDS_PREVIEW = true; // 보상 미리보기
- public static final boolean ENABLE_QUEST_NOTIFICATIONS = true; // 퀘스트 알림
- public static final boolean SHOW_COMPLETION_EFFECTS = true; // 완료 효과 표시
+  // === 게임 플레이 개선 관련 ===
+  public static final boolean SHOW_MONSTER_HINTS = true; // 몬스터 힌트 표시
+  public static final boolean DETAILED_COMBAT_LOG = false; // 상세 전투 로그
+  public static final boolean ENABLE_MONSTER_ABILITIES = true; // 몬스터 특수 능력 활성화
+  public static final boolean SHOW_QUEST_HINTS = true; // 퀘스트 힌트 표시
+  public static final boolean DETAILED_QUEST_LOG = true; // 상세 퀘스트 로그
 
- // === 개발/디버그 관련 ===
- public static final boolean DEBUG_MODE = true; // 디버그 모드
- public static final boolean ENABLE_MONSTER_STATS = true; // 몬스터 통계 표시
- public static final boolean AUTO_RELOAD_JSON = false; // JSON 자동 리로드 (개발용)
- public static final boolean DEBUG_QUEST_SYSTEM = false; // 퀘스트 시스템 디버그
- public static final boolean QUEST_TEMPLATE_VALIDATION = true; // 퀘스트 템플릿 검증
+  // === 퀘스트 UI 관련 ===
+  public static final boolean SHOW_QUEST_PROGRESS_BAR = true; // 진행률 바 표시
+  public static final boolean SHOW_QUEST_REWARDS_PREVIEW = true; // 보상 미리보기
+  public static final boolean ENABLE_QUEST_NOTIFICATIONS = true; // 퀘스트 알림
+  public static final boolean SHOW_COMPLETION_EFFECTS = true; // 완료 효과 표시
 
- // === 퀘스트 밸런싱 관련 ===
- public static final double QUEST_EXP_MULTIPLIER = 1.0; // 퀘스트 경험치 배율
- public static final double QUEST_GOLD_MULTIPLIER = 1.0; // 퀘스트 골드 배율
- public static final double DAILY_QUEST_BONUS = 1.2; // 일일 퀘스트 보너스 배율
- public static final double WEEKLY_QUEST_BONUS = 1.5; // 주간 퀘스트 보너스 배율
+  // === 개발/디버그 관련 ===
+  public static final boolean DEBUG_MODE = true; // 디버그 모드
+  public static final boolean ENABLE_MONSTER_STATS = true; // 몬스터 통계 표시
+  public static final boolean AUTO_RELOAD_JSON = false; // JSON 자동 리로드 (개발용)
+  public static final boolean DEBUG_QUEST_SYSTEM = false; // 퀘스트 시스템 디버그
+  public static final boolean QUEST_TEMPLATE_VALIDATION = true; // 퀘스트 템플릿 검증
 
- // === 퀘스트 생성 관련 ===
- public static final int MIN_DYNAMIC_QUEST_LEVEL = 5; // 동적 퀘스트 최소 레벨
- public static final int MAX_QUEST_OBJECTIVES = 5; // 최대 퀘스트 목표 개수
- public static final int MIN_QUEST_REWARD_GOLD = 10; // 최소 퀘스트 골드 보상
- public static final int MIN_QUEST_REWARD_EXP = 20; // 최소 퀘스트 경험치 보상
+  // === 퀘스트 밸런싱 관련 ===
+  public static final double QUEST_EXP_MULTIPLIER = 1.0; // 퀘스트 경험치 배율
+  public static final double QUEST_GOLD_MULTIPLIER = 1.0; // 퀘스트 골드 배율
+  public static final double DAILY_QUEST_BONUS = 1.2; // 일일 퀘스트 보너스 배율
+  public static final double WEEKLY_QUEST_BONUS = 1.5; // 주간 퀘스트 보너스 배율
+
+  // === 퀘스트 생성 관련 ===
+  public static final int MIN_DYNAMIC_QUEST_LEVEL = 5; // 동적 퀘스트 최소 레벨
+  public static final int MAX_QUEST_OBJECTIVES = 5; // 최대 퀘스트 목표 개수
+  public static final int MIN_QUEST_REWARD_GOLD = 10; // 최소 퀘스트 골드 보상
+  public static final int MIN_QUEST_REWARD_EXP = 20; // 최소 퀘스트 경험치 보상
 }

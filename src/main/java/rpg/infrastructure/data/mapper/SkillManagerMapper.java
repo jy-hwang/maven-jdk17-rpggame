@@ -94,7 +94,7 @@ public class SkillManagerMapper {
     }
 
     // 저장된 데이터로 SkillManager 생성 (기본 스킬 초기화 방지)
-    SkillService skillManager = new SkillService(skills, cooldowns);
+    SkillService skillManager = null; //new SkillService(skills, cooldowns);
 
     logger.debug("DTO -> SkillManager 변환 완료: {}개 스킬 (중복 제거됨), {}개 쿨다운", skills.size(), cooldowns.size());
 

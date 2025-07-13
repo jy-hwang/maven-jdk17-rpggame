@@ -13,6 +13,7 @@ import rpg.domain.item.ItemRarity;
 import rpg.domain.monster.Monster;
 import rpg.domain.player.Player;
 import rpg.domain.skill.Skill;
+import rpg.domain.skill.SkillResult;
 import rpg.shared.constant.BattleConstants;
 import rpg.shared.util.ConsoleColors;
 
@@ -262,7 +263,7 @@ public class BattleEngine {
       return false;
 
     Skill skill = availableSkills.get(skillIndex);
-    Skill.SkillResult result = player.getSkillManager().useSkill(skill.getName(), player, monster);
+    SkillResult result = player.getSkillManager().useSkill(skill.getName(), player, monster);
 
     System.out.println("✨ " + result.getMessage());
 

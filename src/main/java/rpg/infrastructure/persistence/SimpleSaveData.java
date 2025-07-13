@@ -179,11 +179,26 @@ public class SimpleSaveData {
       Player player = new Player(playerName, level, hp, maxHp, mana, maxMana, restoreHp, restoreMp, experience, attack, defense, gold, inventory,
           skillManager, PlayerStatusCondition.valueOf(statusCondition), questManager);
 
-      logger.info("Player 복원 완료: {} (레벨: {}, 아이템: {}개, 퀘스트: {}개)", playerName, level, items.size(), activeQuests.size());
+      // 상태 조건 설정
+      try {
+        PlayerStatusCondition condition = PlayerStatusCondition.valueOf(statusCondition);
+        player.setPlayerStatusCondition(condition);
+      } catch (Exception e) {
+        logger.warn("잘못된 상태 조건, 기본값으로 설정: {}", statusCondition);
+        player.setPlayerStatusCondition(PlayerStatusCondition.NORMAL);
+      }
+
+      // 인벤토리, 스킬, 퀘스트 매니저 설정
+      player.setInventory(inventory);
+      player.setSkillManager(skillManager);
+      player.setQuestManager(questManager);
+
+      logger.info("Player 복원 완료: {} (레벨: {}, 스킬: {}개)", 
+                  playerName, level, learnedSkillIds.size());
       return player;
 
     } catch (Exception e) {
-      logger.error("SimpleSaveData를 Player로 변환 중 오류", e);
+      logger.error("Player 복원 중 오류", e);
       throw new RuntimeException("플레이어 데이터 복원 실패: " + e.getMessage(), e);
     }
   }

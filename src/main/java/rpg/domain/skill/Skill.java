@@ -14,6 +14,7 @@ import rpg.shared.constant.GameConstants;
 public class Skill {
   private static final Logger logger = LoggerFactory.getLogger(Skill.class);
 
+  private String id;
   private String name;
   private String description;
   private SkillType type;
@@ -28,7 +29,8 @@ public class Skill {
   @JsonCreator
   public Skill(
 //@formatter:off
-  @JsonProperty("name") String name
+  @JsonProperty("id") String id
+, @JsonProperty("name") String name
 , @JsonProperty("description") String description
 , @JsonProperty("type") SkillType type
 , @JsonProperty("requiredLevel") int requiredLevel
@@ -39,6 +41,7 @@ public class Skill {
 , @JsonProperty("buffDuration") int buffDuration
 //@formatter:off
       ) {
+    this.id = id;
     this.name = name;
     this.description = description;
     this.type = type;
@@ -49,7 +52,17 @@ public class Skill {
     this.healAmount = healAmount;
     this.buffDuration = buffDuration;
   }
+  /**
+   * 기존 생성자 (하위 호환성)
+   */
+  public Skill(String name, String description, SkillType type, int requiredLevel, 
+               int manaCost, int cooldown, double damageMultiplier, 
+               int healAmount, int buffDuration) {
+    this(null, name, description, type, requiredLevel, manaCost, cooldown, 
+         damageMultiplier, healAmount, buffDuration);
+  }
 
+  
   /**
    * 스킬을 사용합니다.
    * 
@@ -77,12 +90,12 @@ public class Skill {
         return new SkillResult(false, "알 수 없는 스킬 타입입니다.", GameConstants.NUMBER_ZERO);
     }
   }
-
   private SkillResult useAttackSkill(Player caster, Monster target) {
     int damage = (int) (caster.getAttack() * damageMultiplier);
     target.takeDamage(damage);
 
-    String message = String.format("%s이(가) %s을(를) 사용하여 %s에게 %d의 데미지를 입혔습니다!", caster.getName(), name, target.getName(), damage);
+    String message = String.format("%s이(가) %s을(를) 사용하여 %s에게 %d의 데미지를 입혔습니다!", 
+                                   caster.getName(), name, target.getName(), damage);
 
     logger.debug("공격 스킬 사용: {} -> {} (데미지: {})", name, target.getName(), damage);
     return new SkillResult(true, message, damage);
@@ -93,26 +106,30 @@ public class Skill {
     caster.heal(healAmount);
     int actualHeal = caster.getHp() - oldHp;
 
-    String message = String.format("%s이(가) %s을(를) 사용하여 %d HP를 회복했습니다!", caster.getName(), name, actualHeal);
+    String message = String.format("%s이(가) %s을(를) 사용하여 %d HP를 회복했습니다!", 
+                                   caster.getName(), name, actualHeal);
 
     logger.debug("힐 스킬 사용: {} (회복량: {})", name, actualHeal);
     return new SkillResult(true, message, actualHeal);
   }
 
   private SkillResult useBuffSkill(Player caster) {
-    // 버프 효과는 캐릭터의 버프 시스템에서 처리
-    String message = String.format("%s이(가) %s을(를) 사용했습니다!", caster.getName(), name);
+    String message = String.format("%s이(가) %s을(를) 사용했습니다! (%d턴 지속)", 
+                                   caster.getName(), name, buffDuration);
 
-    logger.debug("버프 스킬 사용: {}", name);
-    return new SkillResult(true, message, GameConstants.NUMBER_ZERO);
+    // TODO: 실제 버프 효과 적용 로직 구현
+    logger.debug("버프 스킬 사용: {} (지속시간: {}턴)", name, buffDuration);
+    return new SkillResult(true, message, 0);
   }
 
   private SkillResult useDebuffSkill(Monster target) {
-    String message = String.format("%s이(가) %s의 영향을 받았습니다!", target.getName(), name);
+    String message = String.format("%s에게 %s을(를) 사용했습니다!", target.getName(), name);
 
+    // TODO: 실제 디버프 효과 적용 로직 구현
     logger.debug("디버프 스킬 사용: {} -> {}", name, target.getName());
-    return new SkillResult(true, message, GameConstants.NUMBER_ZERO);
+    return new SkillResult(true, message, 0);
   }
+
 
   public String getSkillInfo() {
     StringBuilder info = new StringBuilder();
@@ -137,68 +154,105 @@ public class Skill {
 
     return info.toString();
   }
+//=== Getters and Setters ===
 
-  // Getters
-  public String getName() {
-    return name;
-  }
+ public String getId() {
+   return id;
+ }
 
-  public String getDescription() {
-    return description;
-  }
+ public void setId(String id) {
+   this.id = id;
+ }
 
-  public SkillType getType() {
-    return type;
-  }
+ public String getName() {
+   return name;
+ }
 
-  public int getRequiredLevel() {
-    return requiredLevel;
-  }
+ public void setName(String name) {
+   this.name = name;
+ }
 
-  public int getManaCost() {
-    return manaCost;
-  }
+ public String getDescription() {
+   return description;
+ }
 
-  public int getCooldown() {
-    return cooldown;
-  }
+ public void setDescription(String description) {
+   this.description = description;
+ }
 
-  public double getDamageMultiplier() {
-    return damageMultiplier;
-  }
+ public SkillType getType() {
+   return type;
+ }
 
-  public int getHealAmount() {
-    return healAmount;
-  }
+ public void setType(SkillType type) {
+   this.type = type;
+ }
 
-  public int getBuffDuration() {
-    return buffDuration;
-  }
+ public int getRequiredLevel() {
+   return requiredLevel;
+ }
 
-  /**
-   * 스킬 사용 결과를 나타내는 클래스
-   */
-  public static class SkillResult {
-    private final boolean success;
-    private final String message;
-    private final int value; // 데미지 또는 회복량
+ public void setRequiredLevel(int requiredLevel) {
+   this.requiredLevel = requiredLevel;
+ }
 
-    public SkillResult(boolean success, String message, int value) {
-      this.success = success;
-      this.message = message;
-      this.value = value;
-    }
+ public int getManaCost() {
+   return manaCost;
+ }
 
-    public boolean isSuccess() {
-      return success;
-    }
+ public void setManaCost(int manaCost) {
+   this.manaCost = manaCost;
+ }
 
-    public String getMessage() {
-      return message;
-    }
+ public int getCooldown() {
+   return cooldown;
+ }
 
-    public int getValue() {
-      return value;
-    }
-  }
+ public void setCooldown(int cooldown) {
+   this.cooldown = cooldown;
+ }
+
+ public double getDamageMultiplier() {
+   return damageMultiplier;
+ }
+
+ public void setDamageMultiplier(double damageMultiplier) {
+   this.damageMultiplier = damageMultiplier;
+ }
+
+ public int getHealAmount() {
+   return healAmount;
+ }
+
+ public void setHealAmount(int healAmount) {
+   this.healAmount = healAmount;
+ }
+
+ public int getBuffDuration() {
+   return buffDuration;
+ }
+
+ public void setBuffDuration(int buffDuration) {
+   this.buffDuration = buffDuration;
+ }
+
+ @Override
+ public String toString() {
+   return String.format("Skill{id='%s', name='%s', type=%s, level=%d, mana=%d}", 
+                        id, name, type, requiredLevel, manaCost);
+ }
+
+ @Override
+ public boolean equals(Object obj) {
+   if (this == obj) return true;
+   if (obj == null || getClass() != obj.getClass()) return false;
+   
+   Skill skill = (Skill) obj;
+   return id != null ? id.equals(skill.id) : name.equals(skill.name);
+ }
+
+ @Override
+ public int hashCode() {
+   return id != null ? id.hashCode() : name.hashCode();
+ }
 }
