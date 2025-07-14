@@ -59,9 +59,10 @@ public class Monster {
   /**
    * JSON 데이터를 포함한 확장 몬스터 생성자
    */
-  public Monster(String name, int hp, int attack, int expReward, int goldReward, MonsterData sourceData) {
+  public Monster(String id, String name, int hp, int attack, int expReward, int goldReward, MonsterData sourceData) {
     validateBasicFields(name, hp, attack, expReward, goldReward);
 
+    this.id = id;
     this.name = name.trim();
     this.hp = hp;
     this.maxHp = hp;
@@ -94,7 +95,7 @@ public class Monster {
     MonsterStats stats = data.getStats();
     MonsterRewards rewards = data.getRewards();
 
-    Monster monster = new Monster(data.getName(), stats.getHp(), stats.getAttack(), rewards.getExp(), rewards.getGold(), data // ⭐ sourceData로 전달하여 참조
+    Monster monster = new Monster(data.getId(), data.getName(), stats.getHp(), stats.getAttack(), rewards.getExp(), rewards.getGold(), data // ⭐ sourceData로 전달하여 참조
                                                                                                                               // 유지
     );
 

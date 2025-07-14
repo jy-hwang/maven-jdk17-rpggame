@@ -23,6 +23,7 @@ import rpg.domain.item.ItemRarity;
 import rpg.domain.item.effect.GameEffect;
 import rpg.domain.player.Player;
 import rpg.domain.quest.Quest;
+import rpg.domain.quest.Quest.QuestStatus;
 import rpg.domain.quest.QuestReward;
 
 /**@formatter:off
@@ -43,8 +44,8 @@ public class QuestManager {
 
   // 팩토리 인스턴스 - JsonBasedQuestFactory 사용
   private final GameItemFactory itemFactory;
-  private final JsonBasedQuestFactory jsonQuestFactory;  // 변경
-  private final GameQuestFactory gameQuestFactory;       // 동적 퀘스트용으로 유지
+  private final JsonBasedQuestFactory jsonQuestFactory; // 변경
+  private final GameQuestFactory gameQuestFactory; // 동적 퀘스트용으로 유지
 
   // 🆕 추가된 필드들
   private final ImprovedDailyQuestManager dailyQuestManager;
@@ -53,19 +54,19 @@ public class QuestManager {
 
   @JsonCreator
   public QuestManager() {
-      this.itemFactory = GameItemFactory.getInstance();
-      this.jsonQuestFactory = JsonBasedQuestFactory.getInstance();  // 추가
-      this.gameQuestFactory = GameQuestFactory.getInstance();       // 동적 퀘스트용
-      
-      this.availableQuests = new ArrayList<>();
-      this.activeQuests = new ArrayList<>();
-      this.completedQuests = new ArrayList<>();
-      this.claimedRewardIds = new ArrayList<>();
+    this.itemFactory = GameItemFactory.getInstance();
+    this.jsonQuestFactory = JsonBasedQuestFactory.getInstance(); // 추가
+    this.gameQuestFactory = GameQuestFactory.getInstance(); // 동적 퀘스트용
 
-      this.dailyQuestManager = new ImprovedDailyQuestManager();
-      this.questHistoryManager = new QuestHistoryManager();
-      initializeQuests();
-      logger.info("QuestManager 초기화 완료 (JsonBasedQuestFactory 사용)");
+    this.availableQuests = new ArrayList<>();
+    this.activeQuests = new ArrayList<>();
+    this.completedQuests = new ArrayList<>();
+    this.claimedRewardIds = new ArrayList<>();
+
+    this.dailyQuestManager = new ImprovedDailyQuestManager();
+    this.questHistoryManager = new QuestHistoryManager();
+    initializeQuests();
+    logger.info("QuestManager 초기화 완료 (JsonBasedQuestFactory 사용)");
   }
 
   // 로드 전용 생성자 (정적 팩토리 메서드)
@@ -266,11 +267,34 @@ public class QuestManager {
   // ==================== 기존 퀘스트 관리 메서드들 ====================
 
   /**
-   * 캐릭터가 수락할 수 있는 퀘스트 목록을 반환합니다.
+   * 레벨에 맞는 퀘스트만 반환
    */
-  public List<Quest> getAvailableQuests(Player character) {
-    return availableQuests.stream().filter(quest -> quest.getRequiredLevel() <= character.getLevel())
-        .filter(quest -> quest.getStatus() == Quest.QuestStatus.AVAILABLE).toList();
+  public List<Quest> getAvailableQuests(Player player) {
+    List<Quest> levelAppropriate = new ArrayList<>();
+
+    for (Quest quest : availableQuests) {
+      // 이미 완료했거나 진행중인 퀘스트는 제외
+      if (isQuestCompleted(quest.getId()) || isQuestActive(quest.getId())) {
+        continue;
+      }
+
+      // 레벨 조건 확인
+      if (quest.getRequiredLevel() <= player.getLevel()) {
+        levelAppropriate.add(quest);
+      }
+    }
+
+    return levelAppropriate;
+  }
+
+
+  // 헬퍼 메서드들
+  private boolean isQuestCompleted(String questId) {
+    return completedQuests.stream().anyMatch(q -> q.getId().equals(questId));
+  }
+
+  private boolean isQuestActive(String questId) {
+    return activeQuests.stream().anyMatch(q -> q.getId().equals(questId));
   }
 
   /**
@@ -290,45 +314,109 @@ public class QuestManager {
   }
 
   /**
-   * 몬스터 처치 시 관련 퀘스트 진행도를 업데이트합니다.
+   * 몬스터 처치 시 퀘스트 진행도 업데이트 - 수정된 버전
    */
-  public void updateKillProgress(String monsterName) {
-    String objectiveKey = "kill_" + monsterName;
+  public void updateKillProgress(String monsterId) {
+    // 정확한 몬스터 ID 사용
+    String objectiveKey = "kill_" + monsterId; // 예: "kill_FOREST_SLIME"
 
-    for (Quest quest : new ArrayList<>(activeQuests)) {
-      if (quest.getType() == Quest.QuestType.KILL && quest.updateProgress(objectiveKey, 1)) {
-        completeQuest(quest);
-        break;
-      }
-    }
-  }
+    logger.debug("몬스터 처치 진행도 업데이트 시도: {} -> {}", monsterId, objectiveKey);
 
-  /**
-   * 레벨업 퀘스트 진행도를 업데이트합니다.
-   */
-  public void updateLevelProgress(Player character) {
+    boolean progressUpdated = false;
     for (Quest quest : new ArrayList<>(activeQuests)) {
-      if (quest.getType() == Quest.QuestType.LEVEL) {
-        if (quest.updateProgress("reach_level", character.getLevel())) {
+      if (quest.getType() == Quest.QuestType.KILL) {
+        logger.debug("퀘스트 {} 목표 확인: {}", quest.getId(), quest.getObjectives().keySet());
+
+        if (quest.updateProgress(objectiveKey, 1)) {
           completeQuest(quest);
+          progressUpdated = true;
           break;
         }
       }
     }
+
+    if (!progressUpdated) {
+      logger.warn("몬스터 {} 처치에 대한 퀘스트를 찾을 수 없음. 목표 키: {}", monsterId, objectiveKey);
+      // 디버깅을 위해 현재 활성 퀘스트 목표들 출력
+      debugActiveQuestObjectives();
+    }
   }
 
   /**
-   * 아이템 수집 퀘스트 진행도를 업데이트합니다.
+   * 레벨업 시 퀘스트 진행도 업데이트 - 개선된 버전
    */
-  public void updateCollectionProgress(Player character, String itemName, int quantity) {
-    String objectiveKey = "collect_" + itemName;
+  public void updateLevelProgress(Player player) {
+      String objectiveKey = "reach_level";
+      int currentLevel = player.getLevel();
+      
+      logger.debug("레벨업 퀘스트 진행도 업데이트: 현재 레벨 {}", currentLevel);
+      
+      boolean anyQuestCompleted = false;
+      
+      // 활성 퀘스트 중 레벨 퀘스트 확인
+      for (Quest quest : new ArrayList<>(activeQuests)) {
+          if (quest.getType() == Quest.QuestType.LEVEL) {
+              logger.debug("레벨 퀘스트 {} 확인: 목표 {}", quest.getId(), quest.getObjectives());
+              
+              // 현재 레벨로 진행도 업데이트 (퀘스트 내부에서 목표 레벨과 비교)
+              if (quest.updateProgress(objectiveKey, currentLevel)) {
+                  completeQuest(quest);
+                  anyQuestCompleted = true;
+                  System.out.println("🎉 레벨업 퀘스트 완료: " + quest.getTitle());
+                  logger.info("레벨 퀘스트 완료: {} (레벨 {} 달성)", quest.getTitle(), currentLevel);
+              }
+          }
+      }
+      
+      if (!anyQuestCompleted) {
+          logger.debug("현재 레벨 {}에 해당하는 활성 레벨 퀘스트가 없음", currentLevel);
+      }
+  }
 
+  /**
+   * 아이템 수집 시 퀘스트 진행도 업데이트 - 수정된 버전
+   */
+  public void updateCollectionProgress(Player player, String itemId, int quantity) {
+    // 정확한 아이템 ID 사용
+    String objectiveKey = "collect_" + itemId; // 예: "collect_HEALTH_POTION"
+
+    logger.debug("아이템 수집 진행도 업데이트 시도: {} x{} -> {}", itemId, quantity, objectiveKey);
+
+    boolean progressUpdated = false;
     for (Quest quest : new ArrayList<>(activeQuests)) {
-      if (quest.getType() == Quest.QuestType.COLLECT && quest.updateProgress(objectiveKey, quantity)) {
-        completeQuest(quest);
-        break;
+      if (quest.getType() == Quest.QuestType.COLLECT) {
+        logger.debug("퀘스트 {} 목표 확인: {}", quest.getId(), quest.getObjectives().keySet());
+
+        if (quest.updateProgress(objectiveKey, quantity)) {
+          completeQuest(quest);
+          progressUpdated = true;
+          break;
+        }
       }
     }
+
+    if (!progressUpdated) {
+      logger.warn("아이템 {} 수집에 대한 퀘스트를 찾을 수 없음. 목표 키: {}", itemId, objectiveKey);
+      // 디버깅을 위해 현재 활성 퀘스트 목표들 출력
+      debugActiveQuestObjectives();
+    }
+  }
+
+
+  /**
+   * 디버깅용 - 현재 활성 퀘스트의 목표들 출력
+   */
+  private void debugActiveQuestObjectives() {
+    if (activeQuests.isEmpty()) {
+      logger.debug("현재 활성 퀘스트가 없음");
+      return;
+    }
+
+    logger.debug("=== 현재 활성 퀘스트 목표들 ===");
+    for (Quest quest : activeQuests) {
+      logger.debug("퀘스트 {}: {}", quest.getId(), quest.getObjectives().keySet());
+    }
+    logger.debug("===============================");
   }
 
   /**
@@ -337,8 +425,12 @@ public class QuestManager {
   private void completeQuest(Quest quest) {
     activeQuests.remove(quest);
     completedQuests.add(quest);
+    quest.setStatus(QuestStatus.COMPLETED);
+
     System.out.println("🎉 퀘스트 '" + quest.getTitle() + "'을(를) 완료했습니다!");
-    logger.info("퀘스트 완료: {}", quest.getTitle());
+    System.out.println("🎁 보상: " + quest.getReward().getRewardDescription());
+
+    logger.info("퀘스트 완료: {} ({})", quest.getTitle(), quest.getId());
   }
 
   // ==================== 동적 퀘스트 생성 시스템 ====================

@@ -3,6 +3,8 @@ package rpg.domain.quest;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import rpg.domain.item.GameItem;
@@ -13,6 +15,8 @@ import rpg.shared.constant.GameConstants;
  * 퀘스트를 나타내는 클래스 (QuestReward와 연동)
  */
 public class Quest {
+  private static final Logger logger = LoggerFactory.getLogger(Quest.class);
+
   private String id;
   private String title;
   private String description;
@@ -79,25 +83,43 @@ public class Quest {
    * @param progress 진행량
    * @return 퀘스트 완료 여부
    */
-  public boolean updateProgress(String objectiveKey, int progress) {
-    if (!objectives.containsKey(objectiveKey) || status != QuestStatus.ACTIVE) {
+  public boolean updateProgress(String objectiveKey, int value) {
+    if (!objectives.containsKey(objectiveKey)) {
+      logger.debug("퀘스트 {}에 목표 키 {}가 없음", this.id, objectiveKey);
       return false;
     }
 
-    int currentValue = currentProgress.getOrDefault(objectiveKey, 0);
     int targetValue = objectives.get(objectiveKey);
-    int newValue = Math.min(currentValue + progress, targetValue);
 
-    currentProgress.put(objectiveKey, newValue);
+    if (type == QuestType.LEVEL && objectiveKey.equals("reach_level")) {
+      // 레벨 퀘스트: 현재 레벨이 목표 레벨 이상인지 확인
+      currentProgress.put(objectiveKey, value);
 
-    // 모든 목표가 완료되었는지 확인
-    if (isCompleted()) {
-      this.status = QuestStatus.COMPLETED;
-      return true;
+      logger.debug("레벨 퀘스트 {} 진행도: 현재 레벨 {} vs 목표 레벨 {}", this.id, value, targetValue);
+
+      if (value >= targetValue) {
+        logger.info("레벨 퀘스트 {} 완료: 레벨 {} >= {}", this.id, value, targetValue);
+        setStatus(QuestStatus.COMPLETED);
+        return true;
+      }
+    } else {
+      // 기존 로직 (처치, 수집 등) - 누적
+      int currentValue = currentProgress.getOrDefault(objectiveKey, 0);
+      int newValue = currentValue + value;
+      currentProgress.put(objectiveKey, newValue);
+
+      logger.debug("퀘스트 {} 진행도: {} = {} + {} = {} (목표: {})", this.id, objectiveKey, currentValue, value, newValue, targetValue);
+
+      if (newValue >= targetValue && isCompleted()) {
+        setStatus(QuestStatus.COMPLETED);
+        return true;
+      }
     }
 
     return false;
   }
+
+
 
   /**
    * 퀘스트가 완료되었는지 확인합니다.

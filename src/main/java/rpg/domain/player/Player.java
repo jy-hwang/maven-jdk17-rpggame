@@ -132,12 +132,12 @@ public class Player {
   }
 
   /**
-   * 경험치를 획득하고 레벨업 여부를 반환합니다.
+   * 경험치를 획득하고 레벨업을 처리합니다. - 간단한 수정
    */
-  public boolean gainExp(int expGained) {
-    if (expGained < GameConstants.NUMBER_ZERO) {
-      logger.warn("음수 경험치 획득 시도: {}", expGained);
-      throw new IllegalArgumentException("경험치는 " + GameConstants.NUMBER_ZERO + " 이상이어야 합니다.");
+  public boolean gainExperience(int expGained) {
+    if (expGained <= 0) {
+      logger.warn("잘못된 경험치 획득 시도: {}", expGained);
+      return false;
     }
 
     int oldLevel = this.level;
@@ -150,12 +150,39 @@ public class Player {
       leveledUp = true;
     }
 
+    // 🔧 레벨업 시 퀘스트 진행도 업데이트 - 간단한 방법
+    if (leveledUp && questManager != null) {
+      logger.debug("레벨업 감지: {} -> {} - 퀘스트 진행도 업데이트", oldLevel, this.level);
+      questManager.updateLevelProgress(this);
+    }
+
     if (leveledUp) {
       logger.info("{} 레벨업: {} -> {}", name, oldLevel, this.level);
     }
 
     return leveledUp;
   }
+
+  /**
+   * 경험치 획득 메서드 (기존 gainExp가 있다면 이것을 수정)
+   */
+  public void gainExp(int expGained) {
+    int oldLevel = this.level;
+
+    // 기존 경험치 획득 로직
+    this.exp += expGained;
+
+    // 레벨업 처리
+    while (this.exp >= getExpRequiredForNextLevel()) {
+      levelUp();
+    }
+
+    // 🔧 레벨업 시 퀘스트 업데이트 추가
+    if (this.level > oldLevel && questManager != null) {
+      questManager.updateLevelProgress(this);
+    }
+  }
+
 
   /**
    * 다음 레벨까지 필요한 경험치를 반환합니다.

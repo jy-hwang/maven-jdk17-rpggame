@@ -332,7 +332,7 @@ public class BattleEngine {
     try {
       System.out.println("\n" + ConsoleColors.BOLD + ConsoleColors.BRIGHT_GREEN + "🏆 승리!" + ConsoleColors.RESET);
 
-      boolean levelUp = player.gainExp(monster.getExpReward());
+      boolean levelUp = player.gainExperience(monster.getExpReward());
       player.setGold(player.getGold() + monster.getGoldReward());
 
       // 보상 표시 (색상 적용)
@@ -347,11 +347,24 @@ public class BattleEngine {
       }
 
       // 게임 통계 업데이트
-      gameState.incrementMonstersKilled();
+      if (gameState != null) {
+        gameState.incrementMonstersKilled();
+      }
 
-      // 퀘스트 진행도 업데이트
+      // 🔧 퀘스트 진행도 업데이트 - 중요한 수정!
       if (questManager != null) {
-        questManager.updateKillProgress(monster.getName());
+        String monsterId = monster.getId(); // ← name 대신 ID 사용
+
+        if (monsterId != null && !monsterId.isEmpty()) {
+          questManager.updateKillProgress(monsterId);
+          logger.debug("몬스터 처치 퀘스트 업데이트: {} ({})", monster.getName(), monsterId);
+        } else {
+          logger.warn("몬스터 ID가 null이거나 비어있음: {}", monster.getName());
+          // 폴백: 이름 기반으로 시도 (호환성 유지)
+          questManager.updateKillProgress(monster.getName());
+        }
+      } else {
+        logger.warn("QuestManager가 null - 퀘스트 진행도 업데이트 불가");
       }
 
       // 아이템 드롭 (20% 확률)

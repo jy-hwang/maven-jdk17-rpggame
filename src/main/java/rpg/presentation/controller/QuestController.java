@@ -346,27 +346,20 @@ public class QuestController {
   }
 
   /**
-   * 몬스터 처치 퀘스트 진행도를 업데이트합니다.
-   * 
-   * @param monsterName 처치한 몬스터 이름
+   * 몬스터 처치 퀘스트 진행도 업데이트 - ID 기반으로 수정
    */
-  public void updateKillProgress(String monsterName) {
-    questManager.updateKillProgress(monsterName);
-    logger.debug("몬스터 처치 퀘스트 진행도 업데이트: {}", monsterName);
+  public void updateKillProgress(String monsterId) {  // ← 파라미터 이름도 변경
+      logger.debug("몬스터 처치 퀘스트 진행도 업데이트 요청: {}", monsterId);
+      questManager.updateKillProgress(monsterId);
   }
 
   /**
-   * 아이템 수집 퀘스트 진행도를 업데이트합니다.
-   * 
-   * @param player 플레이어 캐릭터
-   * @param itemName 획득한 아이템 이름
-   * @param quantity 획득 수량
+   * 아이템 수집 퀘스트 진행도 업데이트 - ID 기반으로 수정
    */
-  public void updateCollectionProgress(Player player, String itemName, int quantity) {
-    questManager.updateCollectionProgress(player, itemName, quantity);
-    logger.debug("아이템 수집 퀘스트 진행도 업데이트: {} x{}", itemName, quantity);
+  public void updateCollectionProgress(Player player, String itemId, int quantity) {  // ← 파라미터 이름도 변경
+      logger.debug("아이템 수집 퀘스트 진행도 업데이트 요청: {} x{}", itemId, quantity);
+      questManager.updateCollectionProgress(player, itemId, quantity);
   }
-
   /**
    * 레벨업 퀘스트 진행도를 업데이트합니다.
    * 
