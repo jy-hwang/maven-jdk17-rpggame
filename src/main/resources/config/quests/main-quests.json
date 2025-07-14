@@ -73,7 +73,7 @@
     "requiredLevel": 5,
     "category": "MAIN",
     "objectives": {
-      "kill_오크": 2
+      "kill_orc": 2
     },
     "reward": {
       "experience": 200,
@@ -107,7 +107,7 @@
     "requiredLevel": 8,
     "category": "MAIN",
     "objectives": {
-      "kill_드래곤": 1
+      "kill_dragon": 1
     },
     "reward": {
       "experience": 1000,
