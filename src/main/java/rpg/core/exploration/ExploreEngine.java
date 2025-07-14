@@ -132,7 +132,7 @@ public class ExploreEngine {
   }
 
   /**
-   * 보물 이벤트 처리
+   * 보물 이벤트 처리 - 아이템 ID 기반으로 수정
    */
   private ExploreResult handleTreasureEvent(Player player, LocationData location) {
     System.out.println("✨ " + location.getNameKo() + "에서 보물을 발견했습니다!");
@@ -142,12 +142,16 @@ public class ExploreEngine {
     GameItem treasure = GameItemFactory.getInstance().createRandomItemByRarity(rarity);
 
     if (treasure != null && inventoryController.addItem(player, treasure, 1)) {
+      // 🔧 보물 아이템도 ID 기반으로 퀘스트 업데이트
+      String itemId = treasure.getId(); // 예: "RARE_GEMSTONE"
+      questController.updateCollectionProgress(player, itemId, 1);
+
       String message = "보물 발견! " + treasure.getName() + " 획득!";
       System.out.println("🎁 " + treasure.getName() + "을(를) 획득했습니다!");
-      logger.info("보물 이벤트: {} -> {} ({})", player.getName(), treasure.getName(), location.getId());
+      logger.info("보물 이벤트: {} -> {} ({}) -> 퀘스트 진행도 업데이트", player.getName(), treasure.getName(), itemId);
       return new ExploreResult(ExploreResult.ResultType.TREASURE, message);
     } else {
-      return new ExploreResult(ExploreResult.ResultType.TREASURE, "보물을 발견했지만 인벤토리가 가득 참!");
+      return new ExploreResult(ExploreResult.ResultType.TREASURE, "보물을 발견했지만 인벤토리가 가득 찬!");
     }
   }
 
@@ -254,18 +258,29 @@ public class ExploreEngine {
   }
 
   /**
-   * 전투 결과 처리
+   * 전투 결과 처리 - 몬스터 ID 기반으로 수정
    */
   private ExploreResult processBattleResult(BattleEngine.BattleResult result, Player player, Monster monster, LocationData location) {
     String message = switch (result) {
       case VICTORY -> {
-        // 퀘스트 진행도 업데이트
-        questController.updateKillProgress(monster.getName());
+        // 🔧 중요한 수정: monster.getName() → monster.getId() 사용
+        String monsterId = monster.getId(); // 예: "FOREST_SLIME"
+
+        logger.debug("몬스터 처치: {} ({}) -> 퀘스트 진행도 업데이트", monster.getName(), monsterId);
+
+        // 퀘스트 진행도 업데이트 - ID 기반
+        questController.updateKillProgress(monsterId); // ← 여기가 핵심!
 
         // 몬스터 드롭 아이템 처리
         GameItem droppedItem = handleMonsterDrops(monster);
         if (droppedItem != null && inventoryController.addItem(player, droppedItem, 1)) {
+          // 🔧 아이템도 ID 기반으로 퀘스트 업데이트
+          String itemId = droppedItem.getId(); // 예: "SLIME_GEL"
+          questController.updateCollectionProgress(player, itemId, 1);
+
           System.out.println("🎁 " + droppedItem.getName() + "을(를) 획득했습니다!");
+          logger.debug("아이템 획득: {} ({}) -> 퀘스트 진행도 업데이트", droppedItem.getName(), itemId);
+
           yield "전투 승리! " + droppedItem.getName() + " 획득!";
         } else {
           yield "전투 승리!";
@@ -286,6 +301,7 @@ public class ExploreEngine {
     logger.debug("전투 결과: {} vs {} at {} ({})", player.getName(), monster.getName(), location.getNameKo(), result);
     return new ExploreResult(resultType, message);
   }
+
 
   /**
    * 가중치에 따른 몬스터 선택

@@ -278,81 +278,82 @@ public class ItemDataLoader {
       return createFallbackDropItem();
     }
   }
-
+  /**
+   * 소비 아이템 생성 (수정된 버전)
+   */
   private static GameConsumable createConsumableItem(GameItemData itemData) {
     try {
       // GameEffect 시스템 사용
       List<GameEffect> effects = GameEffectFactory.createEffects(itemData.getEffects());
 
-      int cooldown = 0;
-      Map<String, Object> properties = itemData.getProperties();
+      // 🆕 cooldown 정보 추출 (새로운 방식)
+      int cooldown = itemData.getCooldown();
 
-      // properties null 체크
-      if (properties != null && properties.containsKey("cooldown")) {
-        Object cooldownObj = properties.get("cooldown");
-        if (cooldownObj instanceof Integer) {
-          cooldown = (Integer) cooldownObj;
-        } else if (cooldownObj instanceof String) {
-          try {
-            cooldown = Integer.parseInt((String) cooldownObj);
-          } catch (NumberFormatException e) {
-            logger.warn("쿨다운 값 파싱 실패: {} - 기본값 0 사용", cooldownObj);
-          }
-        }
-      }
+      return new GameConsumable(
+          itemData.getId(),
+          itemData.getName(),
+          itemData.getDescription(),
+          itemData.getValue(),
+          itemData.getRarity(),
+          effects,
+          cooldown
+      );
 
-      return new GameConsumable(itemData.getId(), itemData.getName(), itemData.getDescription(), itemData.getValue(), itemData.getRarity(), effects,
-          cooldown);
     } catch (Exception e) {
       logger.error("소비 아이템 생성 실패: {}", itemData.getName(), e);
-
-      // 레거시 생성자로 폴백
-      int hpRestore = extractEffectValue(itemData, "HEAL_HP");
-      int mpRestore = extractEffectValue(itemData, "HEAL_MP");
-
-      @SuppressWarnings("deprecation")
-      GameConsumable fallback = new GameConsumable(itemData.getId(), itemData.getName(), itemData.getDescription(), itemData.getValue(),
-          itemData.getRarity(), hpRestore, mpRestore, 0, itemData.isStackable());
-
-      return fallback;
+      return createFallbackConsumableItem(itemData);
     }
   }
+ /**
+  * 장비 아이템 생성 (수정된 버전)
+  */
+ private static GameEquipment createEquipmentItem(GameItemData itemData) {
+   // 1. 장비 타입 결정
+   String equipTypeStr = itemData.getEquipmentType();
+   GameEquipment.EquipmentType equipType;
+   
+   try {
+     equipType = GameEquipment.EquipmentType.valueOf(equipTypeStr != null ? equipTypeStr.toUpperCase() : "WEAPON");
+   } catch (IllegalArgumentException e) {
+     logger.warn("잘못된 장비 타입: {} - WEAPON으로 대체", equipTypeStr);
+     equipType = GameEquipment.EquipmentType.WEAPON;
+   }
 
-  private static GameEquipment createEquipmentItem(GameItemData itemData) {
-    // null 체크 추가
-    Map<String, Object> properties = itemData.getProperties();
-    if (properties == null) {
-      logger.warn("아이템 속성이 null: {} - 기본값 사용", itemData.getName());
-      properties = new HashMap<>();
-    }
+   // 2. 🆕 스탯 정보 추출 (stats 필드 우선 사용)
+   Map<String, Integer> stats = itemData.getStats();
+   
+   // stats가 비어있거나 null이면 기존 방식 사용
+   if (stats.isEmpty()) {
+     // properties에서 stats 찾기 (기존 방식과 호환성 유지)
+     Map<String, Object> properties = itemData.getProperties();
+     if (properties != null && properties.containsKey("stats")) {
+       @SuppressWarnings("unchecked")
+       Map<String, Integer> legacyStats = (Map<String, Integer>) properties.get("stats");
+       if (legacyStats != null) {
+         stats = legacyStats;
+       }
+     }
+   }
+   
+   // 3. 스탯 값 추출
+   int attack = stats.getOrDefault("attack", itemData.getAttackBonus());
+   int defense = stats.getOrDefault("defense", itemData.getDefenseBonus());
+   int magic = stats.getOrDefault("magic", itemData.getMagicBonus());
 
-    // equipmentType과 stats 정보 추출 (null 안전)
-    String equipTypeStr = (String) properties.get("equipmentType");
-    GameEquipment.EquipmentType equipType;
+   // 4. GameEquipment 객체 생성
+   return new GameEquipment(
+       itemData.getId(),
+       itemData.getName(),
+       itemData.getDescription(),
+       itemData.getValue(),
+       itemData.getRarity(),
+       equipType,
+       attack,
+       defense,
+       magic // hpBonus 대신 magic 사용
+   );
+ }
 
-    try {
-      equipType = GameEquipment.EquipmentType.valueOf(equipTypeStr != null ? equipTypeStr : "WEAPON");
-    } catch (IllegalArgumentException e) {
-      logger.warn("잘못된 장비 타입: {} - WEAPON으로 대체", equipTypeStr);
-      equipType = GameEquipment.EquipmentType.WEAPON;
-    }
-
-    @SuppressWarnings("unchecked")
-    Map<String, Integer> stats = (Map<String, Integer>) properties.get("stats");
-
-    // stats가 null일 경우 기본값 사용
-    if (stats == null) {
-      logger.debug("아이템 스탯이 null: {} - 기본값 사용", itemData.getName());
-      stats = new HashMap<>();
-    }
-
-    int attack = stats.getOrDefault("attack", 0);
-    int defense = stats.getOrDefault("defense", 0);
-    int magic = stats.getOrDefault("magic", 0);
-
-    return new GameEquipment(itemData.getId(), itemData.getName(), itemData.getDescription(), itemData.getValue(), itemData.getRarity(), equipType,
-        attack, defense, magic);
-  }
 
   private static int extractEffectValue(GameItemData itemData, String effectType) {
     if (itemData == null || itemData.getEffects() == null || effectType == null) {
@@ -406,5 +407,24 @@ public class ItemDataLoader {
     logger.warn("폴백 드롭 아이템 생성");
     return new GameConsumable("HEALTH_POTION", "기본 물약", "HP를 50 회복합니다", 30, ItemRarity.COMMON, 50, 0, 0, true);
 
+  }
+
+  /**
+   * 폴백 소비 아이템 생성
+   */
+  @SuppressWarnings("deprecation")
+  private static GameConsumable createFallbackConsumableItem(GameItemData itemData) {
+    logger.warn("폴백 소비 아이템 생성: {}", itemData.getName());
+    return new GameConsumable(
+        itemData.getId(),
+        itemData.getName(),
+        itemData.getDescription(),
+        itemData.getValue(),
+        itemData.getRarity(),
+        50, // 기본 HP 회복
+        0,  // MP 회복 없음
+        0,  // 쿨다운 없음
+        true // 스택 가능
+    );
   }
 }

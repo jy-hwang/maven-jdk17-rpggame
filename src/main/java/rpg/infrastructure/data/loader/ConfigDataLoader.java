@@ -156,38 +156,6 @@ public class ConfigDataLoader {
   }
 
   /**
-   * 기본 물약 생성 (JSON 파일이 없을 때)
-   */
-  private static Map<String, GameItemData> createDefaultPotions() {
-    logger.info("기본 물약 데이터를 코드로 생성 중...");
-
-    try {
-      // HP 회복 물약
-      List<GameEffectData> hpEffect = List.of(new GameEffectData("HEAL_HP", 30));
-
-      // MP 회복 물약
-      List<GameEffectData> mpEffect = List.of(new GameEffectData("HEAL_MP", 20));
-
-      //@formatter:off
-      Map<String, GameItemData> defaultPotions = Map.of(
-          "SMALL_HEALTH_POTION", new GameItemData("HEALTH_POTION", "체력 물약", "HP를 30 회복합니다", "CONSUMABLE", 25, "COMMON", true, hpEffect, null, null, null, null, null),
-          "SMALL_MANA_POTION", new GameItemData("MANA_POTION", "마나 물약", "MP를 20 회복합니다", "CONSUMABLE", 30, "COMMON", true, mpEffect, null, null, null, null, null)
-          );
-      //@formatter:on
-      logger.info("기본 물약 생성 완료: {}개", defaultPotions.size());
-
-      // 생성된 기본 데이터도 검증
-      validateLoadedData(List.copyOf(defaultPotions.values()));
-
-      return defaultPotions;
-
-    } catch (Exception e) {
-      logger.error("기본 물약 생성 실패", e);
-      return Map.of(); // 빈 맵 반환
-    }
-  }
-
-  /**
    * 무기 데이터 로드
    */
   public static Map<String, GameItemData> loadBasicWeapons() {
@@ -273,61 +241,148 @@ public class ConfigDataLoader {
       return createDefaultAccessories();
     }
   }
-
   /**
-   * 기본 무기 생성 (JSON 파일이 없을 때)
+   * 기본 무기 생성 (JSON 파일이 없을 때) - 수정된 버전
    */
   private static Map<String, GameItemData> createDefaultWeapons() {
     logger.info("기본 무기 데이터를 코드로 생성 중...");
 
-    //@formatter:off
-    Map<String, GameItemData> defaultWeapons =
-        Map.of(
-            "WOODEN_SWORD", new GameItemData("WOODEN_SWORD", "나무 검", "초보자용 나무 검입니다", "WEAPON", 30, "COMMON", false, null, "WEAPON", 5, 0, 0, null),
-            "IRON_SWORD", new GameItemData("IRON_SWORD", "철 검", "날카로운 철로 만든 검입니다", "WEAPON", 100, "UNCOMMON", false, null, "WEAPON", 12, 0, 0, null),
-            "STEEL_SWORD", new GameItemData("STEEL_SWORD", "강철 검", "단단한 강철로 제련한 고급 검입니다", "WEAPON", 250, "RARE", false, null, "WEAPON", 20, 0, 0, null)
-            );
-    //@formatter:on
+    try {
+      // 🆕 stats 맵 생성
+      Map<String, Integer> woodenSwordStats = Map.of("attack", 5, "defense", 0, "magic", 0);
+      Map<String, Integer> ironSwordStats = Map.of("attack", 12, "defense", 0, "magic", 0);
+      Map<String, Integer> steelSwordStats = Map.of("attack", 20, "defense", 0, "magic", 0);
 
-    logger.info("기본 무기 생성 완료: {}개", defaultWeapons.size());
-    return defaultWeapons;
+      //@formatter:off
+      Map<String, GameItemData> defaultWeapons = Map.of(
+          "WOODEN_SWORD", new GameItemData(
+              "WOODEN_SWORD", "나무 검", "초보자용 나무 검입니다", "EQUIPMENT", 30, "COMMON", 
+              false, null, "WEAPON", 5, 0, 0, 
+              null, woodenSwordStats, null
+          ),
+          "IRON_SWORD", new GameItemData(
+              "IRON_SWORD", "철 검", "날카로운 철로 만든 검입니다", "EQUIPMENT", 100, "UNCOMMON", 
+              false, null, "WEAPON", 12, 0, 0, 
+              null, ironSwordStats, null
+          ),
+          "STEEL_SWORD", new GameItemData(
+              "STEEL_SWORD", "강철 검", "단단한 강철로 제련한 고급 검입니다", "EQUIPMENT", 250, "RARE", 
+              false, null, "WEAPON", 20, 0, 0, 
+              null, steelSwordStats, null
+          )
+      );
+      //@formatter:on
+
+      logger.info("기본 무기 생성 완료: {}개", defaultWeapons.size());
+      return defaultWeapons;
+      
+    } catch (Exception e) {
+      logger.error("기본 무기 생성 실패", e);
+      return new HashMap<>();
+    }
   }
 
   /**
-   * 기본 방어구 생성 (JSON 파일이 없을 때)
+   * 기본 방어구 생성 (JSON 파일이 없을 때) - 수정된 버전
    */
   private static Map<String, GameItemData> createDefaultArmors() {
     logger.info("기본 방어구 데이터를 코드로 생성 중...");
 
-    //@formatter:off
-    Map<String, GameItemData> defaultArmors =
-        Map.of(
-            "LEATHER_ARMOR", new GameItemData("LEATHER_ARMOR", "가죽 갑옷", "질긴 가죽으로 만든 갑옷입니다", "ARMOR", 60, "COMMON", false, null, "ARMOR", 0, 8, 20, null),
-            "CHAIN_MAIL", new GameItemData("CHAIN_MAIL", "사슬 갑옷", "쇠사슬로 엮어 만든 갑옷입니다", "ARMOR", 150, "UNCOMMON", false, null, "ARMOR", 0, 15, 25, null)
-            );
-    //@formatter:on
+    try {
+      // 🆕 stats 맵 생성
+      Map<String, Integer> leatherArmorStats = Map.of("attack", 0, "defense", 8, "magic", 5);
+      Map<String, Integer> chainMailStats = Map.of("attack", 0, "defense", 15, "magic", 8);
 
-    logger.info("기본 방어구 생성 완료: {}개", defaultArmors.size());
-    return defaultArmors;
+      //@formatter:off
+      Map<String, GameItemData> defaultArmors = Map.of(
+          "LEATHER_ARMOR", new GameItemData(
+              "LEATHER_ARMOR", "가죽 갑옷", "질긴 가죽으로 만든 갑옷입니다", "EQUIPMENT", 60, "COMMON", 
+              false, null, "ARMOR", 0, 8, 20, 
+              null, leatherArmorStats, null
+          ),
+          "CHAIN_MAIL", new GameItemData(
+              "CHAIN_MAIL", "사슬 갑옷", "쇠사슬로 엮어 만든 갑옷입니다", "EQUIPMENT", 150, "UNCOMMON", 
+              false, null, "ARMOR", 0, 15, 25, 
+              null, chainMailStats, null
+          )
+      );
+      //@formatter:on
+
+      logger.info("기본 방어구 생성 완료: {}개", defaultArmors.size());
+      return defaultArmors;
+      
+    } catch (Exception e) {
+      logger.error("기본 방어구 생성 실패", e);
+      return new HashMap<>();
+    }
   }
 
   /**
-   * 기본 액세서리 생성 (JSON 파일이 없을 때)
+   * 기본 액세서리 생성 (JSON 파일이 없을 때) - 수정된 버전
    */
   private static Map<String, GameItemData> createDefaultAccessories() {
     logger.info("기본 액세서리 데이터를 코드로 생성 중...");
 
-    //@formatter:off
-    Map<String, GameItemData> defaultAccessories =
-        Map.of(
-            "POWER_RING", new GameItemData("POWER_RING", "힘의 반지", "착용자의 공격력을 높여주는 마법의 반지입니다", "ACCESSORY", 200, "UNCOMMON", false, null, "ACCESSORY", 5, 0, 0, null)
-            );
-    //@formatter:on
+    try {
+      // 🆕 stats 맵 생성
+      Map<String, Integer> powerRingStats = Map.of("attack", 5, "defense", 0, "magic", 3);
 
-    logger.info("기본 액세서리 생성 완료: {}개", defaultAccessories.size());
-    return defaultAccessories;
+      //@formatter:off
+      Map<String, GameItemData> defaultAccessories = Map.of(
+          "POWER_RING", new GameItemData(
+              "POWER_RING", "힘의 반지", "착용자의 공격력을 높여주는 마법의 반지입니다", "EQUIPMENT", 200, "UNCOMMON", 
+              false, null, "ACCESSORY", 5, 0, 0, 
+              null, powerRingStats, null
+          )
+      );
+      //@formatter:on
+
+      logger.info("기본 액세서리 생성 완료: {}개", defaultAccessories.size());
+      return defaultAccessories;
+      
+    } catch (Exception e) {
+      logger.error("기본 액세서리 생성 실패", e);
+      return new HashMap<>();
+    }
   }
 
+  /**
+   * 기본 물약 생성 (JSON 파일이 없을 때) - 수정된 버전
+   */
+  private static Map<String, GameItemData> createDefaultPotions() {
+    logger.info("기본 물약 데이터를 코드로 생성 중...");
+
+    try {
+      // HP 회복 물약
+      List<GameEffectData> hpEffect = List.of(new GameEffectData("HEAL_HP", 30));
+      // MP 회복 물약
+      List<GameEffectData> mpEffect = List.of(new GameEffectData("HEAL_MP", 20));
+
+      //@formatter:off
+      Map<String, GameItemData> defaultPotions = Map.of(
+          "SMALL_HEALTH_POTION", new GameItemData(
+              "HEALTH_POTION", "체력 물약", "HP를 30 회복합니다", "CONSUMABLE", 25, "COMMON", 
+              true, hpEffect, null, null, null, null, 
+              0, null, null  // 🆕 cooldown 추가
+          ),
+          "SMALL_MANA_POTION", new GameItemData(
+              "MANA_POTION", "마나 물약", "MP를 20 회복합니다", "CONSUMABLE", 30, "COMMON", 
+              true, mpEffect, null, null, null, null, 
+              0, null, null  // 🆕 cooldown 추가
+          )
+      );
+      //@formatter:on
+      
+      logger.info("기본 물약 생성 완료: {}개", defaultPotions.size());
+      validateLoadedData(List.copyOf(defaultPotions.values()));
+      return defaultPotions;
+
+    } catch (Exception e) {
+      logger.error("기본 물약 생성 실패", e);
+      return Map.of(); // 빈 맵 반환
+    }
+  }
+  
   /**
    * 장비 데이터 검증
    */
