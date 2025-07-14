@@ -137,5 +137,20 @@
         "value": 100
       }
     ]
+  },
+  {
+    "id": "SPECIAL_POTION",
+    "name": "특별 물약",
+    "description": "경험치를 200 얻습니다",
+    "type": "CONSUMABLE",
+    "value": 200,
+    "rarity": "RARE",
+    "stackable": true,
+    "effects": [
+      {
+        "type": "GAIN_EXP",
+        "value": 200
+      }
+    ]
   }
 ]
