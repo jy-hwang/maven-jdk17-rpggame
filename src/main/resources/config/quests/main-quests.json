@@ -2,12 +2,12 @@
   {
     "id": "quest_001",
     "title": "슬라임 사냥꾼",
-    "description": "마을 근처의 슬라임 5마리를 처치하세요.",
+    "description": "마을 근처의 슬라임 3마리를 처치하세요.",
     "type": "KILL",
     "requiredLevel": 1,
     "category": "MAIN",
     "objectives": {
-      "kill_슬라임": 5
+      "kill_slime": 3
     },
     "reward": {
       "experience": 50,
@@ -21,20 +21,25 @@
       ]
     },
     "prerequisites": [],
-    "unlocks": ["quest_002"],
+    "unlocks": [
+      "quest_002"
+    ],
     "isRepeatable": false,
     "timeLimit": 0,
-    "tags": ["beginner", "combat"]
+    "tags": [
+      "beginner",
+      "combat"
+    ]
   },
   {
     "id": "quest_002",
     "title": "고블린 소탕",
-    "description": "위험한 고블린 3마리를 처치하세요.",
+    "description": "위험한 고블린 2마리를 처치하세요.",
     "type": "KILL",
-    "requiredLevel": 3,
+    "requiredLevel": 2,
     "category": "MAIN",
     "objectives": {
-      "kill_고블린": 3
+      "kill_forest_goblin": 2
     },
     "reward": {
       "experience": 100,
@@ -47,11 +52,18 @@
         }
       ]
     },
-    "prerequisites": ["quest_001"],
-    "unlocks": ["quest_003"],
+    "prerequisites": [
+      "quest_001"
+    ],
+    "unlocks": [
+      "quest_003"
+    ],
     "isRepeatable": false,
     "timeLimit": 0,
-    "tags": ["combat", "progression"]
+    "tags": [
+      "combat",
+      "progression"
+    ]
   },
   {
     "id": "quest_003",
@@ -74,11 +86,18 @@
         }
       ]
     },
-    "prerequisites": ["quest_002"],
-    "unlocks": ["quest_004"],
+    "prerequisites": [
+      "quest_002"
+    ],
+    "unlocks": [
+      "quest_004"
+    ],
     "isRepeatable": false,
     "timeLimit": 0,
-    "tags": ["combat", "challenging"]
+    "tags": [
+      "combat",
+      "challenging"
+    ]
   },
   {
     "id": "quest_004",
@@ -101,10 +120,16 @@
         }
       ]
     },
-    "prerequisites": ["quest_003"],
+    "prerequisites": [
+      "quest_003"
+    ],
     "unlocks": [],
     "isRepeatable": false,
     "timeLimit": 0,
-    "tags": ["boss", "legendary", "endgame"]
+    "tags": [
+      "boss",
+      "legendary",
+      "endgame"
+    ]
   }
 ]
