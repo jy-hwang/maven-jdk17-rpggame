@@ -17,8 +17,10 @@ import rpg.domain.item.GameItem;
 import rpg.domain.item.ItemRarity;
 import rpg.domain.item.effect.GameEffect;
 import rpg.domain.player.Player;
+import rpg.domain.shop.ShopEvent;
 import rpg.domain.shop.ShopItem;
 import rpg.domain.shop.ShopItemCategory;
+import rpg.presentation.menu.ShopMenu;
 import rpg.shared.constant.GameConstants;
 import rpg.shared.constant.ItemConstants;
 
@@ -37,7 +39,7 @@ public class ShopController {
   private final InventoryController inventoryController;
   private final GameItemFactory itemFactory;
   private final Random random;
-
+  private final ShopMenu shopMenu;
 
   private boolean currentEventActive = false;
   private ShopEvent currentEvent = null;
@@ -47,6 +49,7 @@ public class ShopController {
     this.itemFactory = GameItemFactory.getInstance();
     this.shopItems = new ArrayList<>();
     this.random = new Random();
+    this.shopMenu = new ShopMenu();
     initializeShopItems();
     logger.debug("ShopController 초기화 완료 (GameItemFactory 통합)");
   }
@@ -251,24 +254,31 @@ public class ShopController {
    * 상점 메인 메뉴를 표시합니다.
    */
   private void displayShopMenuMain(Player player) {
-    System.out.println("\n🏪 === 마을 상점 ===");
-    System.out.println("💰 보유 골드: " + player.getGold());
-
-    // GameItemFactory 상태 표시
-    System.out.println("📦 상품 종류: " + shopItems.size() + "개 (팩토리 기반)");
-
-    // 이벤트가 활성화되어 있으면 표시
-    if (currentEventActive && currentEvent != null) {
-      displayActiveEventInfo();
-    }
-
-    System.out.println();
-    System.out.println("1. 🛒 아이템 사기");
-    System.out.println("2. 💰 아이템 팔기");
-    System.out.println("3. 📊 판매 시세 확인");
-    System.out.println("4. 📈 상점 통계");
-    System.out.println("5. 🚪 상점 나가기");
-    System.out.println("====================");
+    
+//    System.out.println("\n🏪 === 마을 상점 ===");
+//    System.out.println("💰 보유 골드: " + player.getGold());
+//
+//    // GameItemFactory 상태 표시
+//    System.out.println("📦 상품 종류: " + shopItems.size() + "개 (팩토리 기반)");
+//
+//    // 이벤트가 활성화되어 있으면 표시
+//    if (currentEventActive && currentEvent != null) {
+//      displayActiveEventInfo();
+//    }
+//
+//    System.out.println();
+//    System.out.println("1. 🛒 아이템 사기");
+//    System.out.println("2. 💰 아이템 팔기");
+//    System.out.println("3. 📊 판매 시세 확인");
+//    System.out.println("4. 📈 상점 통계");
+//    System.out.println("5. 🚪 상점 나가기");
+//    System.out.println("====================");
+    //boolean hasEvent = true;
+    
+    shopMenu.displayShopMenuMain(player, shopItems.size(), currentEventActive, currentEvent); 
+      
+      
+    
   }
 
   /**
@@ -715,6 +725,7 @@ public class ShopController {
    * 랜덤 이벤트를 발생시킵니다.
    */
   private void triggerRandomEvent() {
+    logger.info("triggerRandomEvent() executed");
     ShopEvent[] events = ShopEvent.values();
     currentEvent = events[random.nextInt(events.length)];
     currentEventActive = true;
@@ -753,18 +764,7 @@ public class ShopController {
     InputValidator.waitForAnyKey("계속하려면 Enter를 누르세요...");
   }
 
-  /**
-   * 활성화된 이벤트 정보를 표시합니다.
-   */
-  private void displayActiveEventInfo() {
-    System.out.println("\n🎉 현재 진행 중인 이벤트:");
-    switch (currentEvent) {
-      case DISCOUNT_SALE -> System.out.println("🏷️ 할인 세일 (20% 할인)");
-      case BONUS_SELL -> System.out.println("💰 고가 매입 (30% 보너스)");
-      case FREE_POTION -> System.out.println("🎁 무료 체력 물약 (미수령)");
-      case RARE_ITEMS -> System.out.println("⭐ 희귀 아이템 특별 판매");
-    }
-  }
+
 
   /**
    * 이벤트 할인을 적용합니다.
@@ -1250,57 +1250,6 @@ public class ShopController {
     }
 
     return effects.length() > 0 ? effects.toString().trim() : "특별한 효과 없음";
-  }
-
-  // ==================== 이벤트 열거형 ====================
-
-  /**
-   * 상점 이벤트 타입
-   */
-  public enum ShopEvent {
-    DISCOUNT_SALE("할인 세일", "모든 아이템 20% 할인"), BONUS_SELL("고가 매입", "판매 시 30% 보너스 지급"), FREE_POTION("무료 증정", "체력 물약 무료 증정"), RARE_ITEMS("희귀 아이템",
-        "특별한 아이템 판매");
-
-    private final String name;
-    private final String description;
-
-    ShopEvent(String name, String description) {
-      this.name = name;
-      this.description = description;
-    }
-
-    public String getName() {
-      return name;
-    }
-
-    public String getDescription() {
-      return description;
-    }
-
-    public boolean isBuyEvent() {
-      return this == DISCOUNT_SALE || this == FREE_POTION || this == RARE_ITEMS;
-    }
-
-    public boolean isSellEvent() {
-      return this == BONUS_SELL;
-    }
-
-    public double getDiscountPercent() {
-      return this == DISCOUNT_SALE ? 20.0 : 0.0;
-    }
-
-    public int applySellBonus(int originalPrice) {
-      return this == BONUS_SELL ? (int) (originalPrice * 1.3) : originalPrice;
-    }
-
-    public String getDetailedInfo() {
-      return switch (this) {
-        case DISCOUNT_SALE -> "🏷️ " + name + ": " + description + "\n모든 상품을 저렴하게 구매하실 수 있습니다!";
-        case BONUS_SELL -> "💰 " + name + ": " + description + "\n아이템을 평소보다 비싸게 판매하실 수 있습니다!";
-        case FREE_POTION -> "🎁 " + name + ": " + description + "\n체력 물약 구매 시 1개를 추가로 드립니다!";
-        case RARE_ITEMS -> "⭐ " + name + ": " + description + "\n평소에 볼 수 없는 특별한 아이템들을 만나보세요!";
-      };
-    }
   }
 
   // ==================== Getters ====================

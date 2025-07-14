@@ -2,6 +2,8 @@ package rpg.domain.quest;
 
 import java.util.List;
 import java.util.Map;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class QuestTemplateData {
   private String id;
@@ -23,6 +25,44 @@ public class QuestTemplateData {
   // 기본 생성자
   public QuestTemplateData() {}
 
+//JsonCreator 생성자 추가
+ @JsonCreator
+ public QuestTemplateData(
+//@formatter:off
+ @JsonProperty("id") String id
+ , @JsonProperty("title") String title
+ , @JsonProperty("description") String description
+ , @JsonProperty("type") String type
+ , @JsonProperty("requiredLevel") Integer requiredLevel
+ , @JsonProperty("category") String category
+ , @JsonProperty("objectives") Map<String, Integer> objectives
+ , @JsonProperty("reward") QuestRewardData reward
+ , @JsonProperty("prerequisites") List<String> prerequisites
+ , @JsonProperty("unlocks") List<String> unlocks
+ , @JsonProperty("isRepeatable") Boolean isRepeatable
+ , @JsonProperty("timeLimit") Integer timeLimit
+ , @JsonProperty("tags") List<String> tags
+ , @JsonProperty("variableTargets") List<String> variableTargets
+ , @JsonProperty("variableQuantity") VariableQuantity variableQuantity
+//@formatter:on
+ ) {
+   this.id = id;
+   this.title = title;
+   this.description = description;
+   this.type = type;
+   this.requiredLevel = requiredLevel != null ? requiredLevel : 1;
+   this.category = category;
+   this.objectives = objectives;
+   this.reward = reward;
+   this.prerequisites = prerequisites;
+   this.unlocks = unlocks;
+   this.isRepeatable = isRepeatable != null ? isRepeatable : false;
+   this.timeLimit = timeLimit != null ? timeLimit : 0;
+   this.tags = tags;
+   this.variableTargets = variableTargets;
+   this.variableQuantity = variableQuantity;
+ }
+  
   // Getters and Setters
   public String getId() {
     return id;
