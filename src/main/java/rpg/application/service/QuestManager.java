@@ -7,12 +7,14 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import rpg.application.factory.GameEffectFactory;
 import rpg.application.factory.GameItemFactory;
 import rpg.application.factory.GameQuestFactory;
+import rpg.application.factory.JsonBasedQuestFactory;
 import rpg.application.service.ImprovedDailyQuestManager.QuestTier;
 import rpg.domain.item.GameConsumable;
 import rpg.domain.item.GameEquipment;
@@ -39,10 +41,10 @@ public class QuestManager {
 
   private List<String> claimedRewardIds; // 보상 수령한 퀘스트 ID 목록
 
-  // 팩토리 인스턴스
+  // 팩토리 인스턴스 - JsonBasedQuestFactory 사용
   private final GameItemFactory itemFactory;
-
-  private final GameQuestFactory gameQuestFactory;
+  private final JsonBasedQuestFactory jsonQuestFactory;  // 변경
+  private final GameQuestFactory gameQuestFactory;       // 동적 퀘스트용으로 유지
 
   // 🆕 추가된 필드들
   private final ImprovedDailyQuestManager dailyQuestManager;
@@ -51,17 +53,19 @@ public class QuestManager {
 
   @JsonCreator
   public QuestManager() {
-    this.gameQuestFactory = GameQuestFactory.getInstance();
-    this.itemFactory = GameItemFactory.getInstance();
-    this.availableQuests = new ArrayList<>();
-    this.activeQuests = new ArrayList<>();
-    this.completedQuests = new ArrayList<>();
-    this.claimedRewardIds = new ArrayList<>();
+      this.itemFactory = GameItemFactory.getInstance();
+      this.jsonQuestFactory = JsonBasedQuestFactory.getInstance();  // 추가
+      this.gameQuestFactory = GameQuestFactory.getInstance();       // 동적 퀘스트용
+      
+      this.availableQuests = new ArrayList<>();
+      this.activeQuests = new ArrayList<>();
+      this.completedQuests = new ArrayList<>();
+      this.claimedRewardIds = new ArrayList<>();
 
-    this.dailyQuestManager = new ImprovedDailyQuestManager();
-    this.questHistoryManager = new QuestHistoryManager();
-    initializeQuests();
-    logger.info("QuestManager 초기화 완료 (GameItemFactory 통합)");
+      this.dailyQuestManager = new ImprovedDailyQuestManager();
+      this.questHistoryManager = new QuestHistoryManager();
+      initializeQuests();
+      logger.info("QuestManager 초기화 완료 (JsonBasedQuestFactory 사용)");
   }
 
   // 로드 전용 생성자 (정적 팩토리 메서드)
@@ -77,24 +81,32 @@ public class QuestManager {
     return questManager;
   }
 
-  /**
-   * 기본 퀘스트들을 초기화합니다.
-   */
+  // ==== 1. initializeQuests() 메서드 수정 ====
   private void initializeQuests() {
-    logger.info("퀘스트 초기화 중... (팩토리 기반 보상 시스템)");
+    logger.info("퀘스트 초기화 중... (JSON 템플릿 기반)");
 
     try {
-      // 기본 퀘스트들을 팩토리에서 생성
-      List<String> basicQuestIds = List.of("quest_001", // 슬라임 사냥꾼
-          "quest_002", // 고블린 소탕
-          "quest_003", // 오크 토벌
-          "quest_004", // 드래곤 슬레이어
-          "quest_005", // 성장하는 모험가
-          "quest_006" // 물약 수집가
+      // JSON 파일의 모든 퀘스트 ID 로드
+      List<String> allQuestIds = List.of(
+          // 메인 퀘스트
+          "quest_001", // 슬라임 사냥꾼 (JSON: 슬라임 3마리)
+          "quest_002", // 고블린 소탕 (JSON: 고블린 2마리)
+          "quest_003", // 오크 토벌 (JSON: 오크 2마리)
+          "quest_004", // 드래곤 슬레이어 (JSON: 드래곤 1마리)
+
+          // 사이드 퀘스트
+          "quest_005", // 물약 수집가 (JSON: 체력 물약 2개)
+          "quest_006", // 보물 사냥꾼 (JSON: 보물 상자 1개)
+          "quest_007", // 던전 마스터 (JSON: 다양한 몬스터)
+          "quest_008", // 성장하는 모험가1 (JSON: 레벨 3)
+          "quest_009", // 성장하는 모험가2 (JSON: 레벨 5)
+          "quest_010", // 성장하는 모험가3 (JSON: 레벨 8)
+          "quest_011", // 성장하는 모험가4 (JSON: 레벨 11)
+          "quest_012" // 성장하는 모험가5 (JSON: 레벨 15)
       );
 
-      for (String questId : basicQuestIds) {
-        Quest quest = gameQuestFactory.createQuest(questId);
+      for (String questId : allQuestIds) {
+        Quest quest = jsonQuestFactory.createQuest(questId);
         if (quest != null) {
           availableQuests.add(quest);
           logger.debug("퀘스트 생성 완료: {} - {}", questId, quest.getTitle());
@@ -102,9 +114,6 @@ public class QuestManager {
           logger.warn("퀘스트 생성 실패: {}", questId);
         }
       }
-
-      // 일일 퀘스트 몇 개 추가
-      addDailyQuests();
 
       logger.info("퀘스트 초기화 완료: {}개 퀘스트 생성", availableQuests.size());
 
@@ -114,15 +123,6 @@ public class QuestManager {
     }
   }
 
-  /**
-   * 일일 퀘스트 추가
-   */
-  @Deprecated
-  private void addDailyQuests() {
-    // 더 이상 사용하지 않음 - generateDailyQuests가 모든 것을 처리
-    logger.debug("addDailyQuests는 더 이상 사용되지 않음 - generateDailyQuests 사용");
-
-  }
 
   /**
    * 플레이어 레벨에 맞는 동적 퀘스트 생성
@@ -148,108 +148,9 @@ public class QuestManager {
   }
 
   /**
-   * 기본 퀘스트만 초기화 (중복 방지용)
-   */
-  private void initializeDefaultQuestsOnly() {
-    logger.info("기본 퀘스트만 초기화 중...");
-
-    try {
-      // 최소한의 기본 퀘스트만 생성
-      createSlimeQuest();
-      createLevelQuest();
-
-      logger.info("기본 퀘스트 초기화 완료: {}개 퀘스트", availableQuests.size());
-
-    } catch (Exception e) {
-      logger.error("기본 퀘스트 초기화 실패", e);
-      createFallbackQuests();
-    }
-  }
-
-
-  /**
-   * 슬라임 사냥 퀘스트 생성
-   */
-  private void createSlimeQuest() {
-    Map<String, Integer> slimeObjectives = new HashMap<>();
-    slimeObjectives.put("kill_슬라임", 5);
-
-    // GameItemFactory에서 체력 물약 가져오기
-    GameItem healthPotion = itemFactory.createItem("HEALTH_POTION");
-
-    QuestReward slimeReward;
-    if (healthPotion != null) {
-      slimeReward = new QuestReward(50, 100, healthPotion, 2);
-      logger.debug("슬라임 퀘스트 보상: 팩토리에서 체력 물약 생성");
-    } else {
-      // 팩토리에서 실패 시 GameEffectFactory로 생성
-      slimeReward = createFallbackConsumableReward("HEALTH_POTION", "체력 물약", "HP를 50 회복", 50, 2);
-      logger.debug("슬라임 퀘스트 보상: GameEffectFactory로 폴백 생성");
-    }
-
-    Quest slimeQuest = new Quest("quest_001", "슬라임 사냥꾼", "마을 근처의 슬라임 5마리를 처치하세요.", Quest.QuestType.KILL, 1, slimeObjectives, slimeReward);
-
-    availableQuests.add(slimeQuest);
-  }
-
-  /**
-   * 고블린 소탕 퀘스트 생성
-   */
-  private void createGoblinQuest() {
-    Map<String, Integer> goblinObjectives = new HashMap<>();
-    goblinObjectives.put("kill_고블린", 3);
-
-    // 철검 보상 (GameEffectFactory 기반 또는 직접 생성)
-    GameEquipment ironSword = createSpecialEquipment("MAGIC_IRON_SWORD", "마법 철검", "슬라임을 처치하며 단련된 마법의 철검", 100, ItemRarity.UNCOMMON,
-        GameEquipment.EquipmentType.WEAPON, 15, 0, 0);
-
-    QuestReward goblinReward = new QuestReward(100, 200, ironSword, 1);
-
-    Quest goblinQuest = new Quest("quest_002", "고블린 소탕", "위험한 고블린 3마리를 처치하세요.", Quest.QuestType.KILL, 3, goblinObjectives, goblinReward);
-
-    availableQuests.add(goblinQuest);
-  }
-
-  /**
-   * 오크 토벌 퀘스트 생성
-   */
-  private void createOrcQuest() {
-    Map<String, Integer> orcObjectives = new HashMap<>();
-    orcObjectives.put("kill_오크", 2);
-
-    // 판금 갑옷 보상
-    GameEquipment plateArmor = createSpecialEquipment("RARE_PLATE_ARMOR", "용사의 판금 갑옷", "오크와 싸우기 위해 특별히 제작된 갑옷", 200, ItemRarity.RARE,
-        GameEquipment.EquipmentType.ARMOR, 0, 20, 50);
-
-    QuestReward orcReward = new QuestReward(200, 500, plateArmor, 1);
-
-    Quest orcQuest = new Quest("quest_003", "오크 토벌", "강력한 오크 2마리를 처치하세요.", Quest.QuestType.KILL, 5, orcObjectives, orcReward);
-
-    availableQuests.add(orcQuest);
-  }
-
-  /**
-   * 드래곤 슬레이어 퀘스트 생성
-   */
-  private void createDragonQuest() {
-    Map<String, Integer> dragonObjectives = new HashMap<>();
-    dragonObjectives.put("kill_드래곤", 1);
-
-    // 전설의 드래곤 반지
-    GameEquipment legendaryRing = createSpecialEquipment("DRAGON_HEART_RING", "드래곤 하트 링", "드래곤의 심장으로 만든 전설적인 반지", 1000, ItemRarity.LEGENDARY,
-        GameEquipment.EquipmentType.ACCESSORY, 30, 15, 100);
-
-    QuestReward dragonReward = new QuestReward(1000, 2000, legendaryRing, 1);
-
-    Quest dragonQuest = new Quest("quest_004", "드래곤 슬레이어", "전설의 드래곤을 처치하고 영웅이 되세요!", Quest.QuestType.KILL, 8, dragonObjectives, dragonReward);
-
-    availableQuests.add(dragonQuest);
-  }
-
-  /**
    * 레벨업 퀘스트 생성
    */
-  private void createLevelQuest() {
+  private void createBasicLevelQuest() {
     Map<String, Integer> levelObjectives = new HashMap<>();
     levelObjectives.put("reach_level", 5);
 
@@ -278,24 +179,6 @@ public class QuestManager {
     Quest levelQuest = new Quest("quest_005", "성장하는 모험가", "레벨 5에 도달하세요.", Quest.QuestType.LEVEL, 1, levelObjectives, levelReward);
 
     availableQuests.add(levelQuest);
-  }
-
-  /**
-   * 수집 퀘스트 생성 (새로운 퀘스트 타입)
-   */
-  private void createCollectionQuest() {
-    Map<String, Integer> collectionObjectives = new HashMap<>();
-    collectionObjectives.put("collect_체력 물약", 5);
-
-    // 특별 보상: 복합 효과 물약
-    GameConsumable specialPotion = createSpecialPotion("ADVENTURER_POTION", "모험가의 물약", "HP와 MP를 동시에 회복하고 약간의 경험치를 얻는 특별한 물약", 150, ItemRarity.RARE,
-        List.of(GameEffectFactory.createHealHpEffect(100), GameEffectFactory.createHealMpEffect(100), GameEffectFactory.createGainExpEffect(200)));
-
-    QuestReward collectionReward = new QuestReward(150, 100, specialPotion, 1);
-
-    Quest collectionQuest = new Quest("quest_006", "물약 수집가", "체력 물약 5개를 수집하세요.", Quest.QuestType.COLLECT, 3, collectionObjectives, collectionReward);
-
-    availableQuests.add(collectionQuest);
   }
 
   /**
@@ -351,37 +234,33 @@ public class QuestManager {
     }
   }
 
-  /**
-   * 폴백용 보상 생성
-   */
-  private QuestReward createFallbackConsumableReward(String id, String name, String description, int healAmount, int quantity) {
-    GameConsumable item = createFallbackConsumableItem(id, name, description, healAmount);
-    return new QuestReward(50, 100, item, quantity);
-  }
 
-  /**
-   * 폴백 퀘스트들 생성 (초기화 실패 시)
-   */
+  // ==== 2. 기존 하드코딩 메서드들 제거 또는 폴백용으로 이동 ====
   private void createFallbackQuests() {
     logger.warn("폴백 퀘스트 생성 중...");
 
-    try {
-      // 간단한 기본 퀘스트
-      Map<String, Integer> basicObjectives = new HashMap<>();
-      basicObjectives.put("kill_슬라임", 3);
+    // 최소한의 기본 퀘스트만 생성
+    createBasicSlimeQuest();
+    createBasicLevelQuest();
 
-      GameConsumable basicPotion = createFallbackConsumableItem("SMALL_HEALTH_POTION", "작은 체력 물약", "HP를 30 회복", 30);
-      QuestReward basicReward = new QuestReward(25, 50, basicPotion, 1);
+    logger.info("폴백 퀘스트 생성 완료: {}개", availableQuests.size());
+  }
 
-      Quest basicQuest = new Quest("quest_basic", "기본 퀘스트", "슬라임 3마리를 처치하세요.", Quest.QuestType.KILL, 1, basicObjectives, basicReward);
+  private void createBasicSlimeQuest() {
+    Map<String, Integer> objectives = new HashMap<>();
+    objectives.put("kill_slime", 3); // JSON과 일치하도록 수정
 
-      availableQuests.add(basicQuest);
-      logger.info("폴백 퀘스트 1개 생성");
+    QuestReward reward = new QuestReward(50, 100);
 
-    } catch (Exception e) {
-      logger.error("폴백 퀘스트 생성도 실패", e);
-      logger.warn("퀘스트 없이 시작합니다.");
+    // 체력 물약 2개 보상 (JSON과 일치)
+    GameItem healthPotion = itemFactory.createItem("HEALTH_POTION");
+    if (healthPotion != null) {
+      reward.addItemReward(healthPotion, 2);
     }
+
+    Quest quest = new Quest("quest_001", "슬라임 사냥꾼", "마을 근처의 슬라임 3마리를 처치하세요.", Quest.QuestType.KILL, 1, objectives, reward);
+
+    availableQuests.add(quest);
   }
 
   // ==================== 기존 퀘스트 관리 메서드들 ====================
@@ -464,88 +343,15 @@ public class QuestManager {
 
   // ==================== 동적 퀘스트 생성 시스템 ====================
 
-  /**
-   * 플레이어 레벨에 맞는 새로운 퀘스트 생성
-   */
-  public void generateQuestForLevel(int level) {
-    logger.info("레벨 {}에 맞는 퀘스트 생성 중...", level);
-
-    try {
-      if (level == 10) {
-        createAdvancedCollectionQuest();
-      } else if (level == 15) {
-        createEliteMonsterQuest();
-      } else if (level >= 20) {
-        createEndgameQuest(level);
-      }
-    } catch (Exception e) {
-      logger.error("동적 퀘스트 생성 실패 (레벨: {})", level, e);
+  private void generateQuestForLevel(int level) {
+    // JSON 템플릿에 없는 동적 퀘스트만 생성
+    Quest dynamicQuest = gameQuestFactory.createLevelAppropriateQuest(level);
+    if (dynamicQuest != null) {
+      availableQuests.add(dynamicQuest);
+      logger.info("동적 퀘스트 생성: {} (레벨: {})", dynamicQuest.getTitle(), level);
     }
   }
 
-  /**
-   * 고급 수집 퀘스트 생성
-   */
-  private void createAdvancedCollectionQuest() {
-    Map<String, Integer> objectives = new HashMap<>();
-    objectives.put("collect_큰 체력 물약", 3);
-    objectives.put("collect_마나 물약", 5);
-
-    // 특별 보상: 경험치 증가 물약
-    List<GameEffect> expPotionEffects = List.of(GameEffectFactory.createGainExpEffect(100), GameEffectFactory.createHealHpEffect(50));
-
-    GameConsumable expPotion = createSpecialPotion("EXPERIENCE_POTION", "경험의 영약", "경험치를 대량으로 획득하는 특별한 물약", 200, ItemRarity.EPIC, expPotionEffects);
-
-    QuestReward reward = new QuestReward(300, 200, expPotion, 2);
-
-    Quest advancedQuest =
-        new Quest("quest_advanced_collection", "고급 연금술사", "다양한 물약을 수집하여 연금술 실력을 증명하세요.", Quest.QuestType.COLLECT, 10, objectives, reward);
-
-    availableQuests.add(advancedQuest);
-    logger.info("고급 수집 퀘스트 생성: {}", advancedQuest.getTitle());
-  }
-
-  /**
-   * 엘리트 몬스터 퀘스트 생성
-   */
-  private void createEliteMonsterQuest() {
-    Map<String, Integer> objectives = new HashMap<>();
-    objectives.put("kill_트롤", 1);
-    objectives.put("kill_스켈레톤", 3);
-
-    GameEquipment eliteWeapon = createSpecialEquipment("ELITE_KILLER", "엘리트 킬러", "엘리트 몬스터를 사냥하기 위한 특수 무기", 400, ItemRarity.EPIC,
-        GameEquipment.EquipmentType.WEAPON, 25, 5, 20);
-
-    QuestReward reward = new QuestReward(500, 800, eliteWeapon, 1);
-
-    Quest eliteQuest = new Quest("quest_elite_hunter", "엘리트 헌터", "강력한 엘리트 몬스터들을 처치하세요.", Quest.QuestType.KILL, 15, objectives, reward);
-
-    availableQuests.add(eliteQuest);
-    logger.info("엘리트 몬스터 퀘스트 생성: {}", eliteQuest.getTitle());
-  }
-
-  /**
-   * 엔드게임 퀘스트 생성
-   */
-  private void createEndgameQuest(int level) {
-    Map<String, Integer> objectives = new HashMap<>();
-    objectives.put("kill_드래곤", 1);
-    objectives.put("reach_level", level + 5);
-
-    // 최고급 보상들
-    QuestReward reward = new QuestReward(1000, 2000);
-
-    // 여러 아이템 보상
-    GameEquipment ultimateWeapon = createSpecialEquipment("DRAGON_SLAYER", "드래곤 슬레이어", "궁극의 드래곤 처치용 무기", 2000, ItemRarity.LEGENDARY,
-        GameEquipment.EquipmentType.WEAPON, 50, 10, 50);
-
-    reward.addItemReward(ultimateWeapon, 1);
-
-    Quest endgameQuest = new Quest("quest_endgame_" + level, "궁극의 도전", "드래곤을 처치하고 더 높은 레벨에 도달하세요.", Quest.QuestType.KILL, level, objectives, reward);
-
-    availableQuests.add(endgameQuest);
-    logger.info("엔드게임 퀘스트 생성: {} (레벨: {})", endgameQuest.getTitle(), level);
-  }
 
   // ==================== 퀘스트 표시 메서드들 ====================
 
@@ -1013,37 +819,33 @@ public class QuestManager {
     dailyQuestManager.simulateGenerationForPlayer(character);
   }
 
-  // ==================== 5. 로드 시 처리 개선 ====================
-
-  /**
-   * 🔥 로드 후 데이터 검증 개선
-   */
+  // ==== 6. 유효성 검증 추가 ====
   public void validateQuestData() {
-    logger.info("퀘스트 데이터 검증 시작 (개선된 시스템)");
+    logger.debug("퀘스트 데이터 검증 시작...");
 
-    // 기존 검증...
-    if (availableQuests == null)
-      availableQuests = new ArrayList<>();
-    if (activeQuests == null)
-      activeQuests = new ArrayList<>();
-    if (completedQuests == null)
-      completedQuests = new ArrayList<>();
-    if (claimedRewardIds == null)
-      claimedRewardIds = new ArrayList<>();
+    // 중복 퀘스트 제거
+    removeDuplicateQuests();
 
-    // 🆕 만료된 일일 퀘스트 자동 정리
-    cleanupExpiredQuests();
+    // 무효한 퀘스트 제거
+    removeInvalidQuests();
 
-    // 🆕 로드된 퀘스트 히스토리 검증
-    if (questHistoryManager != null) {
-      // 저장된 히스토리가 있다면 복원
-      // (SimpleSaveData에서 히스토리 정보를 가져와야 함)
-    }
-
-    logger.info("퀘스트 데이터 검증 완료: 사용가능 {}개, 활성 {}개, 완료 {}개, 보상수령 {}개", availableQuests.size(), activeQuests.size(), completedQuests.size(),
-        claimedRewardIds.size());
+    logger.debug("퀘스트 데이터 검증 완료");
   }
 
+  private void removeDuplicateQuests() {
+    // 각 리스트에서 중복 제거
+    availableQuests = availableQuests.stream().collect(Collectors.toMap(Quest::getId, quest -> quest, (existing, replacement) -> existing)).values()
+        .stream().collect(Collectors.toList());
+
+    // 다른 리스트들도 동일하게 처리
+  }
+
+  private void removeInvalidQuests() {
+    // null 또는 무효한 퀘스트 제거
+    availableQuests.removeIf(quest -> quest == null || quest.getId() == null);
+    activeQuests.removeIf(quest -> quest == null || quest.getId() == null);
+    completedQuests.removeIf(quest -> quest == null || quest.getId() == null);
+  }
   // ==================== Getters ====================
 
   public List<Quest> getAvailableQuests() {
