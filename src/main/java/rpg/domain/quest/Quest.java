@@ -37,9 +37,8 @@ public class Quest {
   @JsonCreator
   public Quest(
       // @fotmatter:off
-      @JsonProperty("id") String id, @JsonProperty("title") String title, @JsonProperty("description") String description,
-      @JsonProperty("type") QuestType type, @JsonProperty("requiredLevel") int requiredLevel,
-      @JsonProperty("objectives") Map<String, Integer> objectives, @JsonProperty("reward") QuestReward reward
+      @JsonProperty("id") String id, @JsonProperty("title") String title, @JsonProperty("description") String description, @JsonProperty("type") QuestType type,
+      @JsonProperty("requiredLevel") int requiredLevel, @JsonProperty("objectives") Map<String, Integer> objectives, @JsonProperty("reward") QuestReward reward
   // @fotmatter:on
   ) {
     this.id = id;
@@ -71,9 +70,37 @@ public class Quest {
   public boolean accept(Player character) {
     if (canAccept(character)) {
       this.status = QuestStatus.ACTIVE;
+
+      // 레벨 퀘스트의 경우 현재 레벨을 진행도에 반영
+      if (type == QuestType.LEVEL) {
+        for (Map.Entry<String, Integer> entry : objectives.entrySet()) {
+          String key = entry.getKey();
+          if (key.equals("reach_level")) {
+            // 현재 레벨을 진행도에 설정
+            currentProgress.put(key, character.getLevel());
+            logger.debug("레벨 퀘스트 {} 수락: 현재 레벨 {} 반영", this.id, character.getLevel());
+          }
+        }
+      }
+
       return true;
     }
     return false;
+  }
+
+  /**
+   * 레벨 퀘스트의 진행도를 현재 플레이어 레벨로 초기화 (새로운 메서드)
+   */
+  public void initializeLevelProgress(Player player) {
+    if (type == QuestType.LEVEL && player != null) {
+      for (Map.Entry<String, Integer> entry : objectives.entrySet()) {
+        String key = entry.getKey();
+        if (key.equals("reach_level")) {
+          currentProgress.put(key, player.getLevel());
+          logger.debug("레벨 퀘스트 {} 진행도 초기화: 현재 레벨 {}", this.id, player.getLevel());
+        }
+      }
+    }
   }
 
   /**
@@ -204,7 +231,46 @@ public class Quest {
     for (Map.Entry<String, Integer> entry : objectives.entrySet()) {
       String key = entry.getKey();
       int target = entry.getValue();
-      int current = currentProgress.getOrDefault(key, GameConstants.NUMBER_ZERO);
+      int current;
+
+      // 레벨 퀘스트의 경우 특별 처리
+      if (type == QuestType.LEVEL && key.equals("reach_level")) {
+        // 현재 진행도가 0이면 최소 1로 설정 (현재 레벨을 반영)
+        current = Math.max(currentProgress.getOrDefault(key, 1), 1);
+        // 목표 레벨보다 높으면 목표 레벨로 제한
+        current = Math.min(current, target);
+      } else {
+        // 기존 로직 (처치, 수집 등)
+        current = currentProgress.getOrDefault(key, GameConstants.NUMBER_ZERO);
+      }
+
+      if (desc.length() > GameConstants.NUMBER_ZERO)
+        desc.append(", ");
+      desc.append(current).append("/").append(target);
+    }
+
+    return desc.toString();
+  }
+
+
+  /**
+   * 플레이어 정보를 사용한 진행도 설명 반환 (새로운 메서드)
+   */
+  public String getProgressDescription(Player player) {
+    StringBuilder desc = new StringBuilder();
+
+    for (Map.Entry<String, Integer> entry : objectives.entrySet()) {
+      String key = entry.getKey();
+      int target = entry.getValue();
+      int current;
+
+      // 레벨 퀘스트의 경우 플레이어의 현재 레벨 사용
+      if (type == QuestType.LEVEL && key.equals("reach_level") && player != null) {
+        current = Math.min(player.getLevel(), target);
+      } else {
+        // 기존 로직
+        current = currentProgress.getOrDefault(key, GameConstants.NUMBER_ZERO);
+      }
 
       if (desc.length() > GameConstants.NUMBER_ZERO)
         desc.append(", ");

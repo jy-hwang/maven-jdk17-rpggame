@@ -130,11 +130,11 @@ public class QuestController {
   }
 
   /**
-   * 진행 중인 퀘스트를 표시합니다.
+   * 진행 중인 퀘스트를 표시합니다. (수정된 버전)
    */
   private void displayActiveQuests() {
-    System.out.println("\n=== 진행 중인 퀘스트 ===");
-    questManager.displayActiveQuests();
+    // currentPlayer를 사용하여 정확한 진행도 표시
+    questManager.displayActiveQuestsWithPlayer(currentPlayer);
   }
 
   /**
@@ -216,8 +216,7 @@ public class QuestController {
           System.out.print("골드 " + reward.getGoldReward() + " ");
         var itemRewards = reward.getItemRewards();
         if (itemRewards != null && !itemRewards.isEmpty()) {
-          String itemsText =
-              itemRewards.entrySet().stream().map(entry -> entry.getKey().getName() + " x" + entry.getValue()).collect(Collectors.joining(", "));
+          String itemsText = itemRewards.entrySet().stream().map(entry -> entry.getKey().getName() + " x" + entry.getValue()).collect(Collectors.joining(", "));
           System.out.print(itemsText);
         }
         System.out.println();
@@ -348,18 +347,19 @@ public class QuestController {
   /**
    * 몬스터 처치 퀘스트 진행도 업데이트 - ID 기반으로 수정
    */
-  public void updateKillProgress(String monsterId) {  // ← 파라미터 이름도 변경
-      logger.debug("몬스터 처치 퀘스트 진행도 업데이트 요청: {}", monsterId);
-      questManager.updateKillProgress(monsterId);
+  public void updateKillProgress(String monsterId) { // ← 파라미터 이름도 변경
+    logger.debug("몬스터 처치 퀘스트 진행도 업데이트 요청: {}", monsterId);
+    questManager.updateKillProgress(monsterId);
   }
 
   /**
    * 아이템 수집 퀘스트 진행도 업데이트 - ID 기반으로 수정
    */
-  public void updateCollectionProgress(Player player, String itemId, int quantity) {  // ← 파라미터 이름도 변경
-      logger.debug("아이템 수집 퀘스트 진행도 업데이트 요청: {} x{}", itemId, quantity);
-      questManager.updateCollectionProgress(player, itemId, quantity);
+  public void updateCollectionProgress(Player player, String itemId, int quantity) { // ← 파라미터 이름도 변경
+    logger.debug("아이템 수집 퀘스트 진행도 업데이트 요청: {} x{}", itemId, quantity);
+    questManager.updateCollectionProgress(player, itemId, quantity);
   }
+
   /**
    * 레벨업 퀘스트 진행도를 업데이트합니다.
    * 

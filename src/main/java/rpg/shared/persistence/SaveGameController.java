@@ -8,6 +8,7 @@ import rpg.application.validator.InputValidator;
 import rpg.core.engine.GameState;
 import rpg.domain.inventory.PlayerInventory;
 import rpg.domain.player.Player;
+import rpg.domain.quest.Quest;
 import rpg.infrastructure.persistence.GameDataRepository;
 import rpg.infrastructure.persistence.SaveSlotInfo;
 
@@ -183,14 +184,25 @@ public class SaveGameController {
 
         // 퀘스트 진행 상황 확인
         var questManager = loadedPlayer.getQuestManager();
+        questManager.synchronizeLevelQuestProgress(loadedPlayer);
         int activeCount = questManager.getActiveQuests().size();
+        
+        if(activeCount > 0) {
+          // 진행도 표시 확인용 로그
+          var activeQuests = questManager.getActiveQuests();
+          for (var quest : activeQuests) {
+            if (quest.getType() == Quest.QuestType.LEVEL) {
+              logger.debug("레벨 퀘스트 '{}' 진행도: {}", quest.getTitle(), quest.getProgressDescription(loadedPlayer));
+            }
+          }
+        }
         int completedCount = questManager.getCompletedQuests().size();
 
-        // 🆕 만료된 일일 퀘스트가 있는지 확인
+        // 만료된 일일 퀘스트가 있는지 확인
         questManager.validateQuestData();
         questManager.cleanupExpiredQuests();
 
-        // 🆕 새로운 일일 퀘스트가 필요한지 확인
+        // 새로운 일일 퀘스트가 필요한지 확인
         String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
         boolean hasTodaysQuests = questManager.getAvailableQuests(loadedPlayer).stream().anyMatch(quest -> quest.getId().contains(today));
 

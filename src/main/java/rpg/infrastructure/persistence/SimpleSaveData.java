@@ -175,9 +175,11 @@ public class SimpleSaveData {
       // === 3. 퀘스트 매니저 복원 ===
       QuestManager questManager = restoreQuestManagerWithFactory();
 
-      // === 4. Player 생성 ===
-      Player player = new Player(playerName, level, hp, maxHp, mana, maxMana, restoreHp, restoreMp, experience, attack, defense, gold, inventory,
-          skillManager, PlayerStatusCondition.valueOf(statusCondition), questManager);
+   // === 4. Player 생성 ===
+      Player player = new Player(playerName, level, hp, maxHp, mana, maxMana, 
+                                restoreHp, restoreMp, experience, attack, defense, 
+                                gold, inventory, skillManager, 
+                                PlayerStatusCondition.valueOf(statusCondition), questManager);
 
       // 상태 조건 설정
       try {
@@ -187,10 +189,22 @@ public class SimpleSaveData {
         logger.warn("잘못된 상태 조건, 기본값으로 설정: {}", statusCondition);
         player.setPlayerStatusCondition(PlayerStatusCondition.NORMAL);
       }
-
+      
       // 인벤토리, 스킬, 퀘스트 매니저 설정
       player.setInventory(inventory);
       player.setSkillManager(skillManager);
+      
+      try {
+        // 모든 활성 레벨 퀘스트의 진행도를 현재 플레이어 레벨과 동기화
+        questManager.synchronizeLevelQuestProgress(player);
+        logger.info("게임 로드 후 퀘스트 진행도 동기화 완료 (레벨: {})", level);
+        // 추가: 활성 레벨 퀘스트들의 진행도를 현재 레벨로 즉시 업데이트
+        questManager.updateLevelProgress(player);
+        logger.debug("레벨 퀘스트 진행도 즉시 업데이트 완료");
+      } catch (Exception e) {
+        logger.error("퀘스트 진행도 동기화 중 오류", e);
+      }
+      
       player.setQuestManager(questManager);
 
       logger.info("Player 복원 완료: {} (레벨: {}, 스킬: {}개)", playerName, level, learnedSkillIds.size());

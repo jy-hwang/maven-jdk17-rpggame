@@ -185,15 +185,14 @@ public class QuestManager {
   /**
    * 특별한 장비 생성
    */
-  private GameEquipment createSpecialEquipment(String id, String name, String description, int value, ItemRarity rarity,
-      GameEquipment.EquipmentType type, int attackBonus, int defenseBonus, int hpBonus) {
+  private GameEquipment createSpecialEquipment(String id, String name, String description, int value, ItemRarity rarity, GameEquipment.EquipmentType type, int attackBonus, int defenseBonus,
+      int hpBonus) {
     try {
       return new GameEquipment(id, name, description, value, rarity, type, attackBonus, defenseBonus, hpBonus);
     } catch (Exception e) {
       logger.error("특별 장비 생성 실패: {}", name, e);
       // 기본 장비 반환
-      return new GameEquipment(id, "기본 " + name, "기본 장비", value / 2, ItemRarity.COMMON, type, Math.max(1, attackBonus / 2),
-          Math.max(1, defenseBonus / 2), Math.max(1, hpBonus / 2));
+      return new GameEquipment(id, "기본 " + name, "기본 장비", value / 2, ItemRarity.COMMON, type, Math.max(1, attackBonus / 2), Math.max(1, defenseBonus / 2), Math.max(1, hpBonus / 2));
     }
   }
 
@@ -306,11 +305,30 @@ public class QuestManager {
       if (quest.accept(character)) {
         availableQuests.remove(quest);
         activeQuests.add(quest);
+
+        // 레벨 퀘스트의 경우 추가적으로 진행도 업데이트
+        if (quest.getType() == Quest.QuestType.LEVEL) {
+          updateLevelProgress(character);
+          logger.debug("레벨 퀘스트 수락 후 진행도 업데이트: {} (현재 레벨: {})", quest.getTitle(), character.getLevel());
+        }
+
         logger.info("퀘스트 수락: {} (캐릭터: {})", quest.getTitle(), character.getName());
         return true;
       }
     }
     return false;
+  }
+
+  /**
+   * 모든 활성 레벨 퀘스트의 진행도를 현재 플레이어 레벨로 동기화 (새로운 메서드)
+   */
+  public void synchronizeLevelQuestProgress(Player player) {
+    for (Quest quest : activeQuests) {
+      if (quest.getType() == Quest.QuestType.LEVEL) {
+        quest.initializeLevelProgress(player);
+        logger.debug("레벨 퀘스트 진행도 동기화: {} -> 레벨 {}", quest.getTitle(), player.getLevel());
+      }
+    }
   }
 
   /**
@@ -346,31 +364,31 @@ public class QuestManager {
    * 레벨업 시 퀘스트 진행도 업데이트 - 개선된 버전
    */
   public void updateLevelProgress(Player player) {
-      String objectiveKey = "reach_level";
-      int currentLevel = player.getLevel();
-      
-      logger.debug("레벨업 퀘스트 진행도 업데이트: 현재 레벨 {}", currentLevel);
-      
-      boolean anyQuestCompleted = false;
-      
-      // 활성 퀘스트 중 레벨 퀘스트 확인
-      for (Quest quest : new ArrayList<>(activeQuests)) {
-          if (quest.getType() == Quest.QuestType.LEVEL) {
-              logger.debug("레벨 퀘스트 {} 확인: 목표 {}", quest.getId(), quest.getObjectives());
-              
-              // 현재 레벨로 진행도 업데이트 (퀘스트 내부에서 목표 레벨과 비교)
-              if (quest.updateProgress(objectiveKey, currentLevel)) {
-                  completeQuest(quest);
-                  anyQuestCompleted = true;
-                  System.out.println("🎉 레벨업 퀘스트 완료: " + quest.getTitle());
-                  logger.info("레벨 퀘스트 완료: {} (레벨 {} 달성)", quest.getTitle(), currentLevel);
-              }
-          }
+    String objectiveKey = "reach_level";
+    int currentLevel = player.getLevel();
+
+    logger.debug("레벨업 퀘스트 진행도 업데이트: 현재 레벨 {}", currentLevel);
+
+    boolean anyQuestCompleted = false;
+
+    // 활성 퀘스트 중 레벨 퀘스트 확인
+    for (Quest quest : new ArrayList<>(activeQuests)) {
+      if (quest.getType() == Quest.QuestType.LEVEL) {
+        logger.debug("레벨 퀘스트 {} 확인: 목표 {}", quest.getId(), quest.getObjectives());
+
+        // 현재 레벨로 진행도 업데이트 (퀘스트 내부에서 목표 레벨과 비교)
+        if (quest.updateProgress(objectiveKey, currentLevel)) {
+          completeQuest(quest);
+          anyQuestCompleted = true;
+          System.out.println("🎉 레벨업 퀘스트 완료: " + quest.getTitle());
+          logger.info("레벨 퀘스트 완료: {} (레벨 {} 달성)", quest.getTitle(), currentLevel);
+        }
       }
-      
-      if (!anyQuestCompleted) {
-          logger.debug("현재 레벨 {}에 해당하는 활성 레벨 퀘스트가 없음", currentLevel);
-      }
+    }
+
+    if (!anyQuestCompleted) {
+      logger.debug("현재 레벨 {}에 해당하는 활성 레벨 퀘스트가 없음", currentLevel);
+    }
   }
 
   /**
@@ -765,8 +783,7 @@ public class QuestManager {
     }
 
 
-    logger.debug("퀘스트 데이터 교체 완료: 사용가능 {}개, 활성 {}개, 완료 {}개, 보상수령 {}개", availableQuests.size(), activeQuests.size(), completedQuests.size(),
-        claimedRewardIds.size());
+    logger.debug("퀘스트 데이터 교체 완료: 사용가능 {}개, 활성 {}개, 완료 {}개, 보상수령 {}개", availableQuests.size(), activeQuests.size(), completedQuests.size(), claimedRewardIds.size());
 
   }
 
@@ -926,8 +943,7 @@ public class QuestManager {
 
   private void removeDuplicateQuests() {
     // 각 리스트에서 중복 제거
-    availableQuests = availableQuests.stream().collect(Collectors.toMap(Quest::getId, quest -> quest, (existing, replacement) -> existing)).values()
-        .stream().collect(Collectors.toList());
+    availableQuests = availableQuests.stream().collect(Collectors.toMap(Quest::getId, quest -> quest, (existing, replacement) -> existing)).values().stream().collect(Collectors.toList());
 
     // 다른 리스트들도 동일하게 처리
   }
@@ -999,8 +1015,7 @@ public class QuestManager {
 
     @Override
     public String toString() {
-      return String.format("QuestStatistics{available=%d, active=%d, claimable=%d, claimed=%d, completion=%.1f%%}", availableCount, activeCount,
-          claimableCount, claimedCount, getCompletionRate());
+      return String.format("QuestStatistics{available=%d, active=%d, claimable=%d, claimed=%d, completion=%.1f%%}", availableCount, activeCount, claimableCount, claimedCount, getCompletionRate());
     }
   }
 
@@ -1039,8 +1054,8 @@ public class QuestManager {
     QuestTier tier = QuestTier.getTierForLevel(playerLevel);
     String questId = String.format("daily_kill_%s_%s01", today, tier.getCode());
 
-    Quest dailyQuest = new Quest(questId, String.format("[%s] 일일 사냥 - %s", tier.getDescription(), targetMonster),
-        String.format("%s을(를) %d마리 처치하세요.", targetMonster, killCount), Quest.QuestType.KILL, Math.max(1, playerLevel - 2), // 최소 레벨 요구사항
+    Quest dailyQuest = new Quest(questId, String.format("[%s] 일일 사냥 - %s", tier.getDescription(), targetMonster), String.format("%s을(를) %d마리 처치하세요.", targetMonster, killCount), Quest.QuestType.KILL,
+        Math.max(1, playerLevel - 2), // 최소 레벨 요구사항
         objectives, reward);
 
     availableQuests.add(dailyQuest);
@@ -1063,8 +1078,7 @@ public class QuestManager {
     // 특별 일일 보상
     List<GameEffect> dailyEffects = List.of(GameEffectFactory.createHealHpEffect(60), GameEffectFactory.createGainExpEffect(30));
 
-    GameConsumable dailyPotion =
-        createSpecialPotion("DAILY_SPECIAL_POTION", "일일 특제 물약", "하루 한 번 받을 수 있는 특별한 물약", 100, ItemRarity.UNCOMMON, dailyEffects);
+    GameConsumable dailyPotion = createSpecialPotion("DAILY_SPECIAL_POTION", "일일 특제 물약", "하루 한 번 받을 수 있는 특별한 물약", 100, ItemRarity.UNCOMMON, dailyEffects);
 
     QuestReward reward = new QuestReward(100, 150, dailyPotion, 1);
 
@@ -1072,8 +1086,7 @@ public class QuestManager {
     String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
     String questId = String.format("daily_collect_%s_A01", today);
 
-    Quest dailyCollectionQuest = new Quest(questId, String.format("[초급] 일일 수집 - %s", targetItem),
-        String.format("%s을(를) %d개 수집하세요.", targetItem, collectCount), Quest.QuestType.COLLECT, 10, // 최소 레벨 10
+    Quest dailyCollectionQuest = new Quest(questId, String.format("[초급] 일일 수집 - %s", targetItem), String.format("%s을(를) %d개 수집하세요.", targetItem, collectCount), Quest.QuestType.COLLECT, 10, // 최소 레벨 10
         objectives, reward);
 
     availableQuests.add(dailyCollectionQuest);
@@ -1181,5 +1194,31 @@ public class QuestManager {
    */
   public void checkMerchantBasedQuests(String merchantName) {
     // TODO
+  }
+  
+  /**
+   * QuestManager에 추가할 새로운 메서드 - 플레이어 정보를 활용한 진행도 표시
+   */
+  public void displayActiveQuestsWithPlayer(Player player) {
+    System.out.println("\n=== 진행 중인 퀘스트 ===");
+    List<Quest> activeQuests = player.getQuestManager().getActiveQuests();
+    if (activeQuests.isEmpty()) {
+      System.out.println("진행 중인 퀘스트가 없습니다.");
+    } else {
+      for (int i = 0; i < activeQuests.size(); i++) {
+        Quest quest = activeQuests.get(i);
+        System.out.printf("%d. %s%n", i + 1, quest.getTitle());
+        
+        // 플레이어 정보를 활용한 정확한 진행도 표시
+        if (player != null && quest.getType() == Quest.QuestType.LEVEL) {
+          System.out.printf("   진행도: %s%n", quest.getProgressDescription(player));
+        } else {
+          System.out.printf("   진행도: %s%n", quest.getProgressDescription());
+        }
+        
+        System.out.printf("   보상: %s%n", quest.getReward().getRewardDescription());
+      }
+    }
+    System.out.println("===================");
   }
 }
