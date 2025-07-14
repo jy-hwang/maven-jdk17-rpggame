@@ -87,7 +87,7 @@ public class SystemConstants {
   // === 개발/디버그 관련 ===
   public static final boolean DEBUG_MODE = true; // 디버그 모드
   public static final boolean ENABLE_MONSTER_STATS = true; // 몬스터 통계 표시
-  public static final boolean AUTO_RELOAD_JSON = false; // JSON 자동 리로드 (개발용)
+  public static final boolean AUTO_RELOAD_JSON = true; // JSON 자동 리로드 (개발용)
   public static final boolean DEBUG_QUEST_SYSTEM = false; // 퀘스트 시스템 디버그
   public static final boolean QUEST_TEMPLATE_VALIDATION = true; // 퀘스트 템플릿 검증
 

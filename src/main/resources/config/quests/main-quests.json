@@ -7,7 +7,7 @@
     "requiredLevel": 1,
     "category": "MAIN",
     "objectives": {
-      "kill_slime": 3
+      "kill_FOREST_SLIME": 3
     },
     "reward": {
       "experience": 50,
