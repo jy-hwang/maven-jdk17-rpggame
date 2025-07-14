@@ -27,8 +27,8 @@
         ]
       },
       "locations": [
-        "deep_forest",
-        "magical_forest"
+        "DEEP_FOREST",
+        "MAGICAL_FOREST"
       ],
       "minLevel": 1,
       "maxLevel": 4,
@@ -38,7 +38,7 @@
         "점프"
       ],
       "properties": {
-        "element": "none",
+        "element": "NONE",
         "peaceful": false
       }
     },
@@ -72,8 +72,8 @@
         ]
       },
       "locations": [
-        "deep_forest",
-        "magical_forest"
+        "DEEP_FOREST",
+        "MAGICAL_FOREST"
       ],
       "minLevel": 3,
       "maxLevel": 7,
@@ -84,7 +84,7 @@
         "속도 증가"
       ],
       "properties": {
-        "element": "nature",
+        "element": "NATURE",
         "packHunter": true
       }
     },
@@ -112,8 +112,8 @@
         ]
       },
       "locations": [
-        "dark_cave",
-        "ruined_castle"
+        "DARK_CAVE",
+        "RUINED_CASTLE"
       ],
       "minLevel": 2,
       "maxLevel": 6,
@@ -124,7 +124,7 @@
         "초음파"
       ],
       "properties": {
-        "element": "darkness",
+        "element": "DARKNESS",
         "flying": true
       }
     },
@@ -158,9 +158,9 @@
         ]
       },
       "locations": [
-        "dark_cave",
-        "rugged_mountain",
-        "ancient_ruins"
+        "DARK_CAVE",
+        "RUGGED_MOUNTAIN",
+        "ANCIENT_RUINS"
       ],
       "minLevel": 5,
       "maxLevel": 10,
@@ -171,7 +171,7 @@
         "돌 던지기"
       ],
       "properties": {
-        "element": "earth",
+        "element": "EARTH",
         "construct": true,
         "heavy": true
       }
@@ -206,8 +206,8 @@
         ]
       },
       "locations": [
-        "rugged_mountain",
-        "frozen_wasteland"
+        "RUGGED_MOUNTAIN",
+        "FROZEN_WASTELAND"
       ],
       "minLevel": 6,
       "maxLevel": 11,
@@ -218,7 +218,7 @@
         "발톱 공격"
       ],
       "properties": {
-        "element": "nature",
+        "element": "NATURE",
         "territorial": true,
         "hibernation": false
       }
@@ -253,8 +253,8 @@
         ]
       },
       "locations": [
-        "magical_forest",
-        "celestial_garden"
+        "MAGICAL_FOREST",
+        "CELESTIAL_GARDEN"
       ],
       "minLevel": 4,
       "maxLevel": 8,
@@ -265,7 +265,7 @@
         "뿌리 속박"
       ],
       "properties": {
-        "element": "nature",
+        "element": "NATURE",
         "magical": true,
         "regeneration": 5
       }
@@ -300,8 +300,8 @@
         ]
       },
       "locations": [
-        "mystic_lake",
-        "deep_ocean"
+        "MYSTIC_LAKE",
+        "DEEP_OCEAN"
       ],
       "minLevel": 7,
       "maxLevel": 12,
@@ -312,7 +312,7 @@
         "치유의 물"
       ],
       "properties": {
-        "element": "water",
+        "element": "WATER",
         "fluid": true,
         "healing": true
       }
@@ -347,8 +347,8 @@
         ]
       },
       "locations": [
-        "ruined_castle",
-        "ancient_ruins"
+        "RUINED_CASTLE",
+        "ANCIENT_RUINS"
       ],
       "minLevel": 8,
       "maxLevel": 13,
@@ -359,7 +359,7 @@
         "불멸"
       ],
       "properties": {
-        "element": "undead",
+        "element": "UNDEAD",
         "undead": true,
         "fearless": true
       }
@@ -394,7 +394,7 @@
         ]
       },
       "locations": [
-        "lava_cave"
+        "LAVA_CAVE"
       ],
       "minLevel": 15,
       "maxLevel": 20,
@@ -405,7 +405,7 @@
         "열 저항"
       ],
       "properties": {
-        "element": "fire",
+        "element": "FIRE",
         "heat_immune": true,
         "burn_attack": true
       }
@@ -440,7 +440,7 @@
         ]
       },
       "locations": [
-        "ancient_ruins"
+        "ANCIENT_RUINS"
       ],
       "minLevel": 12,
       "maxLevel": 18,
@@ -452,7 +452,7 @@
         "재생"
       ],
       "properties": {
-        "element": "ancient",
+        "element": "ANCIENT",
         "magical": true,
         "boss": true,
         "regeneration": 10
@@ -488,7 +488,7 @@
         ]
       },
       "locations": [
-        "frozen_wasteland"
+        "FROZEN_WASTELAND"
       ],
       "minLevel": 13,
       "maxLevel": 19,
@@ -500,7 +500,7 @@
         "순간이동"
       ],
       "properties": {
-        "element": "ice",
+        "element": "ICE",
         "undead": true,
         "phase_through": true,
         "freeze_attack": true
@@ -542,7 +542,7 @@
         ]
       },
       "locations": [
-        "sky_fortress"
+        "SKY_FORTRESS"
       ],
       "minLevel": 20,
       "maxLevel": 28,
@@ -555,7 +555,7 @@
         "마법 저항"
       ],
       "properties": {
-        "element": "wind",
+        "element": "WIND",
         "dragon": true,
         "flying": true,
         "boss": true,
@@ -598,7 +598,7 @@
         ]
       },
       "locations": [
-        "deep_ocean"
+        "DEEP_OCEAN"
       ],
       "minLevel": 22,
       "maxLevel": 32,
@@ -611,7 +611,7 @@
         "재생"
       ],
       "properties": {
-        "element": "water",
+        "element": "WATER",
         "sea_monster": true,
         "giant": true,
         "boss": true,
@@ -648,7 +648,7 @@
         ]
       },
       "locations": [
-        "shadow_realm"
+        "SHADOW_REALM"
       ],
       "minLevel": 26,
       "maxLevel": 36,
@@ -661,7 +661,7 @@
         "분신술"
       ],
       "properties": {
-        "element": "shadow",
+        "element": "SHADOW",
         "assassin": true,
         "stealth": true,
         "dimensional": true
@@ -703,7 +703,7 @@
         ]
       },
       "locations": [
-        "celestial_garden"
+        "CELESTIAL_GARDEN"
       ],
       "minLevel": 32,
       "maxLevel": 42,
@@ -716,7 +716,7 @@
         "축복"
       ],
       "properties": {
-        "element": "holy",
+        "element": "HOLY",
         "divine": true,
         "healing": true,
         "purification": true,
@@ -759,7 +759,7 @@
         ]
       },
       "locations": [
-        "void_chasm"
+        "VOID_CHASM"
       ],
       "minLevel": 40,
       "maxLevel": 50,
@@ -772,7 +772,7 @@
         "무효화"
       ],
       "properties": {
-        "element": "void",
+        "element": "VOID",
         "eldritch": true,
         "reality_break": true,
         "boss": true,
@@ -780,7 +780,7 @@
       }
     },
     {
-      "id": "forest_goblin",
+      "id": "FOREST_GOBLIN",
       "name": "숲 고블린",
       "description": "숲속에 서식하는 작은 녹색 도깨비. 날쌔고 교활하다.",
       "stats": {
@@ -795,7 +795,7 @@
         "gold": 8
       },
       "locations": [
-        "deep_forest"
+        "DEEP_FOREST"
       ],
       "minLevel": 1,
       "maxLevel": 3,
@@ -806,7 +806,7 @@
         "기습공격"
       ],
       "properties": {
-        "element": "earth",
+        "element": "EARTH",
         "canDrop": [
           "나뭇가지",
           "고블린 귀"
@@ -814,7 +814,7 @@
       }
     },
     {
-      "id": "wild_boar",
+      "id": "WILD_BOAR",
       "name": "멧돼지",
       "description": "거친 야생의 멧돼지. 화가 나면 돌진한다.",
       "stats": {
@@ -829,7 +829,7 @@
         "gold": 12
       },
       "locations": [
-        "deep_forest"
+        "DEEP_FOREST"
       ],
       "minLevel": 2,
       "maxLevel": 4,
@@ -840,7 +840,7 @@
         "분노"
       ],
       "properties": {
-        "element": "earth",
+        "element": "EARTH",
         "canDrop": [
           "멧돼지 가죽",
           "야생 고기"
@@ -848,7 +848,7 @@
       }
     },
     {
-      "id": "forest_spider",
+      "id": "FOREST_SPIDER",
       "name": "숲 거미",
       "description": "큰 몸집의 독을 가진 거미. 거미줄로 먹이를 사냥한다.",
       "stats": {
@@ -863,7 +863,7 @@
         "gold": 10
       },
       "locations": [
-        "deep_forest"
+        "DEEP_FOREST"
       ],
       "minLevel": 2,
       "maxLevel": 5,
@@ -874,7 +874,7 @@
         "거미줄 덫"
       ],
       "properties": {
-        "element": "poison",
+        "element": "POISON",
         "canDrop": [
           "거미 독",
           "질긴 거미줄"
@@ -882,7 +882,7 @@
       }
     },
     {
-      "id": "forest_ent",
+      "id": "FOREST_ENT",
       "name": "숲 정령",
       "description": "숲을 지키는 고대 나무 정령. 매우 강력하다.",
       "stats": {
@@ -897,7 +897,7 @@
         "gold": 25
       },
       "locations": [
-        "deep_forest"
+        "DEEP_FOREST"
       ],
       "minLevel": 3,
       "maxLevel": 6,
@@ -908,7 +908,7 @@
         "자연의 치유"
       ],
       "properties": {
-        "element": "nature",
+        "element": "NATURE",
         "canDrop": [
           "신성한 나뭇잎",
           "정령의 눈물"
@@ -916,7 +916,7 @@
       }
     },
     {
-      "id": "cave_bat",
+      "id": "CAVE_BAT",
       "name": "동굴 박쥐",
       "description": "어둠 속에서 초음파로 사냥하는 박쥐 무리.",
       "stats": {
@@ -931,7 +931,7 @@
         "gold": 6
       },
       "locations": [
-        "dark_cave"
+        "DARK_CAVE"
       ],
       "minLevel": 1,
       "maxLevel": 4,
@@ -942,7 +942,7 @@
         "날개 공격"
       ],
       "properties": {
-        "element": "dark",
+        "element": "DARK",
         "canDrop": [
           "박쥐 날개",
           "야광석"
@@ -950,7 +950,7 @@
       }
     },
     {
-      "id": "cave_troll",
+      "id": "CAVE_TROLL",
       "name": "동굴 트롤",
       "description": "거대한 몸집의 동굴 거주 트롤. 느리지만 강력하다.",
       "stats": {
@@ -965,7 +965,7 @@
         "gold": 30
       },
       "locations": [
-        "dark_cave"
+        "DARK_CAVE"
       ],
       "minLevel": 4,
       "maxLevel": 7,
@@ -976,7 +976,7 @@
         "돌 던지기"
       ],
       "properties": {
-        "element": "earth",
+        "element": "EARTH",
         "canDrop": [
           "트롤 가죽",
           "단단한 뼈"
@@ -984,7 +984,7 @@
       }
     },
     {
-      "id": "crystal_golem",
+      "id": "CRYSTAL_GOLEM",
       "name": "수정 골렘",
       "description": "동굴의 수정으로 만들어진 마법 생명체.",
       "stats": {
@@ -999,7 +999,7 @@
         "gold": 35
       },
       "locations": [
-        "dark_cave"
+        "DARK_CAVE"
       ],
       "minLevel": 3,
       "maxLevel": 6,
@@ -1010,7 +1010,7 @@
         "견고함"
       ],
       "properties": {
-        "element": "crystal",
+        "element": "CRYSTAL",
         "canDrop": [
           "수정 조각",
           "마나 크리스탈"
@@ -1018,7 +1018,7 @@
       }
     },
     {
-      "id": "mountain_eagle",
+      "id": "MOUNTAIN_EAGLE",
       "name": "산독수리",
       "description": "높은 산에서 내려다보는 날카로운 독수리.",
       "stats": {
@@ -1033,7 +1033,7 @@
         "gold": 15
       },
       "locations": [
-        "rocky_mountain"
+        "ROCKY_MOUNTAIN"
       ],
       "minLevel": 3,
       "maxLevel": 6,
@@ -1044,7 +1044,7 @@
         "날카로운 발톱"
       ],
       "properties": {
-        "element": "air",
+        "element": "AIR",
         "canDrop": [
           "독수리 깃털",
           "날카로운 발톱"
@@ -1052,7 +1052,7 @@
       }
     },
     {
-      "id": "rock_lizard",
+      "id": "ROCK_LIZARD",
       "name": "바위 도마뱀",
       "description": "바위와 같은 색깔의 거대한 도마뱀.",
       "stats": {
@@ -1067,7 +1067,7 @@
         "gold": 20
       },
       "locations": [
-        "rocky_mountain"
+        "ROCKY_MOUNTAIN"
       ],
       "minLevel": 4,
       "maxLevel": 7,
@@ -1078,7 +1078,7 @@
         "꼬리 채찍"
       ],
       "properties": {
-        "element": "earth",
+        "element": "EARTH",
         "canDrop": [
           "바위 비늘",
           "도마뱀 꼬리"
@@ -1086,7 +1086,7 @@
       }
     },
     {
-      "id": "mountain_giant",
+      "id": "MOUNTAIN_GIANT",
       "name": "산악 거인",
       "description": "산의 주인이라 불리는 거대한 거인.",
       "stats": {
@@ -1101,7 +1101,7 @@
         "gold": 50
       },
       "locations": [
-        "rocky_mountain"
+        "ROCKY_MOUNTAIN"
       ],
       "minLevel": 6,
       "maxLevel": 9,
@@ -1112,7 +1112,7 @@
         "거대한 주먹"
       ],
       "properties": {
-        "element": "earth",
+        "element": "EARTH",
         "canDrop": [
           "거인의 심장",
           "신성한 돌"
@@ -1120,7 +1120,7 @@
       }
     },
     {
-      "id": "water_sprite",
+      "id": "WATER_SPRITE",
       "name": "물의 정령",
       "description": "호수에 서식하는 아름다운 물의 정령.",
       "stats": {
@@ -1135,7 +1135,7 @@
         "gold": 18
       },
       "locations": [
-        "mystic_lake"
+        "MYSTIC_LAKE"
       ],
       "minLevel": 2,
       "maxLevel": 5,
@@ -1146,7 +1146,7 @@
         "치유의 물"
       ],
       "properties": {
-        "element": "water",
+        "element": "WATER",
         "canDrop": [
           "정화된 물",
           "물의 구슬"
@@ -1154,7 +1154,7 @@
       }
     },
     {
-      "id": "giant_fish",
+      "id": "GIANT_FISH",
       "name": "거대한 물고기",
       "description": "호수 깊은 곳에 사는 거대한 육식 물고기.",
       "stats": {
@@ -1169,7 +1169,7 @@
         "gold": 25
       },
       "locations": [
-        "mystic_lake"
+        "MYSTIC_LAKE"
       ],
       "minLevel": 4,
       "maxLevel": 7,
@@ -1180,7 +1180,7 @@
         "강력한 턱"
       ],
       "properties": {
-        "element": "water",
+        "element": "WATER",
         "canDrop": [
           "신선한 생선",
           "물고기 비늘"
@@ -1188,7 +1188,7 @@
       }
     },
     {
-      "id": "lake_dragon",
+      "id": "LAKE_DRAGON",
       "name": "호수 드래곤",
       "description": "호수를 지배하는 전설의 물 드래곤.",
       "stats": {
@@ -1203,7 +1203,7 @@
         "gold": 80
       },
       "locations": [
-        "mystic_lake"
+        "MYSTIC_LAKE"
       ],
       "minLevel": 8,
       "maxLevel": 12,
@@ -1215,7 +1215,7 @@
         "재생"
       ],
       "properties": {
-        "element": "water",
+        "element": "WATER",
         "canDrop": [
           "드래곤 비늘",
           "용의 눈물",
@@ -1224,7 +1224,7 @@
       }
     },
     {
-      "id": "skeleton_warrior",
+      "id": "SKELETON_WARRIOR",
       "name": "해골 전사",
       "description": "고대 전사의 해골이 되살아난 언데드.",
       "stats": {
@@ -1239,7 +1239,7 @@
         "gold": 20
       },
       "locations": [
-        "ancient_ruins"
+        "ANCIENT_RUINS"
       ],
       "minLevel": 3,
       "maxLevel": 6,
@@ -1250,7 +1250,7 @@
         "언데드의 저항"
       ],
       "properties": {
-        "element": "dark",
+        "element": "DARK",
         "canDrop": [
           "오래된 뼈",
           "낡은 검"
@@ -1258,7 +1258,7 @@
       }
     },
     {
-      "id": "ghost_mage",
+      "id": "GHOST_MAGE",
       "name": "유령 마법사",
       "description": "유적에 갇힌 고대 마법사의 영혼.",
       "stats": {
@@ -1273,7 +1273,7 @@
         "gold": 25
       },
       "locations": [
-        "ancient_ruins"
+        "ANCIENT_RUINS"
       ],
       "minLevel": 4,
       "maxLevel": 7,
@@ -1284,7 +1284,7 @@
         "영혼 흡수"
       ],
       "properties": {
-        "element": "dark",
+        "element": "DARK",
         "canDrop": [
           "마법 구슬",
           "고대 두루마리"
@@ -1292,7 +1292,7 @@
       }
     },
     {
-      "id": "ancient_guardian",
+      "id": "ANCIENT_GUARDIAN",
       "name": "고대 수호자",
       "description": "유적을 지키는 강력한 골렘 수호자.",
       "stats": {
@@ -1307,7 +1307,7 @@
         "gold": 45
       },
       "locations": [
-        "ancient_ruins"
+        "ANCIENT_RUINS"
       ],
       "minLevel": 6,
       "maxLevel": 9,
@@ -1318,7 +1318,7 @@
         "고대의 힘"
       ],
       "properties": {
-        "element": "magic",
+        "element": "MAGIC",
         "canDrop": [
           "고대 보석",
           "수호자의 파편"
@@ -1326,7 +1326,7 @@
       }
     },
     {
-      "id": "fire_salamander",
+      "id": "FIRE_SALAMANDER",
       "name": "불 도롱뇽",
       "description": "용암 속에서 자라난 불의 도롱뇽.",
       "stats": {
@@ -1341,7 +1341,7 @@
         "gold": 22
       },
       "locations": [
-        "lava_fields"
+        "LAVA_FIELDS"
       ],
       "minLevel": 4,
       "maxLevel": 7,
@@ -1352,7 +1352,7 @@
         "열기 발산"
       ],
       "properties": {
-        "element": "fire",
+        "element": "FIRE",
         "canDrop": [
           "화염 선",
           "뜨거운 비늘"
@@ -1360,7 +1360,7 @@
       }
     },
     {
-      "id": "lava_golem",
+      "id": "LAVA_GOLEM",
       "name": "용암 골렘",
       "description": "용암으로 만들어진 거대한 골렘.",
       "stats": {
@@ -1375,7 +1375,7 @@
         "gold": 35
       },
       "locations": [
-        "lava_fields"
+        "LAVA_FIELDS"
       ],
       "minLevel": 6,
       "maxLevel": 9,
@@ -1386,7 +1386,7 @@
         "열기 파동"
       ],
       "properties": {
-        "element": "fire",
+        "element": "FIRE",
         "canDrop": [
           "용암석",
           "화염의 핵"
@@ -1394,7 +1394,7 @@
       }
     },
     {
-      "id": "fire_elemental",
+      "id": "FIRE_ELEMENTAL",
       "name": "화염 정령",
       "description": "순수한 화염의 힘으로 이루어진 정령.",
       "stats": {
@@ -1409,7 +1409,7 @@
         "gold": 30
       },
       "locations": [
-        "lava_fields"
+        "LAVA_FIELDS"
       ],
       "minLevel": 5,
       "maxLevel": 8,
@@ -1420,7 +1420,7 @@
         "불의 폭풍"
       ],
       "properties": {
-        "element": "fire",
+        "element": "FIRE",
         "canDrop": [
           "화염의 정수",
           "불타는 보석"
@@ -1428,7 +1428,7 @@
       }
     },
     {
-      "id": "magma_dragon",
+      "id": "MAGMA_DRAGON",
       "name": "마그마 드래곤",
       "description": "용암 지대의 절대 지배자인 화염 드래곤.",
       "stats": {
@@ -1443,7 +1443,7 @@
         "gold": 100
       },
       "locations": [
-        "lava_fields"
+        "LAVA_FIELDS"
       ],
       "minLevel": 10,
       "maxLevel": 15,
@@ -1455,7 +1455,7 @@
         "화염 재생"
       ],
       "properties": {
-        "element": "fire",
+        "element": "FIRE",
         "canDrop": [
           "드래곤 심장",
           "마그마 크리스탈",
@@ -1464,7 +1464,7 @@
       }
     },
     {
-      "id": "ice_spider",
+      "id": "ICE_SPIDER",
       "name": "얼음 거미",
       "description": "차가운 얼음 동굴에 서식하는 거미.",
       "stats": {
@@ -1479,7 +1479,7 @@
         "gold": 16
       },
       "locations": [
-        "ice_cavern"
+        "ICE_CAVERN"
       ],
       "minLevel": 3,
       "maxLevel": 6,
@@ -1490,7 +1490,7 @@
         "얼음 거미줄"
       ],
       "properties": {
-        "element": "ice",
+        "element": "ICE",
         "canDrop": [
           "얼음 거미줄",
           "차가운 독"
@@ -1498,7 +1498,7 @@
       }
     },
     {
-      "id": "frost_wolf",
+      "id": "FROST_WOLF",
       "name": "서리 늑대",
       "description": "얼음처럼 차가운 늑대. 무리를 지어 사냥한다.",
       "stats": {
@@ -1513,7 +1513,7 @@
         "gold": 24
       },
       "locations": [
-        "ice_cavern"
+        "ICE_CAVERN"
       ],
       "minLevel": 4,
       "maxLevel": 7,
@@ -1524,7 +1524,7 @@
         "무리 사냥"
       ],
       "properties": {
-        "element": "ice",
+        "element": "ICE",
         "canDrop": [
           "서리 늑대 가죽",
           "얼음 이빨"
@@ -1532,7 +1532,7 @@
       }
     },
     {
-      "id": "ice_giant",
+      "id": "ICE_GIANT",
       "name": "얼음 거인",
       "description": "고대의 얼음으로 만들어진 거대한 거인.",
       "stats": {
@@ -1547,7 +1547,7 @@
         "gold": 55
       },
       "locations": [
-        "ice_cavern"
+        "ICE_CAVERN"
       ],
       "minLevel": 7,
       "maxLevel": 10,
@@ -1558,7 +1558,7 @@
         "빙하 생성"
       ],
       "properties": {
-        "element": "ice",
+        "element": "ICE",
         "canDrop": [
           "영원한 얼음",
           "거인의 눈"
@@ -1566,7 +1566,7 @@
       }
     },
     {
-      "id": "sand_worm",
+      "id": "SAND_WORM",
       "name": "모래벌레",
       "description": "황무지 모래 속에 숨어있는 거대한 벌레.",
       "stats": {
@@ -1581,7 +1581,7 @@
         "gold": 25
       },
       "locations": [
-        "wasteland"
+        "WASTELAND"
       ],
       "minLevel": 5,
       "maxLevel": 8,
@@ -1592,7 +1592,7 @@
         "독침"
       ],
       "properties": {
-        "element": "earth",
+        "element": "EARTH",
         "canDrop": [
           "단단한 껍질",
           "모래벌레 독"
@@ -1600,7 +1600,7 @@
       }
     },
     {
-      "id": "vulture",
+      "id": "VULTURE",
       "name": "독수리",
       "description": "죽음의 냄새를 맡고 모여드는 검은 독수리.",
       "stats": {
@@ -1615,7 +1615,7 @@
         "gold": 18
       },
       "locations": [
-        "wasteland"
+        "WASTELAND"
       ],
       "minLevel": 4,
       "maxLevel": 7,
@@ -1626,7 +1626,7 @@
         "부패 독"
       ],
       "properties": {
-        "element": "dark",
+        "element": "DARK",
         "canDrop": [
           "검은 깃털",
           "날카로운 부리"
@@ -1634,7 +1634,7 @@
       }
     },
     {
-      "id": "desert_scorpion",
+      "id": "DESERT_SCORPION",
       "name": "사막 전갈",
       "description": "황무지에 서식하는 거대한 독 전갈.",
       "stats": {
@@ -1649,7 +1649,7 @@
         "gold": 28
       },
       "locations": [
-        "wasteland"
+        "WASTELAND"
       ],
       "minLevel": 6,
       "maxLevel": 9,
@@ -1660,7 +1660,7 @@
         "집게 공격"
       ],
       "properties": {
-        "element": "poison",
+        "element": "POISON",
         "canDrop": [
           "전갈 독",
           "단단한 집게"
@@ -1668,7 +1668,7 @@
       }
     },
     {
-      "id": "shadow_wolf",
+      "id": "SHADOW_WOLF",
       "name": "그림자 늑대",
       "description": "어둠에 숨어 사냥하는 신비한 늑대.",
       "stats": {
@@ -1683,7 +1683,7 @@
         "gold": 26
       },
       "locations": [
-        "dark_forest"
+        "DARK_FOREST"
       ],
       "minLevel": 5,
       "maxLevel": 8,
@@ -1694,7 +1694,7 @@
         "어둠의 발톱"
       ],
       "properties": {
-        "element": "dark",
+        "element": "DARK",
         "canDrop": [
           "그림자 털",
           "어둠의 정수"
@@ -1702,7 +1702,7 @@
       }
     },
     {
-      "id": "dark_elf",
+      "id": "DARK_ELF",
       "name": "다크 엘프",
       "description": "어둠에 타락한 엘프 전사.",
       "stats": {
@@ -1717,7 +1717,7 @@
         "gold": 32
       },
       "locations": [
-        "dark_forest"
+        "DARK_FOREST"
       ],
       "minLevel": 6,
       "maxLevel": 9,
@@ -1728,7 +1728,7 @@
         "그림자 이동"
       ],
       "properties": {
-        "element": "dark",
+        "element": "DARK",
         "canDrop": [
           "엘프 활",
           "어둠의 보석"
@@ -1736,7 +1736,7 @@
       }
     },
     {
-      "id": "shadow_beast",
+      "id": "SHADOW_BEAST",
       "name": "그림자 야수",
       "description": "어둠의 힘으로 만들어진 무서운 야수.",
       "stats": {
@@ -1751,7 +1751,7 @@
         "gold": 40
       },
       "locations": [
-        "dark_forest"
+        "DARK_FOREST"
       ],
       "minLevel": 7,
       "maxLevel": 10,
@@ -1762,7 +1762,7 @@
         "그림자 분신"
       ],
       "properties": {
-        "element": "dark",
+        "element": "DARK",
         "canDrop": [
           "어둠의 심장",
           "그림자 크리스탈"
@@ -1770,7 +1770,7 @@
       }
     },
     {
-      "id": "temple_guardian",
+      "id": "TEMPLE_GUARDIAN",
       "name": "신전 수호자",
       "description": "신전을 지키는 빛의 수호자.",
       "stats": {
@@ -1785,7 +1785,7 @@
         "gold": 35
       },
       "locations": [
-        "holy_temple"
+        "HOLY_TEMPLE"
       ],
       "minLevel": 6,
       "maxLevel": 9,
@@ -1796,7 +1796,7 @@
         "치유"
       ],
       "properties": {
-        "element": "light",
+        "element": "LIGHT",
         "canDrop": [
           "성스러운 깃털",
           "빛의 구슬"
@@ -1804,7 +1804,7 @@
       }
     },
     {
-      "id": "fallen_angel",
+      "id": "FALLEN_ANGEL",
       "name": "타락한 천사",
       "description": "어둠에 물든 타락한 천사.",
       "stats": {
@@ -1819,7 +1819,7 @@
         "gold": 45
       },
       "locations": [
-        "holy_temple"
+        "HOLY_TEMPLE"
       ],
       "minLevel": 8,
       "maxLevel": 11,
@@ -1830,7 +1830,7 @@
         "절망의 노래"
       ],
       "properties": {
-        "element": "dark",
+        "element": "DARK",
         "canDrop": [
           "타락한 날개",
           "절망의 눈물"
@@ -1838,7 +1838,7 @@
       }
     },
     {
-      "id": "magic_golem",
+      "id": "MAGIC_GOLEM",
       "name": "마법 골렘",
       "description": "마법사가 만든 강력한 마법 골렘.",
       "stats": {
@@ -1853,7 +1853,7 @@
         "gold": 38
       },
       "locations": [
-        "wizard_tower"
+        "WIZARD_TOWER"
       ],
       "minLevel": 7,
       "maxLevel": 10,
@@ -1864,7 +1864,7 @@
         "마법 방벽"
       ],
       "properties": {
-        "element": "magic",
+        "element": "MAGIC",
         "canDrop": [
           "마법 코어",
           "골렘 부품"
@@ -1872,7 +1872,7 @@
       }
     },
     {
-      "id": "elemental_wisp",
+      "id": "ELEMENTAL_WISP",
       "name": "원소 정령",
       "description": "탑에 떠다니는 작은 원소 정령.",
       "stats": {
@@ -1887,7 +1887,7 @@
         "gold": 25
       },
       "locations": [
-        "wizard_tower"
+        "WIZARD_TOWER"
       ],
       "minLevel": 5,
       "maxLevel": 8,
@@ -1898,7 +1898,7 @@
         "순간이동"
       ],
       "properties": {
-        "element": "magic",
+        "element": "MAGIC",
         "canDrop": [
           "원소 정수",
           "마법 가루"
@@ -1906,7 +1906,7 @@
       }
     },
     {
-      "id": "arcane_sentinel",
+      "id": "ARCANE_SENTINEL",
       "name": "비전 감시자",
       "description": "탑의 최상층을 지키는 강력한 감시자.",
       "stats": {
@@ -1921,7 +1921,7 @@
         "gold": 60
       },
       "locations": [
-        "wizard_tower"
+        "WIZARD_TOWER"
       ],
       "minLevel": 9,
       "maxLevel": 12,
@@ -1932,7 +1932,7 @@
         "마법 흡수"
       ],
       "properties": {
-        "element": "magic",
+        "element": "MAGIC",
         "canDrop": [
           "비전 크리스탈",
           "고대 지식서"
@@ -1940,7 +1940,7 @@
       }
     },
     {
-      "id": "dungeon_rat",
+      "id": "DUNGEON_RAT",
       "name": "던전 쥐",
       "description": "지하에서 자란 거대한 쥐.",
       "stats": {
@@ -1955,7 +1955,7 @@
         "gold": 10
       },
       "locations": [
-        "underground_dungeon"
+        "UNDERGROUND_DUNGEON"
       ],
       "minLevel": 2,
       "maxLevel": 5,
@@ -1966,7 +1966,7 @@
         "질병 전파"
       ],
       "properties": {
-        "element": "dark",
+        "element": "DARK",
         "canDrop": [
           "쥐 꼬리",
           "더러운 털"
@@ -1974,7 +1974,7 @@
       }
     },
     {
-      "id": "orc_warrior",
+      "id": "ORC_WARRIOR",
       "name": "오크 전사",
       "description": "지하 던전에 숨어사는 강인한 오크.",
       "stats": {
@@ -1989,7 +1989,7 @@
         "gold": 30
       },
       "locations": [
-        "underground_dungeon"
+        "UNDERGROUND_DUNGEON"
       ],
       "minLevel": 5,
       "maxLevel": 8,
@@ -2000,7 +2000,7 @@
         "전투 함성"
       ],
       "properties": {
-        "element": "earth",
+        "element": "EARTH",
         "canDrop": [
           "오크 무기",
           "야만의 장신구"
@@ -2008,7 +2008,7 @@
       }
     },
     {
-      "id": "dungeon_lord",
+      "id": "DUNGEON_LORD",
       "name": "던전 군주",
       "description": "지하 던전을 지배하는 강력한 마왕.",
       "stats": {
@@ -2023,7 +2023,7 @@
         "gold": 85
       },
       "locations": [
-        "underground_dungeon"
+        "UNDERGROUND_DUNGEON"
       ],
       "minLevel": 10,
       "maxLevel": 15,
@@ -2035,7 +2035,7 @@
         "마왕의 분노"
       ],
       "properties": {
-        "element": "dark",
+        "element": "DARK",
         "canDrop": [
           "마왕의 왕관",
           "절망의 보석",
@@ -2044,7 +2044,7 @@
       }
     },
     {
-      "id": "ancient_dragon",
+      "id": "ANCIENT_DRAGON",
       "name": "고대 드래곤",
       "description": "세상에서 가장 오래되고 강력한 드래곤.",
       "stats": {
@@ -2059,9 +2059,9 @@
         "gold": 150
       },
       "locations": [
-        "rocky_mountain",
-        "ancient_ruins",
-        "lava_fields"
+        "ROCKY_MOUNTAIN",
+        "ANCIENT_RUINS",
+        "LAVA_FIELDS"
       ],
       "minLevel": 15,
       "maxLevel": 20,
@@ -2074,7 +2074,7 @@
         "완전 재생"
       ],
       "properties": {
-        "element": "ancient",
+        "element": "ANCIENT",
         "canDrop": [
           "고대 드래곤 비늘",
           "시간의 구슬",
@@ -2083,7 +2083,7 @@
       }
     },
     {
-      "id": "demon_king",
+      "id": "DEMON_KING",
       "name": "마왕",
       "description": "모든 악의 근원인 절대 마왕.",
       "stats": {
@@ -2098,9 +2098,9 @@
         "gold": 200
       },
       "locations": [
-        "underground_dungeon",
-        "dark_forest",
-        "ancient_ruins"
+        "UNDERGROUND_DUNGEON",
+        "DARK_FOREST",
+        "ANCIENT_RUINS"
       ],
       "minLevel": 18,
       "maxLevel": 25,
@@ -2113,7 +2113,7 @@
         "악마 소환"
       ],
       "properties": {
-        "element": "demon",
+        "element": "DEMON",
         "canDrop": [
           "마왕의 왕관",
           "지옥의 검",
@@ -2122,7 +2122,7 @@
       }
     },
     {
-      "id": "mimic_chest",
+      "id": "MIMIC_CHEST",
       "name": "미믹 상자",
       "description": "보물상자로 위장한 교활한 몬스터.",
       "stats": {
@@ -2137,9 +2137,9 @@
         "gold": 100
       },
       "locations": [
-        "ancient_ruins",
-        "wizard_tower",
-        "underground_dungeon"
+        "ANCIENT_RUINS",
+        "WIZARD_TOWER",
+        "UNDERGROUND_DUNGEON"
       ],
       "minLevel": 3,
       "maxLevel": 10,
@@ -2150,7 +2150,7 @@
         "보물 유혹"
       ],
       "properties": {
-        "element": "magic",
+        "element": "MAGIC",
         "canDrop": [
           "희귀 보물",
           "미믹의 이빨",
@@ -2159,7 +2159,7 @@
       }
     },
     {
-      "id": "wandering_merchant",
+      "id": "WANDERING_MERCHANT",
       "name": "떠돌이 상인",
       "description": "위험한 지역을 돌아다니는 신비한 상인.",
       "stats": {
@@ -2174,9 +2174,9 @@
         "gold": 0
       },
       "locations": [
-        "deep_forest",
-        "wasteland",
-        "rocky_mountain"
+        "DEEP_FOREST",
+        "WASTELAND",
+        "ROCKY_MOUNTAIN"
       ],
       "minLevel": 1,
       "maxLevel": 20,
@@ -2187,13 +2187,13 @@
         "상품 판매"
       ],
       "properties": {
-        "element": "neutral",
+        "element": "NEUTRAL",
         "canDrop": [],
         "special": "전투 시 특별 상점 개방"
       }
     },
     {
-      "id": "night_phantom",
+      "id": "NIGHT_PHANTOM",
       "name": "밤의 유령",
       "description": "밤에만 나타나는 신비한 유령.",
       "stats": {
@@ -2208,9 +2208,9 @@
         "gold": 30
       },
       "locations": [
-        "dark_forest",
-        "ancient_ruins",
-        "holy_temple"
+        "DARK_FOREST",
+        "ANCIENT_RUINS",
+        "HOLY_TEMPLE"
       ],
       "minLevel": 4,
       "maxLevel": 8,
@@ -2221,16 +2221,16 @@
         "공포 유발"
       ],
       "properties": {
-        "element": "ghost",
+        "element": "GHOST",
         "canDrop": [
           "유령의 정수",
           "밤의 장막"
         ],
-        "timeRestriction": "night_only"
+        "timeRestriction": "NIGHT_ONLY"
       }
     },
     {
-      "id": "dawn_sprite",
+      "id": "DAWN_SPRITE",
       "name": "새벽 요정",
       "description": "새벽 시간에만 볼 수 있는 아름다운 요정.",
       "stats": {
@@ -2245,9 +2245,9 @@
         "gold": 25
       },
       "locations": [
-        "mystic_lake",
-        "holy_temple",
-        "deep_forest"
+        "MYSTIC_LAKE",
+        "HOLY_TEMPLE",
+        "DEEP_FOREST"
       ],
       "minLevel": 2,
       "maxLevel": 6,
@@ -2258,12 +2258,12 @@
         "축복"
       ],
       "properties": {
-        "element": "light",
+        "element": "LIGHT",
         "canDrop": [
           "요정 가루",
           "새벽의 이슬"
         ],
-        "timeRestriction": "dawn_only"
+        "timeRestriction": "DAWN_ONLY"
       }
     }
   ]

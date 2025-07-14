@@ -1,7 +1,7 @@
 {
   "locations": [
     {
-      "id": "deep_forest",
+      "id": "DEEP_FOREST",
       "nameKo": "숲속 깊은 곳",
       "nameEn": "Deep Forest",
       "icon": "🌲",
@@ -18,7 +18,7 @@
       }
     },
     {
-      "id": "dark_cave",
+      "id": "DARK_CAVE",
       "nameKo": "어두운 동굴",
       "nameEn": "Dark Cave",
       "icon": "🕳️",
@@ -35,7 +35,7 @@
       }
     },
     {
-      "id": "rugged_mountain",
+      "id": "RUGGED_MOUNTAIN",
       "nameKo": "험준한 산길",
       "nameEn": "Rugged Mountain Path",
       "icon": "⛰️",
@@ -52,7 +52,7 @@
       }
     },
     {
-      "id": "magical_forest",
+      "id": "MAGICAL_FOREST",
       "nameKo": "마법의 숲",
       "nameEn": "Magical Forest",
       "icon": "🌟",
@@ -69,7 +69,7 @@
       }
     },
     {
-      "id": "mystic_lake",
+      "id": "MYSTIC_LAKE",
       "nameKo": "신비한 호수",
       "nameEn": "Mystic Lake",
       "icon": "🏞️",
@@ -86,7 +86,7 @@
       }
     },
     {
-      "id": "ruined_castle",
+      "id": "RUINED_CASTLE",
       "nameKo": "폐허가 된 성",
       "nameEn": "Ruined Castle",
       "icon": "🏰",
@@ -103,7 +103,7 @@
       }
     },
     {
-      "id": "ancient_ruins",
+      "id": "ANCIENT_RUINS",
       "nameKo": "고대 유적",
       "nameEn": "Ancient Ruins",
       "icon": "🏛️",
@@ -120,7 +120,7 @@
       }
     },
     {
-      "id": "lava_cave",
+      "id": "LAVA_CAVE",
       "nameKo": "용암 동굴",
       "nameEn": "Lava Cave",
       "icon": "🌋",
@@ -137,7 +137,7 @@
       }
     },
     {
-      "id": "frozen_wasteland",
+      "id": "FROZEN_WASTELAND",
       "nameKo": "얼어붙은 황무지",
       "nameEn": "Frozen Wasteland",
       "icon": "🧊",
@@ -154,7 +154,7 @@
       }
     },
     {
-      "id": "sky_fortress",
+      "id": "SKY_FORTRESS",
       "nameKo": "하늘 요새",
       "nameEn": "Sky Fortress",
       "icon": "☁️",
@@ -171,7 +171,7 @@
       }
     },
     {
-      "id": "deep_ocean",
+      "id": "DEEP_OCEAN",
       "nameKo": "심해",
       "nameEn": "Deep Ocean",
       "icon": "🌊",
@@ -189,7 +189,7 @@
       }
     },
     {
-      "id": "shadow_realm",
+      "id": "SHADOW_REALM",
       "nameKo": "그림자 영역",
       "nameEn": "Shadow Realm",
       "icon": "🌑",
@@ -207,7 +207,7 @@
       }
     },
     {
-      "id": "celestial_garden",
+      "id": "CELESTIAL_GARDEN",
       "nameKo": "천상의 정원",
       "nameEn": "Celestial Garden",
       "icon": "🌸",
@@ -225,7 +225,7 @@
       }
     },
     {
-      "id": "void_chasm",
+      "id": "VOID_CHASM",
       "nameKo": "공허의 틈",
       "nameEn": "Void Chasm",
       "icon": "⚫",
