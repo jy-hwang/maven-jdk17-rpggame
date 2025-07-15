@@ -64,27 +64,59 @@ public class GameEngine {
     this.gameStartTime = System.currentTimeMillis();
     this.currentSaveSlot = 0;
 
-    initializeControllers();
-    logger.info("게임 인스턴스 생성 완료 (v" + SystemConstants.GAME_VERSION + "- 몬스터 도감 추가)");
+    // 단계별 초기화
+    initializeBasicControllers();
+    logger.info("게임 엔진 기본 초기화 완료 (v{})", SystemConstants.GAME_VERSION);
   }
 
   /**
-   * 모든 컨트롤러를 초기화합니다.
+   * 플레이어 독립적인 기본 컨트롤러들을 초기화합니다.
    */
-  private void initializeControllers() {
+  private void initializeBasicControllers() {
     try {
-      // 순서 중요: 의존성이 있는 컨트롤러들을 순서대로 초기화
+      // 1단계: 플레이어 독립적인 컨트롤러들
       inventoryController = new InventoryController();
-      battleController = new BattleEngine(null, gameState); // 임시로 null
-      shopController = new ShopController(inventoryController);
-      exploreController = new ExploreEngine(battleController, null, inventoryController, gameState); // 임시로 null
-
       saveGameController = new SaveGameController();
-      debugController = new DebugController(player);
-      logger.debug("모든 컨트롤러 초기화 완료");
+
+      // 2단계: 나머지는 플레이어 생성 후 초기화
+      logger.debug("기본 컨트롤러 초기화 완료");
+
     } catch (Exception e) {
-      logger.error("컨트롤러 초기화 실패", e);
+      logger.error("기본 컨트롤러 초기화 실패", e);
       throw new RuntimeException("게임 초기화 중 오류가 발생했습니다.", e);
+    }
+  }
+
+  /**
+   * 플레이어 종속적인 컨트롤러들을 초기화합니다.
+   */
+  private void initializePlayerDependentControllers() {
+    if (player == null) {
+      throw new IllegalStateException("플레이어가 없으면 컨트롤러를 초기화할 수 없습니다.");
+    }
+
+    try {
+      QuestManager questManager = player.getQuestManager();
+
+      // 1단계: QuestController 먼저 초기화
+      questController = new QuestController(questManager, gameState, player);
+      logger.debug("QuestController 초기화 완료");
+
+      // 2단계: 나머지 컨트롤러들 초기화
+      battleController = new BattleEngine(questManager, gameState);
+      shopController = new ShopController(inventoryController);
+      exploreController = new ExploreEngine(battleController, questController, inventoryController, gameState);
+
+      // 3단계: 디버그 컨트롤러 (선택적)
+      if (SystemConstants.DEBUG_MODE) {
+        debugController = new DebugController(player);
+      }
+
+      logger.debug("플레이어 종속 컨트롤러 초기화 완료");
+
+    } catch (Exception e) {
+      logger.error("플레이어 종속 컨트롤러 초기화 실패", e);
+      throw new RuntimeException("컨트롤러 초기화 중 오류가 발생했습니다.", e);
     }
   }
 
@@ -121,14 +153,47 @@ public class GameEngine {
       logger.info("게임 종료");
     }
   }
+  
+  /**
+   * 새 게임을 시작합니다.
+   */
+  private void startNewGame() {
+    try {
+      String name = InputValidator.getStringInput("캐릭터 이름: ", 2, 20);
+
+      // 1단계: 플레이어 생성
+      player = new Player(name);
+      logger.info("새 플레이어 생성: {}", name);
+
+      // 2단계: 플레이어 종속 컨트롤러들 초기화
+      initializePlayerDependentControllers();
+
+      // 3단계: 게임 초기화
+      giveStartingItems();
+      player.displayStats();
+
+      // 4단계: 일일 퀘스트 생성
+      player.getQuestManager().generateDailyQuests(player);
+
+      logger.info("새 게임 초기화 완료");
+      System.out.println("\n💡 퀘스트 메뉴에서 첫 번째 퀘스트를 수락해보세요!");
+
+      // 5단계: 게임 시작
+      startGameLoop();
+
+    } catch (Exception e) {
+      logger.error("새 게임 시작 실패", e);
+      System.out.println("새 게임 시작 중 오류가 발생했습니다.");
+      InputValidator.waitForAnyKey("계속하려면 Enter를 누르세요...");
+    }
+  }
 
   /**
    * 환영 메시지를 표시합니다.
    */
   private void showWelcomeMessage() {
     System.out.println(ConsoleColors.CYAN + "====================================");
-    System.out.println("   🎮 " + ConsoleColors.BOLD + ConsoleColors.GOLD_FALLBACK + "RPG 게임 v" + SystemConstants.GAME_VERSION + ConsoleColors.RESET
-        + ConsoleColors.CYAN + " 🎮   ");
+    System.out.println("   🎮 " + ConsoleColors.BOLD + ConsoleColors.GOLD_FALLBACK + "RPG 게임 v" + SystemConstants.GAME_VERSION + ConsoleColors.RESET + ConsoleColors.CYAN + " 🎮   ");
     System.out.println("====================================" + ConsoleColors.RESET);
 
     System.out.println("새로운 기능:");
@@ -155,44 +220,44 @@ public class GameEngine {
   /**
    * 새 게임을 시작합니다.
    */
-  private void startNewGame() {
-    try {
-      String name = InputValidator.getStringInput("캐릭터 이름을 입력하세요: ", 1, 20);
-      player = new Player(name);
-
-      // 게임 상태 초기화
-      gameState = new GameState();
-      gameStartTime = System.currentTimeMillis();
-      currentSaveSlot = 0;
-
-      // 🔥 시작 아이템으로 기본 물약 지급
-      giveStartingItems();
-
-      // 컨트롤러들에 새로운 게임 상태 적용
-      updateControllersWithNewGameState();
-
-      System.out.println("🎉 새로운 모험가 " + name + "님, 환영합니다!");
-      player.displayStats();
-
-      // 🆕 일일 퀘스트 초기 생성
-      player.getQuestManager().generateDailyQuests(player);
-
-      logger.info("새 게임 초기화 완료 - 일일 퀘스트 포함");
-
-      // 시작 퀘스트 안내
-      System.out.println("\n💡 퀘스트 메뉴에서 첫 번째 퀘스트를 수락해보세요!");
-
-      logger.info("새 캐릭터 생성: {}", name);
-
-      // 인게임 루프 시작
-      startGameLoop();
-
-    } catch (Exception e) {
-      logger.error("새 게임 시작 실패", e);
-      System.out.println("새 게임 시작 중 오류가 발생했습니다.");
-      InputValidator.waitForAnyKey("계속하려면 Enter를 누르세요...");
-    }
-  }
+  // private void startNewGame() {
+  // try {
+  // String name = InputValidator.getStringInput("캐릭터 이름을 입력하세요: ", 1, 20);
+  // player = new Player(name);
+  //
+  // // 게임 상태 초기화
+  // gameState = new GameState();
+  // gameStartTime = System.currentTimeMillis();
+  // currentSaveSlot = 0;
+  //
+  // // 🔥 시작 아이템으로 기본 물약 지급
+  // giveStartingItems();
+  //
+  // // 컨트롤러들에 새로운 게임 상태 적용
+  // updateControllersWithNewGameState();
+  //
+  // System.out.println("🎉 새로운 모험가 " + name + "님, 환영합니다!");
+  // player.displayStats();
+  //
+  // // 🆕 일일 퀘스트 초기 생성
+  // player.getQuestManager().generateDailyQuests(player);
+  //
+  // logger.info("새 게임 초기화 완료 - 일일 퀘스트 포함");
+  //
+  // // 시작 퀘스트 안내
+  // System.out.println("\n💡 퀘스트 메뉴에서 첫 번째 퀘스트를 수락해보세요!");
+  //
+  // logger.info("새 캐릭터 생성: {}", name);
+  //
+  // // 인게임 루프 시작
+  // startGameLoop();
+  //
+  // } catch (Exception e) {
+  // logger.error("새 게임 시작 실패", e);
+  // System.out.println("새 게임 시작 중 오류가 발생했습니다.");
+  // InputValidator.waitForAnyKey("계속하려면 Enter를 누르세요...");
+  // }
+  // }
 
   /**
    * 시작 아이템 지급
@@ -234,10 +299,15 @@ public class GameEngine {
   private void loadGame() {
     SaveGameController.SaveLoadResult result = saveGameController.loadGame();
     if (result.isSuccess()) {
+      // 1단계: 플레이어와 게임 상태 복원
       player = result.getPlayer();
       gameState = result.getGameState();
       currentSaveSlot = result.getSlotNumber();
-      updateControllersWithNewGameState();
+
+      // 2단계: 컨트롤러 재초기화
+      initializePlayerDependentControllers();
+
+      // 3단계: 게임 시작
       startGameLoop();
     }
   }
@@ -251,28 +321,53 @@ public class GameEngine {
       gameRunning = false;
     }
   }
+  
+  /**
+   * 컨트롤러 상태 검증
+   */
+  private void validateControllers() {
+    if (player != null) {
+      // 플레이어가 있을 때는 모든 컨트롤러가 초기화되어야 함
+      if (questController == null) {
+        throw new IllegalStateException("QuestController가 초기화되지 않았습니다.");
+      }
+      if (battleController == null) {
+        throw new IllegalStateException("BattleController가 초기화되지 않았습니다.");
+      }
+      if (exploreController == null) {
+        throw new IllegalStateException("ExploreController가 초기화되지 않았습니다.");
+      }
+    }
 
+    // 기본 컨트롤러들은 항상 초기화되어야 함
+    if (inventoryController == null) {
+      throw new IllegalStateException("InventoryController가 초기화되지 않았습니다.");
+    }
+    if (saveGameController == null) {
+      throw new IllegalStateException("SaveGameController가 초기화되지 않았습니다.");
+    }
+  }
 
   /**
    * 새로운 게임 상태로 컨트롤러들을 업데이트합니다.
    */
   private void updateControllersWithNewGameState() {
-    QuestManager questManager = player.getQuestManager();
-
-    questController = new QuestController(questManager, gameState, player);
-    battleController = new BattleEngine(questManager, gameState);
-    exploreController = new ExploreEngine(battleController, questController, inventoryController, gameState);
-
-    // 디버그 컨트롤러 초기화 (플레이어가 있을 때만)
-    if (player != null && SystemConstants.DEBUG_MODE) {
-      debugController = new DebugController(player);
+    if (player == null) {
+      logger.warn("플레이어가 null인 상태에서 컨트롤러 업데이트 시도");
+      return;
     }
+
+    // 플레이어 종속 컨트롤러들 재초기화
+    initializePlayerDependentControllers();
+    logger.debug("컨트롤러 업데이트 완료");
   }
 
   /**
    * 메인 게임 루프를 실행합니다.
    */
   private void startGameLoop() {
+    validateControllers();
+
     inGameLoop = true;
 
     while (inGameLoop && player.isAlive()) {
@@ -295,6 +390,10 @@ public class GameEngine {
             manageSkills();
             break;
           case 5:
+            if (questController == null) {
+              System.out.println("❌ 퀘스트 시스템이 초기화되지 않았습니다.");
+              break;
+            }
             questController.manageQuests(player);
             break;
           case 6:
@@ -424,8 +523,7 @@ public class GameEngine {
 
     var allMonsters = MonsterDataLoader.loadAllMonsters();
 
-    var searchResults =
-        allMonsters.values().stream().filter(monster -> monster.getName().toLowerCase().contains(keyword.toLowerCase())).collect(Collectors.toList());
+    var searchResults = allMonsters.values().stream().filter(monster -> monster.getName().toLowerCase().contains(keyword.toLowerCase())).collect(Collectors.toList());
 
     if (searchResults.isEmpty()) {
       System.out.println("'" + keyword + "'와 일치하는 몬스터를 찾을 수 없습니다.");
@@ -476,8 +574,7 @@ public class GameEngine {
     if (!rewards.getDropItems().isEmpty()) {
       System.out.println("🎁 드롭 아이템:");
       for (var dropItem : rewards.getDropItems()) {
-        System.out.printf("   • %s (확률 %.1f%%, 수량 %d~%d)%n", dropItem.getItemId(), dropItem.getDropRate() * 100, dropItem.getMinQuantity(),
-            dropItem.getMaxQuantity());
+        System.out.printf("   • %s (확률 %.1f%%, 수량 %d~%d)%n", dropItem.getItemId(), dropItem.getDropRate() * 100, dropItem.getMinQuantity(), dropItem.getMaxQuantity());
       }
     }
 
@@ -599,6 +696,11 @@ public class GameEngine {
    * 탐험을 처리합니다. (개선된 버전)
    */
   private void handleExploration() {
+    if (exploreController == null) {
+      System.out.println("❌ 탐험 시스템이 초기화되지 않았습니다.");
+      return;
+    }
+
     while (true) {
       showExplorationMenu();
 
@@ -634,8 +736,7 @@ public class GameEngine {
       String difficultyColor = getDifficultyColor(location.getDangerLevel());
       String recommendationText = getRecommendationText(location, player.getLevel());
 
-      System.out.printf("%s%d. %s %s%s %s%n", difficultyColor, i + 1, location.getIcon(), location.getNameKo(), ConsoleColors.RESET,
-          recommendationText);
+      System.out.printf("%s%d. %s %s%s %s%n", difficultyColor, i + 1, location.getIcon(), location.getNameKo(), ConsoleColors.RESET, recommendationText);
     }
 
     System.out.println(ConsoleColors.WHITE + "0. 🏠 마을로 돌아가기" + ConsoleColors.RESET);
@@ -915,9 +1016,9 @@ public class GameEngine {
    * 미래 접근 가능 지역 표시
    */
   private void showFutureLocations(int playerLevel) {
-    List<LocationData> futureLocations = LocationManager.getAllLocations().stream().filter(location -> location.getMinLevel() > playerLevel)
-        .filter(location -> location.getMinLevel() <= playerLevel + 5) // 5레벨 이내
-        .sorted((l1, l2) -> Integer.compare(l1.getMinLevel(), l2.getMinLevel())).collect(Collectors.toList());
+    List<LocationData> futureLocations =
+        LocationManager.getAllLocations().stream().filter(location -> location.getMinLevel() > playerLevel).filter(location -> location.getMinLevel() <= playerLevel + 5) // 5레벨 이내
+            .sorted((l1, l2) -> Integer.compare(l1.getMinLevel(), l2.getMinLevel())).collect(Collectors.toList());
 
     if (!futureLocations.isEmpty()) {
       System.out.println("\n🔮 곧 접근 가능한 지역:");
@@ -1082,8 +1183,7 @@ public class GameEngine {
 
     try {
       JsonBasedQuestFactory questFactory = JsonBasedQuestFactory.getInstance();
-      System.out.printf("• 퀘스트 템플릿: 메인 %d개, 사이드 %d개, 일일 %d개\n", questFactory.getQuestCount("MAIN"), questFactory.getQuestCount("SIDE"),
-          questFactory.getQuestCount("DAILY"));
+      System.out.printf("• 퀘스트 템플릿: 메인 %d개, 사이드 %d개, 일일 %d개\n", questFactory.getQuestCount("MAIN"), questFactory.getQuestCount("SIDE"), questFactory.getQuestCount("DAILY"));
     } catch (Exception e) {
       System.out.println("• 퀘스트 시스템: 초기화 중 오류 발생");
     }
@@ -1101,8 +1201,7 @@ public class GameEngine {
       System.out.printf("• 초기화 상태: %s\n", itemFactory.isInitialized() ? "정상" : "오류");
 
       JsonBasedQuestFactory questFactory = JsonBasedQuestFactory.getInstance();
-      System.out.printf("• 퀘스트 템플릿: 메인 %d개, 사이드 %d개, 일일 %d개\n", questFactory.getQuestCount("MAIN"), questFactory.getQuestCount("SIDE"),
-          questFactory.getQuestCount("DAILY"));
+      System.out.printf("• 퀘스트 템플릿: 메인 %d개, 사이드 %d개, 일일 %d개\n", questFactory.getQuestCount("MAIN"), questFactory.getQuestCount("SIDE"), questFactory.getQuestCount("DAILY"));
     } catch (Exception e) {
       System.out.println("• 시스템 상태: 일부 오류 발생 (" + e.getMessage() + ")");
     }
@@ -1155,9 +1254,9 @@ public class GameEngine {
     }
 
     // 지역별로 그룹화
-    Map<String, List<MonsterData>> monstersByLocation = suitableMonsters.stream()
-        .flatMap(monster -> monster.getLocations().stream().map(locationId -> new AbstractMap.SimpleEntry<>(locationId, monster)))
-        .collect(Collectors.groupingBy(Map.Entry::getKey, Collectors.mapping(Map.Entry::getValue, Collectors.toList())));
+    Map<String, List<MonsterData>> monstersByLocation =
+        suitableMonsters.stream().flatMap(monster -> monster.getLocations().stream().map(locationId -> new AbstractMap.SimpleEntry<>(locationId, monster)))
+            .collect(Collectors.groupingBy(Map.Entry::getKey, Collectors.mapping(Map.Entry::getValue, Collectors.toList())));
 
     for (Map.Entry<String, List<MonsterData>> entry : monstersByLocation.entrySet()) {
       String locationId = entry.getKey();
@@ -1177,8 +1276,7 @@ public class GameEngine {
   private void showMonstersByRarity() {
     System.out.println("\n✨ === 희귀도별 몬스터 ===");
 
-    Map<String, List<MonsterData>> monstersByRarity =
-        MonsterDataLoader.loadAllMonsters().values().stream().collect(Collectors.groupingBy(MonsterData::getRarity));
+    Map<String, List<MonsterData>> monstersByRarity = MonsterDataLoader.loadAllMonsters().values().stream().collect(Collectors.groupingBy(MonsterData::getRarity));
 
     String[] rarityOrder = {"COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHICAL"};
 
@@ -1223,8 +1321,7 @@ public class GameEngine {
     System.out.println("\n🔍 === '" + searchTerm + "' 검색 결과 ===");
 
     List<MonsterData> allMonsters = new ArrayList<>(MonsterDataLoader.loadAllMonsters().values());
-    List<MonsterData> searchResults = allMonsters.stream()
-        .filter(monster -> monster.getName().contains(searchTerm) || monster.getDescription().contains(searchTerm)).collect(Collectors.toList());
+    List<MonsterData> searchResults = allMonsters.stream().filter(monster -> monster.getName().contains(searchTerm) || monster.getDescription().contains(searchTerm)).collect(Collectors.toList());
 
     if (searchResults.isEmpty()) {
       System.out.println("❌ 검색 결과가 없습니다.");
@@ -1241,4 +1338,47 @@ public class GameEngine {
       System.out.printf("   🗺️ 서식지: %s%n", String.join(", ", locationNames));
     }
   }
+
+  /**
+   * 컨트롤러 초기화 상태 열거형
+   */
+  public enum ControllerInitializationState {
+    BASIC_ONLY, // 기본 컨트롤러만 초기화
+    PLAYER_DEPENDENT, // 플레이어 종속 컨트롤러까지 초기화
+    FULLY_INITIALIZED // 모든 컨트롤러 초기화 완료
+  }
+
+  /**
+   * 초기화 상태 추적
+   */
+  private ControllerInitializationState initializationState = ControllerInitializationState.BASIC_ONLY;
+
+  /**
+   * 현재 초기화 상태 반환
+   */
+  public ControllerInitializationState getInitializationState() {
+    return initializationState;
+  }
+
+  /**
+   * 게임 상태 디버그 정보 출력
+   */
+  public void printGameEngineStatus() {
+    System.out.println("\n=== 🎮 GameEngine 상태 ===");
+    System.out.printf("초기화 상태: %s\n", initializationState);
+    System.out.printf("플레이어: %s\n", player != null ? player.getName() : "없음");
+    System.out.printf("게임 실행 중: %s\n", gameRunning ? "예" : "아니오");
+    System.out.printf("인게임 루프: %s\n", inGameLoop ? "예" : "아니오");
+
+    System.out.println("\n컨트롤러 상태:");
+    System.out.printf("  InventoryController: %s\n", inventoryController != null ? "✅" : "❌");
+    System.out.printf("  QuestController: %s\n", questController != null ? "✅" : "❌");
+    System.out.printf("  BattleEngine: %s\n", battleController != null ? "✅" : "❌");
+    System.out.printf("  ExploreEngine: %s\n", exploreController != null ? "✅" : "❌");
+    System.out.printf("  ShopController: %s\n", shopController != null ? "✅" : "❌");
+    System.out.printf("  DebugController: %s\n", debugController != null ? "✅" : "❌");
+
+    System.out.println("========================");
+  }
+  
 }
