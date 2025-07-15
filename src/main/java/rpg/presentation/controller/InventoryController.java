@@ -12,6 +12,7 @@ import rpg.domain.item.GameEquipment;
 import rpg.domain.item.GameItem;
 import rpg.domain.item.ItemRarity;
 import rpg.domain.player.Player;
+import rpg.presentation.menu.InventoryMenu;
 import rpg.shared.constant.GameConstants;
 
 /**
@@ -20,9 +21,11 @@ import rpg.shared.constant.GameConstants;
 public class InventoryController {
   private static final Logger logger = LoggerFactory.getLogger(InventoryController.class);
   private final GameItemFactory itemFactory;
+  private final InventoryMenu inventoryMenu;
 
   public InventoryController() {
     this.itemFactory = GameItemFactory.getInstance();
+    this.inventoryMenu = new InventoryMenu();
     logger.debug("InventoryController 초기화 완료");
   }
 
@@ -92,14 +95,7 @@ public class InventoryController {
   private void displayInventoryMenu(Player player) {
     player.getInventory().displayInventory();
 
-    System.out.println("\n=== 인벤토리 관리 ===");
-    System.out.println("1. 🧪 아이템 사용");
-    System.out.println("2. ⚔️ 장비 관리");
-    System.out.println("3. 📋 아이템 정보");
-    System.out.println("4. 📦 인벤토리 정렬");
-    System.out.println("5. 📊 인벤토리 통계");
-    System.out.println("6. 🔍 장비 비교");
-    System.out.println("7. 🔙 돌아가기");
+    inventoryMenu.displayInventoryMenu(player);
 
     // 상태 알림
     showInventoryAlerts(player);
@@ -223,14 +219,16 @@ public class InventoryController {
    * 체력 회복 아이템인지 확인
    */
   private boolean isHealingItem(GameConsumable item) {
-    return item.getEffectsDescription().toLowerCase().contains("hp") || item.getName().toLowerCase().contains("체력") || item.getName().toLowerCase().contains("health");
+    return item.getEffectsDescription().toLowerCase().contains("hp") || item.getName().toLowerCase().contains("체력")
+        || item.getName().toLowerCase().contains("health");
   }
 
   /**
    * 마나 회복 아이템인지 확인
    */
   private boolean isManaItem(GameConsumable item) {
-    return item.getEffectsDescription().toLowerCase().contains("mp") || item.getName().toLowerCase().contains("마나") || item.getName().toLowerCase().contains("mana");
+    return item.getEffectsDescription().toLowerCase().contains("mp") || item.getName().toLowerCase().contains("마나")
+        || item.getName().toLowerCase().contains("mana");
   }
 
   /**
@@ -238,7 +236,7 @@ public class InventoryController {
    */
   private void manageEquipment(Player player) {
     while (true) {
-      displayEquipmentMenu(player);
+      inventoryMenu.displayEquipmentMenu(player);
 
       int choice = InputValidator.getIntInput("선택: ", 1, 5);
 
@@ -259,18 +257,6 @@ public class InventoryController {
           return;
       }
     }
-  }
-
-  /**
-   * 장비 관리 메뉴를 표시합니다.
-   */
-  private void displayEquipmentMenu(Player player) {
-    System.out.println("\n=== 장비 관리 ===");
-    System.out.println("1. ⚔️ 장비 착용");
-    System.out.println("2. 📤 장비 해제");
-    System.out.println("3. 👁️ 현재 장비 보기");
-    System.out.println("4. ⚡ 최적 장비 자동 착용");
-    System.out.println("5. 🔙 돌아가기");
   }
 
   /**
@@ -424,12 +410,7 @@ public class InventoryController {
    * 장비를 해제합니다.
    */
   private void unequipItem(Player player) {
-    System.out.println("\n=== 장비 해제 ===");
-    System.out.println("1. ⚔️ 무기 해제");
-    System.out.println("2. 🛡️ 방어구 해제");
-    System.out.println("3. 💍 장신구 해제");
-    System.out.println("4. 🔄 모든 장비 해제");
-    System.out.println("5. 🔙 취소");
+    inventoryMenu.displayUnequipItemMenu(player);
 
     int choice = InputValidator.getIntInput("선택: ", 1, 5);
     if (choice == 5)
@@ -443,7 +424,8 @@ public class InventoryController {
       return;
     }
 
-    GameEquipment.EquipmentType[] types = {GameEquipment.EquipmentType.WEAPON, GameEquipment.EquipmentType.ARMOR, GameEquipment.EquipmentType.ACCESSORY};
+    GameEquipment.EquipmentType[] types =
+        {GameEquipment.EquipmentType.WEAPON, GameEquipment.EquipmentType.ARMOR, GameEquipment.EquipmentType.ACCESSORY};
 
     String[] typeNames = {"무기", "방어구", "장신구"};
 
@@ -525,7 +507,8 @@ public class InventoryController {
     // 총 장비 보너스 표시
     PlayerInventory.EquipmentBonus bonus = inventory.getTotalBonus();
     System.out.println("\n📊 총 장비 보너스:");
-    if (bonus.getAttackBonus() > GameConstants.NUMBER_ZERO || bonus.getDefenseBonus() > GameConstants.NUMBER_ZERO || bonus.getHpBonus() > GameConstants.NUMBER_ZERO) {
+    if (bonus.getAttackBonus() > GameConstants.NUMBER_ZERO || bonus.getDefenseBonus() > GameConstants.NUMBER_ZERO
+        || bonus.getHpBonus() > GameConstants.NUMBER_ZERO) {
       if (bonus.getAttackBonus() > GameConstants.NUMBER_ZERO)
         System.out.println("⚔️ 공격력: +" + bonus.getAttackBonus());
       if (bonus.getDefenseBonus() > GameConstants.NUMBER_ZERO)
@@ -721,7 +704,8 @@ public class InventoryController {
    * 비교용 장비 포맷을 생성합니다.
    */
   private String formatEquipmentForComparison(GameEquipment equipment) {
-    return String.format("%s [%s] (공격+%d, 방어+%d, HP+%d)", equipment.getName(), getRarityKorean(equipment.getRarity()), equipment.getAttackBonus(), equipment.getDefenseBonus(), equipment.getHpBonus());
+    return String.format("%s [%s] (공격+%d, 방어+%d, HP+%d)", equipment.getName(), getRarityKorean(equipment.getRarity()), equipment.getAttackBonus(),
+        equipment.getDefenseBonus(), equipment.getHpBonus());
   }
 
   /**
@@ -984,6 +968,7 @@ public class InventoryController {
    */
   public String getInventorySummary(Player player) {
     PlayerInventory inventory = player.getInventory();
-    return String.format("인벤토리: %d/%d (%.0f%%) | 골드: %dG", inventory.getCurrentSize(), inventory.getMaxSize(), inventory.getUsageRate() * 100, player.getGold());
+    return String.format("인벤토리: %d/%d (%.0f%%) | 골드: %dG", inventory.getCurrentSize(), inventory.getMaxSize(), inventory.getUsageRate() * 100,
+        player.getGold());
   }
 }
