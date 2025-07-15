@@ -174,7 +174,7 @@ public class GameEngine {
       player.displayStats();
 
       // 4단계: 일일 퀘스트 생성
-      //player.getQuestManager().generateDailyQuests(player);
+      // player.getQuestManager().generateDailyQuests(player);
 
       logger.info("새 게임 초기화 완료");
       System.out.println("\n💡 퀘스트 메뉴에서 첫 번째 퀘스트를 수락해보세요!");
@@ -193,9 +193,9 @@ public class GameEngine {
    * 환영 메시지를 표시합니다.
    */
   private void showWelcomeMessage() {
-    System.out.println(ConsoleColors.CYAN + "====================================");
-    System.out.println("   🎮 " + ConsoleColors.BOLD + ConsoleColors.GOLD_FALLBACK + "RPG 게임 v" + SystemConstants.GAME_VERSION + ConsoleColors.RESET + ConsoleColors.CYAN + " 🎮   ");
-    System.out.println("====================================" + ConsoleColors.RESET);
+    System.out.println("====================================");
+    System.out.println("   🎮 RPG 게임 v" + SystemConstants.GAME_VERSION + "🎮   ");
+    System.out.println("====================================");
 
     System.out.println("새로운 기능:");
     System.out.println("• 📦 다중 저장 슬롯 시스템 (5개)");
@@ -210,11 +210,11 @@ public class GameEngine {
    * 메인 메뉴를 표시합니다.
    */
   private void showMainMenu() {
-    System.out.println("\n" + ConsoleColors.BRIGHT_GREEN + "=== 🎮 메인 메뉴 ===" + ConsoleColors.RESET);
-    System.out.println(ConsoleColors.colorize("1. 🆕 새로하기", ConsoleColors.BRIGHT_GREEN));
-    System.out.println(ConsoleColors.colorize("2. 📁 불러오기", ConsoleColors.BRIGHT_BLUE));
-    System.out.println(ConsoleColors.colorize("3. 🚪 종료하기", ConsoleColors.BRIGHT_RED));
-    System.out.println(ConsoleColors.CYAN + "==================" + ConsoleColors.RESET);
+    System.out.println("\n=== 🎮 메인 메뉴 ===");
+    System.out.println("1. 🆕 새로하기");
+    System.out.println("2. 📁 불러오기");
+    System.out.println("3. 🚪 종료하기");
+    System.out.println("==================");
   }
 
 
@@ -455,32 +455,32 @@ public class GameEngine {
    * 확장된 메인 메뉴를 표시합니다.
    */
   private void showInGameMenu() {
-    System.out.println("\n" + ConsoleColors.BOLD + ConsoleColors.BRIGHT_CYAN + "=== 🎯 게임 메뉴 ===" + ConsoleColors.RESET);
+    System.out.println("\n=== 🎯 게임 메뉴 ===");
 
     // 탐험 관련
-    System.out.println(ConsoleColors.colorize("1. 🗡️ 탐험하기", ConsoleColors.BRIGHT_RED));
-    System.out.println(ConsoleColors.colorize("2. 📊 상태 확인", ConsoleColors.BRIGHT_BLUE));
+    System.out.println("1. 🗡️ 탐험하기");
+    System.out.println("2. 📊 상태 확인");
 
     // 관리 메뉴
-    System.out.println(ConsoleColors.colorize("3. 🎒 인벤토리", ConsoleColors.BRIGHT_GREEN));
-    System.out.println(ConsoleColors.colorize("4. ⚡ 스킬 관리", ConsoleColors.GOLD_FALLBACK));
-    System.out.println(ConsoleColors.colorize("5. 📋 퀘스트", ConsoleColors.BRIGHT_PURPLE));
-    System.out.println(ConsoleColors.colorize("6. 🏪 상점", ConsoleColors.BRIGHT_CYAN));
+    System.out.println("3. 🎒 인벤토리");
+    System.out.println("4. ⚡ 스킬 관리");
+    System.out.println("5. 📋 퀘스트");
+    System.out.println("6. 🏪 상점");
 
     // 정보 메뉴
-    System.out.println(ConsoleColors.colorize("7. 🗺️ 지역 정보", ConsoleColors.GREEN));
-    System.out.println(ConsoleColors.colorize("8. 📚 몬스터 도감", ConsoleColors.YELLOW));
+    System.out.println("7. 🗺️ 지역 정보");
+    System.out.println("8. 📚 몬스터 도감");
 
     // 시스템 메뉴
-    System.out.println(ConsoleColors.colorize("9. 📁 저장 관리", ConsoleColors.PURPLE));
-    System.out.println(ConsoleColors.colorize("10. 🚪 게임 종료", ConsoleColors.RED));
-    System.out.println(ConsoleColors.colorize("11. ❓ 도움말", ConsoleColors.WHITE));
+    System.out.println("9. 📁 저장 관리");
+    System.out.println("10. 🚪 게임 종료");
+    System.out.println("11. ❓ 도움말");
 
     // 디버그 모드가 활성화된 경우에만 디버그 메뉴 표시
     if (SystemConstants.DEBUG_MODE) {
-      System.out.println(ConsoleColors.colorize("99. 🔧 디버그 메뉴", ConsoleColors.GOLD_FALLBACK));
+      System.out.println("99. 🔧 디버그 메뉴");
     }
-    System.out.println(ConsoleColors.CYAN + "==================" + ConsoleColors.RESET);
+    System.out.println("==================");
   }
 
 
@@ -524,7 +524,8 @@ public class GameEngine {
 
     var allMonsters = MonsterDataLoader.loadAllMonsters();
 
-    var searchResults = allMonsters.values().stream().filter(monster -> monster.getName().toLowerCase().contains(keyword.toLowerCase())).collect(Collectors.toList());
+    var searchResults =
+        allMonsters.values().stream().filter(monster -> monster.getName().toLowerCase().contains(keyword.toLowerCase())).collect(Collectors.toList());
 
     if (searchResults.isEmpty()) {
       System.out.println("'" + keyword + "'와 일치하는 몬스터를 찾을 수 없습니다.");
@@ -575,7 +576,8 @@ public class GameEngine {
     if (!rewards.getDropItems().isEmpty()) {
       System.out.println("🎁 드롭 아이템:");
       for (var dropItem : rewards.getDropItems()) {
-        System.out.printf("   • %s (확률 %.1f%%, 수량 %d~%d)%n", dropItem.getItemId(), dropItem.getDropRate() * 100, dropItem.getMinQuantity(), dropItem.getMaxQuantity());
+        System.out.printf("   • %s (확률 %.1f%%, 수량 %d~%d)%n", dropItem.getItemId(), dropItem.getDropRate() * 100, dropItem.getMinQuantity(),
+            dropItem.getMaxQuantity());
       }
     }
 
@@ -726,26 +728,23 @@ public class GameEngine {
    * 탐험 메뉴를 표시합니다.
    */
   private void showExplorationMenu() {
-    System.out.println("\n" + ConsoleColors.BOLD + ConsoleColors.BRIGHT_CYAN + "=== 🗡️ 탐험 메뉴 ===" + ConsoleColors.RESET);
-    System.out.println(ConsoleColors.CYAN + "(갈 수 있는 지역이 레벨별 추천에 맞춰서 정렬되어 보임)" + ConsoleColors.RESET);
-    System.out.println(ConsoleColors.YELLOW + "현재 레벨: " + player.getLevel() + ConsoleColors.RESET);
+    System.out.println("\n=== 🗡️ 탐험 메뉴 ===");
+    System.out.println("(갈 수 있는 지역이 레벨별 추천에 맞춰서 정렬되어 보임)");
+    System.out.println("현재 레벨: " + player.getLevel());
 
     List<LocationData> availableLocations = LocationManager.getAvailableLocations(player.getLevel());
 
     for (int i = 0; i < availableLocations.size(); i++) {
       LocationData location = availableLocations.get(i);
-      String difficultyColor = getDifficultyColor(location.getDangerLevel());
+      String difficultyColor = "(" + location.getDangerLevel().toString() + ")";
       String recommendationText = getRecommendationText(location, player.getLevel());
 
-      System.out.printf("%s%d. %s %s%s %s%n", difficultyColor, i + 1, location.getIcon(), location.getNameKo(), ConsoleColors.RESET, recommendationText);
+      System.out.printf("%d. %s %s%s\t%s %n", i + 1, location.getIcon(), location.getNameKo(), recommendationText, difficultyColor);
     }
 
-    System.out.println(ConsoleColors.WHITE + "0. 🏠 마을로 돌아가기" + ConsoleColors.RESET);
-    System.out.println(ConsoleColors.CYAN + "==================" + ConsoleColors.RESET);
-
+    System.out.println("0. 🏠 마을로 돌아가기");
+    System.out.println("==================");
   }
-
-
 
   /**
    * 특정 지역으로 탐험을 진행합니다. (LocationData 기반)
@@ -864,13 +863,13 @@ public class GameEngine {
    */
   private String getRecommendationText(LocationData location, int playerLevel) {
     if (playerLevel >= location.getMinLevel() && playerLevel <= location.getMaxLevel()) {
-      return ConsoleColors.GREEN + "[추천]" + ConsoleColors.RESET;
+      return "[추천]";
     } else if (playerLevel < location.getMaxLevel() + 3) {
-      return ConsoleColors.GOLD_FALLBACK + "[적정]" + ConsoleColors.RESET;
+      return "[적정]";
     } else if (playerLevel > location.getMaxLevel()) {
-      return ConsoleColors.BRIGHT_BLACK + "[쉬움]" + ConsoleColors.RESET;
+      return "[쉬움]";
     } else {
-      return ConsoleColors.RED + "[위험]" + ConsoleColors.RESET;
+      return "[위험]";
     }
   }
 
@@ -1017,9 +1016,9 @@ public class GameEngine {
    * 미래 접근 가능 지역 표시
    */
   private void showFutureLocations(int playerLevel) {
-    List<LocationData> futureLocations =
-        LocationManager.getAllLocations().stream().filter(location -> location.getMinLevel() > playerLevel).filter(location -> location.getMinLevel() <= playerLevel + 5) // 5레벨 이내
-            .sorted((l1, l2) -> Integer.compare(l1.getMinLevel(), l2.getMinLevel())).collect(Collectors.toList());
+    List<LocationData> futureLocations = LocationManager.getAllLocations().stream().filter(location -> location.getMinLevel() > playerLevel)
+        .filter(location -> location.getMinLevel() <= playerLevel + 5) // 5레벨 이내
+        .sorted((l1, l2) -> Integer.compare(l1.getMinLevel(), l2.getMinLevel())).collect(Collectors.toList());
 
     if (!futureLocations.isEmpty()) {
       System.out.println("\n🔮 곧 접근 가능한 지역:");
@@ -1191,7 +1190,8 @@ public class GameEngine {
 
     try {
       JsonBasedQuestFactory questFactory = JsonBasedQuestFactory.getInstance();
-      System.out.printf("• 퀘스트 템플릿: 메인 %d개, 사이드 %d개, 일일 %d개\n", questFactory.getQuestCount("MAIN"), questFactory.getQuestCount("SIDE"), questFactory.getQuestCount("DAILY"));
+      System.out.printf("• 퀘스트 템플릿: 메인 %d개, 사이드 %d개, 일일 %d개\n", questFactory.getQuestCount("MAIN"), questFactory.getQuestCount("SIDE"),
+          questFactory.getQuestCount("DAILY"));
     } catch (Exception e) {
       System.out.println("• 퀘스트 시스템: 초기화 중 오류 발생");
     }
@@ -1263,9 +1263,9 @@ public class GameEngine {
     }
 
     // 지역별로 그룹화
-    Map<String, List<MonsterData>> monstersByLocation =
-        suitableMonsters.stream().flatMap(monster -> monster.getLocations().stream().map(locationId -> new AbstractMap.SimpleEntry<>(locationId, monster)))
-            .collect(Collectors.groupingBy(Map.Entry::getKey, Collectors.mapping(Map.Entry::getValue, Collectors.toList())));
+    Map<String, List<MonsterData>> monstersByLocation = suitableMonsters.stream()
+        .flatMap(monster -> monster.getLocations().stream().map(locationId -> new AbstractMap.SimpleEntry<>(locationId, monster)))
+        .collect(Collectors.groupingBy(Map.Entry::getKey, Collectors.mapping(Map.Entry::getValue, Collectors.toList())));
 
     for (Map.Entry<String, List<MonsterData>> entry : monstersByLocation.entrySet()) {
       String locationId = entry.getKey();
@@ -1285,7 +1285,8 @@ public class GameEngine {
   private void showMonstersByRarity() {
     System.out.println("\n✨ === 희귀도별 몬스터 ===");
 
-    Map<String, List<MonsterData>> monstersByRarity = MonsterDataLoader.loadAllMonsters().values().stream().collect(Collectors.groupingBy(MonsterData::getRarity));
+    Map<String, List<MonsterData>> monstersByRarity =
+        MonsterDataLoader.loadAllMonsters().values().stream().collect(Collectors.groupingBy(MonsterData::getRarity));
 
     String[] rarityOrder = {"COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHICAL"};
 
@@ -1330,7 +1331,8 @@ public class GameEngine {
     System.out.println("\n🔍 === '" + searchTerm + "' 검색 결과 ===");
 
     List<MonsterData> allMonsters = new ArrayList<>(MonsterDataLoader.loadAllMonsters().values());
-    List<MonsterData> searchResults = allMonsters.stream().filter(monster -> monster.getName().contains(searchTerm) || monster.getDescription().contains(searchTerm)).collect(Collectors.toList());
+    List<MonsterData> searchResults = allMonsters.stream()
+        .filter(monster -> monster.getName().contains(searchTerm) || monster.getDescription().contains(searchTerm)).collect(Collectors.toList());
 
     if (searchResults.isEmpty()) {
       System.out.println("❌ 검색 결과가 없습니다.");
@@ -1398,7 +1400,8 @@ public class GameEngine {
     System.out.println("• 총 지역 수: " + allLocations.size() + "개");
 
     // 난이도별 분포
-    Map<String, Long> dangerLevelStats = allLocations.stream().collect(Collectors.groupingBy(location -> location.getDangerLevel().getDisplayName(), Collectors.counting()));
+    Map<String, Long> dangerLevelStats =
+        allLocations.stream().collect(Collectors.groupingBy(location -> location.getDangerLevel().getDisplayName(), Collectors.counting()));
 
     System.out.println("• 난이도별 분포:");
     dangerLevelStats.forEach((level, count) -> System.out.println("  " + level + ": " + count + "개"));
@@ -1425,7 +1428,8 @@ public class GameEngine {
     rarityStats.forEach((rarity, count) -> System.out.println("  " + rarity + ": " + count + "종"));
 
     // 지역별 통계 (상위 5개만)
-    Map<String, Long> locationStats = allMonsters.stream().flatMap(monster -> monster.getLocations().stream()).collect(Collectors.groupingBy(location -> location, Collectors.counting()));
+    Map<String, Long> locationStats = allMonsters.stream().flatMap(monster -> monster.getLocations().stream())
+        .collect(Collectors.groupingBy(location -> location, Collectors.counting()));
 
     System.out.println("• 주요 지역별 분포:");
     locationStats.entrySet().stream().sorted(Map.Entry.<String, Long>comparingByValue().reversed()).limit(5) // 상위 5개만 표시
@@ -1435,9 +1439,11 @@ public class GameEngine {
         });
 
     // 레벨 분포
-    IntSummaryStatistics levelStats = allMonsters.stream().mapToInt(monster -> (monster.getMinLevel() + monster.getMaxLevel()) / 2).summaryStatistics();
+    IntSummaryStatistics levelStats =
+        allMonsters.stream().mapToInt(monster -> (monster.getMinLevel() + monster.getMaxLevel()) / 2).summaryStatistics();
 
-    System.out.println("• 레벨 분포: 최소 " + levelStats.getMin() + " | 최대 " + levelStats.getMax() + " | 평균 " + String.format("%.1f", levelStats.getAverage()));
+    System.out
+        .println("• 레벨 분포: 최소 " + levelStats.getMin() + " | 최대 " + levelStats.getMax() + " | 평균 " + String.format("%.1f", levelStats.getAverage()));
   }
 
 }

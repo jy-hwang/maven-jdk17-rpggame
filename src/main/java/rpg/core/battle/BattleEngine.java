@@ -118,31 +118,25 @@ public class BattleEngine {
     };
   }
 
-  /**
-   * 하트 아이콘 유지 + 중복 제거 버전
-   */
-  private void showBattleStatus(Player player, Monster monster) {
-    System.out.println("\n" + ConsoleColors.BOLD + ConsoleColors.BRIGHT_RED + "--- ⚔️ 전투 상황 ---" + ConsoleColors.RESET);
-
-    // 플레이어 상태 (하트 유지)
-    System.out.printf("🧙 " + ConsoleColors.colorize(player.getName(), ConsoleColors.BRIGHT_CYAN) + "\t: ");
-
-    // 커스텀 진행률 바 (하트 포함, 중복 없음)
-    System.out.print(createHealthBar(player.getHp(), player.getTotalMaxHp(), 10, true)); // true = 하트 포함
-
-    // MP 표시
-    System.out.print(" | " + ConsoleColors.colorize("💙 " + player.getMana() + "/" + player.getMaxMana(), ConsoleColors.MP_COLOR));
+private void showBattleStatus(Player player, Monster monster) {
+    System.out.println("\n--- ⚔️ 전투 상황 ---");
+    //@formatter:off
+    // 플레이어 상태
+    System.out.printf("🧙 %s%n❤️ HP (%d/%d) | 💙 MP (%d/%d)%n",
+        player.getName(),
+        player.getHp(),
+        player.getTotalMaxHp(),
+        player.getMana(),
+        player.getMaxMana());
     System.out.println();
-
-    // 몬스터 상태 (하트 유지)
-    System.out.printf("👹 " + ConsoleColors.colorize(monster.getName(), ConsoleColors.BRIGHT_RED) + "\t: ");
-
-    // 몬스터 진행률 바 (하트 포함)
-    System.out.print(createHealthBar(monster.getHp(), monster.getMaxHp(), 10, true));
-    System.out.println();
-
-    System.out.println(ConsoleColors.BRIGHT_RED + "-------------------" + ConsoleColors.RESET);
-  }
+    // 몬스터 상태
+    System.out.printf("👹 %s%n❤️ HP (%d/%d)%n",
+        monster.getName(),
+        monster.getHp(),
+        monster.getMaxHp());
+    //@formatter:on
+    System.out.println("-------------------");
+}
 
   /**
    * 커스텀 체력 바 생성 (하트 아이콘 옵션 포함)
@@ -170,7 +164,7 @@ public class BattleEngine {
 
     // 하트 아이콘과 수치 (옵션)
     if (includeHeart) {
-      bar.append(ConsoleColors.colorize("❤️ " + current + "/" + max, ConsoleColors.HP_COLOR));
+      bar.append("❤️ " + current + "/" + max);
     } else {
       bar.append(String.format("%d/%d", current, max));
     }
@@ -188,16 +182,14 @@ public class BattleEngine {
     if (isCritical) {
       damage = (int) (damage * 1.5);
       actualDamage = monster.takeDamage(damage);
-      System.out.println(ConsoleColors.BOLD + ConsoleColors.BRIGHT_YELLOW + "💥 크리티컬 히트! " + ConsoleColors.RESET + ConsoleColors.colorize(player.getName(), ConsoleColors.BRIGHT_CYAN) + "이(가) "
-          + ConsoleColors.colorize(monster.getName(), ConsoleColors.BRIGHT_RED) + "에게 " + ConsoleColors.colorize(String.valueOf(actualDamage), ConsoleColors.BRIGHT_YELLOW) + "의 강력한 데미지를 입혔습니다!");
+      System.out.println("💥 크리티컬 히트! "+ player.getName() + "이(가) " + monster.getName() + "에게 " + String.valueOf(actualDamage) + "의 강력한 데미지를 입혔습니다!");
     } else {
       actualDamage = monster.takeDamage(damage);
-      System.out.println("⚔️ " + ConsoleColors.colorize(player.getName(), ConsoleColors.BRIGHT_CYAN) + "이(가) " + ConsoleColors.colorize(monster.getName(), ConsoleColors.BRIGHT_RED) + "에게 "
-          + ConsoleColors.colorize(String.valueOf(actualDamage), ConsoleColors.BRIGHT_RED) + "의 데미지를 입혔습니다!");
+      System.out.println("⚔️ " + player.getName() + "이(가) " + monster.getName() + "에게 " + String.valueOf(actualDamage) + "의 데미지를 입혔습니다!");
     }
 
     if (!monster.isAlive()) {
-      System.out.println(ConsoleColors.success(monster.getName() + "을(를) 물리쳤습니다!"));
+      System.out.println(monster.getName() + "을(를) 물리쳤습니다!");
     }
 
     logger.info("플레이어 공격: {} -> {} (데미지: {}, 크리티컬: {})", player.getName(), monster.getName(), actualDamage, isCritical);
@@ -211,8 +203,7 @@ public class BattleEngine {
     int monsterDamage = monster.getAttack() + random.nextInt(3);
     int actualDamage = player.takeDamage(monsterDamage);
 
-    System.out.println("💢 " + ConsoleColors.colorize(monster.getName(), ConsoleColors.BRIGHT_RED) + "이(가) " + ConsoleColors.colorize(player.getName(), ConsoleColors.BRIGHT_CYAN) + "에게 "
-        + ConsoleColors.colorize(String.valueOf(actualDamage), ConsoleColors.BRIGHT_RED) + "의 데미지를 입혔습니다!");
+    System.out.println("💢 " + monster.getName() + "이(가) " + player.getName() + "에게 " + String.valueOf(actualDamage) + "의 데미지를 입혔습니다!");
 
     // 현재 체력 표시 (색상 적용)
     double hpPercent = (double) player.getHp() / player.getTotalMaxHp();
@@ -225,13 +216,13 @@ public class BattleEngine {
       hpColor = ConsoleColors.BRIGHT_RED;
     }
 
-    System.out.println("현재 체력: " + ConsoleColors.colorize(String.format("%d/%d", player.getHp(), player.getTotalMaxHp()), hpColor));
+    System.out.println("현재 체력: " + String.format("%d/%d", player.getHp(), player.getTotalMaxHp()));
 
     // 체력이 위험 수준일 때 경고
     if (hpPercent <= 0.2) {
-      System.out.println(ConsoleColors.error("⚠️ 위험! 체력이 매우 부족합니다!"));
+      System.out.println("⚠️ 위험! 체력이 매우 부족합니다!");
     } else if (hpPercent <= 0.4) {
-      System.out.println(ConsoleColors.warning("체력이 부족합니다!"));
+      System.out.println("체력이 부족합니다!");
     }
 
     logger.debug("몬스터 공격: {} -> {} (데미지: {})", monster.getName(), player.getName(), actualDamage);
@@ -326,20 +317,20 @@ public class BattleEngine {
    */
   private void handleVictory(Player player, Monster monster) {
     try {
-      System.out.println("\n" + ConsoleColors.BOLD + ConsoleColors.BRIGHT_GREEN + "🏆 승리!" + ConsoleColors.RESET);
+      System.out.println("\n🏆 승리!");
 
       boolean levelUp = player.gainExperience(monster.getExpReward());
       player.setGold(player.getGold() + monster.getGoldReward());
 
       // 보상 표시 (색상 적용)
-      System.out.println(ConsoleColors.exp(monster.getExpReward()) + " 획득!");
-      System.out.println(ConsoleColors.gold(monster.getGoldReward()) + " 획득!");
+      System.out.println(monster.getExpReward() + " 획득!");
+      System.out.println(monster.getGoldReward() + " 획득!");
 
       if (levelUp) {
-        System.out.println(ConsoleColors.BOLD + ConsoleColors.rainbow("🎉 축하합니다! 레벨이 올랐습니다! 🎉") + ConsoleColors.RESET);
+        System.out.println("🎉 축하합니다! 레벨이 올랐습니다! 🎉");
 
         // 레벨업 효과 표시
-        System.out.println(ConsoleColors.colorize("✨ 새로운 힘이 몸에 스며듭니다!", ConsoleColors.BRIGHT_YELLOW));
+        System.out.println("✨ 새로운 힘이 몸에 스며듭니다!");
       }
 
       // 게임 통계 업데이트
@@ -372,7 +363,7 @@ public class BattleEngine {
 
     } catch (Exception e) {
       logger.error("승리 처리 중 오류", e);
-      System.out.println(ConsoleColors.error("승리 보상 처리 중 오류가 발생했습니다."));
+      System.out.println("승리 보상 처리 중 오류가 발생했습니다.");
     }
   }
 

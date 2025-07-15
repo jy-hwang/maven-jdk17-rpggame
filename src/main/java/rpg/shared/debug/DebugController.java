@@ -72,7 +72,7 @@ public class DebugController {
       System.out.println("10. 🎒 테스트 아이템 생성");
       System.out.println("11. 🛠️ 전체 시스템 진단");
       System.out.println("12. 📖 도움말 메뉴");
-      System.out.println("13. 🎨 " + ConsoleColors.rainbow("색깔테스트"));
+      System.out.println("13. 🎨 색깔테스트");
       System.out.println("0. 🔙 돌아가기");
 
       int choice = InputValidator.getIntInput("선택 (0-12): ", 0, 12);
