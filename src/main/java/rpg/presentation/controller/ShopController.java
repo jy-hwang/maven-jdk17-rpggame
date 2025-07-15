@@ -650,22 +650,11 @@ public class ShopController {
    * 판매 메뉴를 표시합니다.
    */
   private void displaySellMenu(Player player) {
-    System.out.println("\n💰 === 아이템 판매 ===");
-    System.out.println("💰 보유 골드: " + player.getGold());
-    System.out.println();
-    System.out.println("1. 🧪 소비 아이템 판매");
-    System.out.println("2. ⚔️ 무기 판매");
-    System.out.println("3. 🛡️ 방어구 판매");
-    System.out.println("4. 💍 장신구 판매");
-    System.out.println("5. ⚡ 일반 아이템 일괄 판매");
-    System.out.println("6. 🔙 돌아가기");
-    System.out.println("====================");
-
     // 예상 수익 표시
     int totalSellValue = calculateTotalSellValue(player);
-    if (totalSellValue > 0) {
-      System.out.println("💡 전체 아이템 판매 시 예상 수익: " + totalSellValue + "골드");
-    }
+   
+    shopMenu.displaySellMenu(player, totalSellValue);
+
   }
 
   // ==================== 이벤트 관련 메서드들 ====================

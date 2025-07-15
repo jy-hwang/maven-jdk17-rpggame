@@ -50,6 +50,29 @@ public class ShopMenu {
     System.out.println("========================");
   }
 
+
+  /**
+   * 판매 메뉴를 표시합니다.
+   */
+  public void displaySellMenu(Player player, int totalSellValue) {
+    System.out.println("\n💰 === 아이템 판매 ===");
+    System.out.println("💰 보유 골드: " + player.getGold());
+    System.out.println();
+    System.out.println("1. 🧪 소비 아이템 판매");
+    System.out.println("2. ⚔️ 무기 판매");
+    System.out.println("3. 🛡️ 방어구 판매");
+    System.out.println("4. 💍 장신구 판매");
+    System.out.println("5. ⚡ 일반 아이템 일괄 판매");
+    System.out.println("6. 🔙 돌아가기");
+    System.out.println("====================");
+
+    if (totalSellValue > 0) {
+      System.out.println("💡 전체 아이템 판매 시 예상 수익: " + totalSellValue + "골드");
+    }
+  }
+
+  
+  
   /**
    * 카테고리별 통계 표시
    */
