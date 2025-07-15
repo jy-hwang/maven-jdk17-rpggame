@@ -309,10 +309,12 @@ public class Monster {
     logger.debug("몬스터 {} HP 변경: {}/{}", name, this.hp, maxHp);
   }
 
-  public void takeDamage(int damage) {
+  public int takeDamage(int damage) {
     int actualDamage = Math.max(1, damage - defense); // ⭐ 방어력 적용
     setHp(hp - actualDamage);
+    
     logger.debug("몬스터 {} 피해 입음: {} (방어력 {} 적용, 실제 피해: {})", name, damage, defense, actualDamage);
+    return actualDamage;
   }
 
   public boolean isAlive() {

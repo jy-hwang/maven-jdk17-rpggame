@@ -182,25 +182,25 @@ public class BattleEngine {
    * 색상이 적용된 플레이어 공격
    */
   private void handlePlayerAttack(Player player, Monster monster) {
-    int damage = player.getAttack() + random.nextInt(5);
+    int damage = player.getAttack();// + random.nextInt(5);
     boolean isCritical = random.nextInt(100) < 15; // 15% 크리티컬 확률
-
+    int actualDamage = 0;
     if (isCritical) {
       damage = (int) (damage * 1.5);
+      actualDamage = monster.takeDamage(damage);
       System.out.println(ConsoleColors.BOLD + ConsoleColors.BRIGHT_YELLOW + "💥 크리티컬 히트! " + ConsoleColors.RESET + ConsoleColors.colorize(player.getName(), ConsoleColors.BRIGHT_CYAN) + "이(가) "
-          + ConsoleColors.colorize(monster.getName(), ConsoleColors.BRIGHT_RED) + "에게 " + ConsoleColors.colorize(String.valueOf(damage), ConsoleColors.BRIGHT_YELLOW) + "의 강력한 데미지를 입혔습니다!");
+          + ConsoleColors.colorize(monster.getName(), ConsoleColors.BRIGHT_RED) + "에게 " + ConsoleColors.colorize(String.valueOf(actualDamage), ConsoleColors.BRIGHT_YELLOW) + "의 강력한 데미지를 입혔습니다!");
     } else {
+      actualDamage = monster.takeDamage(damage);
       System.out.println("⚔️ " + ConsoleColors.colorize(player.getName(), ConsoleColors.BRIGHT_CYAN) + "이(가) " + ConsoleColors.colorize(monster.getName(), ConsoleColors.BRIGHT_RED) + "에게 "
-          + ConsoleColors.colorize(String.valueOf(damage), ConsoleColors.BRIGHT_RED) + "의 데미지를 입혔습니다!");
+          + ConsoleColors.colorize(String.valueOf(actualDamage), ConsoleColors.BRIGHT_RED) + "의 데미지를 입혔습니다!");
     }
-
-    monster.takeDamage(damage);
 
     if (!monster.isAlive()) {
       System.out.println(ConsoleColors.success(monster.getName() + "을(를) 물리쳤습니다!"));
     }
 
-    logger.debug("플레이어 공격: {} -> {} (데미지: {}, 크리티컬: {})", player.getName(), monster.getName(), damage, isCritical);
+    logger.info("플레이어 공격: {} -> {} (데미지: {}, 크리티컬: {})", player.getName(), monster.getName(), actualDamage, isCritical);
   }
 
 
