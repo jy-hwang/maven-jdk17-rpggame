@@ -1,5 +1,6 @@
 package rpg.presentation.menu;
 
+import rpg.application.validator.InputValidator;
 import rpg.domain.player.Player;
 import rpg.domain.shop.CategoryStats;
 import rpg.domain.shop.ShopEvent;
@@ -18,7 +19,7 @@ public class ShopMenu {
     if (hasEvent && eventInfo != null) {
       System.out.println("🎉 " + eventInfo.getDetailedInfo());
 
-      // displayActiveEventInfo();
+      displayActiveEventInfo(eventInfo);
     }
 
     System.out.println();
@@ -66,13 +67,58 @@ public class ShopMenu {
     System.out.println("6. 🔙 돌아가기");
     System.out.println("====================");
 
+    // 예상 수익 표시
     if (totalSellValue > 0) {
       System.out.println("💡 전체 아이템 판매 시 예상 수익: " + totalSellValue + "골드");
     }
   }
 
-  
-  
+  /**
+   * 이벤트 알림을 표시합니다.
+   */
+  public void displayEventNotification(ShopEvent currentEvent) {
+    System.out.println("\n" + "🎉".repeat(20));
+    System.out.println("✨ 특별 이벤트 발생! ✨");
+
+    switch (currentEvent) {
+      case DISCOUNT_SALE -> {
+        System.out.printf("%s %s%n", ShopEvent.DISCOUNT_SALE.getIcon(), ShopEvent.DISCOUNT_SALE.getName());
+        System.out.printf("%s %s%n", ShopEvent.DISCOUNT_SALE.getIcon(), ShopEvent.DISCOUNT_SALE.getDescription());
+      }
+      case BONUS_SELL -> {
+        System.out.printf("%s %s%n", ShopEvent.BONUS_SELL.getIcon(), ShopEvent.BONUS_SELL.getName());
+        System.out.printf("%s %s%n", ShopEvent.BONUS_SELL.getIcon(), ShopEvent.BONUS_SELL.getDescription());
+      }
+      case FREE_POTION -> {
+        System.out.printf("%s %s%n", ShopEvent.FREE_POTION.getIcon(), ShopEvent.FREE_POTION.getName());
+        System.out.printf("%s %s%n", ShopEvent.FREE_POTION.getIcon(), ShopEvent.FREE_POTION.getDescription());
+      }
+      case RARE_ITEMS -> {
+        System.out.printf("%s %s%n", ShopEvent.RARE_ITEMS.getIcon(), ShopEvent.RARE_ITEMS.getName());
+        System.out.printf("%s %s%n", ShopEvent.RARE_ITEMS.getIcon(), ShopEvent.RARE_ITEMS.getDescription());
+      }
+      case VIP_BONUS -> {
+        System.out.printf("%s %s%n", ShopEvent.VIP_BONUS.getIcon(), ShopEvent.VIP_BONUS.getName());
+        System.out.printf("%s %s%n", ShopEvent.VIP_BONUS.getIcon(), ShopEvent.VIP_BONUS.getDescription());
+      }
+      case LUCKY_DRAW -> {
+        System.out.printf("%s %s%n", ShopEvent.LUCKY_DRAW.getIcon(), ShopEvent.LUCKY_DRAW.getName());
+        System.out.printf("%s %s%n", ShopEvent.LUCKY_DRAW.getIcon(), ShopEvent.LUCKY_DRAW.getDescription());
+      }
+      case DOUBLE_DISCOUNT -> {
+        System.out.printf("%s %s%n", ShopEvent.DOUBLE_DISCOUNT.getIcon(), ShopEvent.DOUBLE_DISCOUNT.getName());
+        System.out.printf("%s %s%n", ShopEvent.DOUBLE_DISCOUNT.getIcon(), ShopEvent.DOUBLE_DISCOUNT.getDescription());
+      }
+      case BULK_DISCOUNT -> {
+        System.out.printf("%s %s%n", ShopEvent.BULK_DISCOUNT.getIcon(), ShopEvent.BULK_DISCOUNT.getName());
+        System.out.printf("%s %s%n", ShopEvent.BULK_DISCOUNT.getIcon(), ShopEvent.BULK_DISCOUNT.getDescription());
+      }
+    }
+
+    System.out.println("🎉".repeat(20));
+    InputValidator.waitForAnyKey("계속하려면 Enter를 누르세요...");
+  }
+
   /**
    * 카테고리별 통계 표시
    */
@@ -101,13 +147,33 @@ public class ShopMenu {
   /**
    * 활성화된 이벤트 정보를 표시합니다.
    */
-  // private void displayActiveEventInfo() {
-  // System.out.println("\n🎉 현재 진행 중인 이벤트:");
-  // switch (currentEvent) {
-  // case DISCOUNT_SALE -> System.out.println("🏷️ 할인 세일 (20% 할인)");
-  // case BONUS_SELL -> System.out.println("💰 고가 매입 (30% 보너스)");
-  // case FREE_POTION -> System.out.println("🎁 무료 체력 물약 (미수령)");
-  // case RARE_ITEMS -> System.out.println("⭐ 희귀 아이템 특별 판매");
-  // }
-  // }
+  private void displayActiveEventInfo(ShopEvent currentEvent) {
+    System.out.println("\n🎉 현재 진행 중인 이벤트:");
+    switch (currentEvent) {
+      case DISCOUNT_SALE -> {
+        System.out.printf("%s %s%n", ShopEvent.DISCOUNT_SALE.getIcon(), ShopEvent.DISCOUNT_SALE.getName());
+      }
+      case BONUS_SELL -> {
+        System.out.printf("%s %s%n", ShopEvent.BONUS_SELL.getIcon(), ShopEvent.BONUS_SELL.getName());
+      }
+      case FREE_POTION -> {
+        System.out.printf("%s %s%n", ShopEvent.FREE_POTION.getIcon(), ShopEvent.FREE_POTION.getName());
+      }
+      case RARE_ITEMS -> {
+        System.out.printf("%s %s%n", ShopEvent.RARE_ITEMS.getIcon(), ShopEvent.RARE_ITEMS.getName());
+      }
+      case VIP_BONUS -> {
+        System.out.printf("%s %s%n", ShopEvent.VIP_BONUS.getIcon(), ShopEvent.VIP_BONUS.getName());
+      }
+      case LUCKY_DRAW -> {
+        System.out.printf("%s %s%n", ShopEvent.LUCKY_DRAW.getIcon(), ShopEvent.LUCKY_DRAW.getName());
+      }
+      case DOUBLE_DISCOUNT -> {
+        System.out.printf("%s %s%n", ShopEvent.DOUBLE_DISCOUNT.getIcon(), ShopEvent.DOUBLE_DISCOUNT.getName());
+      }
+      case BULK_DISCOUNT -> {
+        System.out.printf("%s %s%n", ShopEvent.BULK_DISCOUNT.getIcon(), ShopEvent.BULK_DISCOUNT.getName());
+      }
+    }
+  }
 }

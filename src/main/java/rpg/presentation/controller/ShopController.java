@@ -650,11 +650,10 @@ public class ShopController {
    * 판매 메뉴를 표시합니다.
    */
   private void displaySellMenu(Player player) {
-    // 예상 수익 표시
+    // 예상 수익 계산
     int totalSellValue = calculateTotalSellValue(player);
    
     shopMenu.displaySellMenu(player, totalSellValue);
-
   }
 
   // ==================== 이벤트 관련 메서드들 ====================
@@ -677,41 +676,9 @@ public class ShopController {
     currentEvent = events[random.nextInt(events.length)];
     currentEventActive = true;
 
-    displayEventNotification();
+    shopMenu.displayEventNotification(currentEvent);
     logger.info("상점 이벤트 발생: {}", currentEvent);
   }
-
-  /**
-   * 이벤트 알림을 표시합니다.
-   */
-  private void displayEventNotification() {
-    System.out.println("\n" + "🎉".repeat(20));
-    System.out.println("✨ 특별 이벤트 발생! ✨");
-
-    switch (currentEvent) {
-      case DISCOUNT_SALE -> {
-        System.out.println("🏷️ 할인 세일!");
-        System.out.println("💥 모든 아이템 20% 할인!");
-      }
-      case BONUS_SELL -> {
-        System.out.println("💰 고가 매입 이벤트!");
-        System.out.println("📈 판매 시 30% 보너스!");
-      }
-      case FREE_POTION -> {
-        System.out.println("🎁 무료 증정 이벤트!");
-        System.out.println("🧪 체력 물약 1개 무료 증정!");
-      }
-      case RARE_ITEMS -> {
-        System.out.println("⭐ 희귀 아이템 입고!");
-        System.out.println("🔥 특별한 아이템들이 입고되었습니다!");
-      }
-    }
-
-    System.out.println("🎉".repeat(20));
-    InputValidator.waitForAnyKey("계속하려면 Enter를 누르세요...");
-  }
-
-
 
   /**
    * 이벤트 할인을 적용합니다.
