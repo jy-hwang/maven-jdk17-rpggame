@@ -900,7 +900,7 @@ public class QuestManager {
   public void refreshDailyQuests(Player character) {
     logger.info("일일 퀘스트 강제 새로고침...");
     cleanupExpiredQuests();
-    generateDailyQuests(character);
+    //generateDailyQuests(character);
     System.out.println("✅ 일일 퀘스트가 새로고침되었습니다!");
   }
 

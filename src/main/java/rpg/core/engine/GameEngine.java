@@ -174,7 +174,7 @@ public class GameEngine {
       player.displayStats();
 
       // 4단계: 일일 퀘스트 생성
-      player.getQuestManager().generateDailyQuests(player);
+      //player.getQuestManager().generateDailyQuests(player);
 
       logger.info("새 게임 초기화 완료");
       System.out.println("\n💡 퀘스트 메뉴에서 첫 번째 퀘스트를 수락해보세요!");
