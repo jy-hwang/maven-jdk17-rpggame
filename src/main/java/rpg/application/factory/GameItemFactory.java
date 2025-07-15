@@ -166,8 +166,7 @@ public class GameItemFactory {
       int defense = data.getDefenseBonus();
       int magic = data.getMagicBonus();
 
-      return new GameEquipment(data.getId(), data.getName(), data.getDescription(), data.getValue(), data.getRarity(), equipType, attack, defense,
-          magic);
+      return new GameEquipment(data.getId(), data.getName(), data.getDescription(), data.getValue(), data.getRarity(), equipType, attack, defense, magic);
 
     } catch (Exception e) {
       logger.error("무기 아이템 생성 실패: {}", data.getName(), e);
@@ -187,8 +186,7 @@ public class GameItemFactory {
       int defense = data.getDefenseBonus();
       int magic = data.getMagicBonus();
 
-      return new GameEquipment(data.getId(), data.getName(), data.getDescription(), data.getValue(), data.getRarity(), equipType, attack, defense,
-          magic);
+      return new GameEquipment(data.getId(), data.getName(), data.getDescription(), data.getValue(), data.getRarity(), equipType, attack, defense, magic);
 
     } catch (Exception e) {
       logger.error("방어구 아이템 생성 실패: {}", data.getName(), e);
@@ -208,8 +206,7 @@ public class GameItemFactory {
       int defense = data.getDefenseBonus();
       int magic = data.getMagicBonus();
 
-      return new GameEquipment(data.getId(), data.getName(), data.getDescription(), data.getValue(), data.getRarity(), equipType, attack, defense,
-          magic);
+      return new GameEquipment(data.getId(), data.getName(), data.getDescription(), data.getValue(), data.getRarity(), equipType, attack, defense, magic);
 
     } catch (Exception e) {
       logger.error("액세서리 아이템 생성 실패: {}", data.getName(), e);
@@ -244,16 +241,14 @@ public class GameItemFactory {
    * 특정 타입의 아이템 ID 목록 반환
    */
   public List<String> getItemIdsByType(String itemType) {
-    return itemDatabase.entrySet().stream().filter(entry -> entry.getValue().getType().equalsIgnoreCase(itemType)).map(Map.Entry::getKey)
-        .collect(Collectors.toList());
+    return itemDatabase.entrySet().stream().filter(entry -> entry.getValue().getType().equalsIgnoreCase(itemType)).map(Map.Entry::getKey).collect(Collectors.toList());
   }
 
   /**
    * 특정 효과를 가진 아이템 검색
    */
   public List<String> findItemsByEffect(String effectType) {
-    return itemDatabase.entrySet().stream().filter(entry -> hasEffectType(entry.getValue(), effectType)).map(Map.Entry::getKey)
-        .collect(Collectors.toList());
+    return itemDatabase.entrySet().stream().filter(entry -> hasEffectType(entry.getValue(), effectType)).map(Map.Entry::getKey).collect(Collectors.toList());
   }
 
   /**
@@ -294,8 +289,7 @@ public class GameItemFactory {
    * 특정 등급의 아이템 목록 반환
    */
   public List<String> getItemsByRarity(ItemRarity rarity) {
-    return itemDatabase.entrySet().stream().filter(entry -> entry.getValue().getRarity() == rarity).map(Map.Entry::getKey)
-        .collect(Collectors.toList());
+    return itemDatabase.entrySet().stream().filter(entry -> entry.getValue().getRarity() == rarity).map(Map.Entry::getKey).collect(Collectors.toList());
   }
 
   /**
@@ -370,8 +364,7 @@ public class GameItemFactory {
     Map<String, Long> typeStats = itemDatabase.values().stream().collect(Collectors.groupingBy(GameItemData::getType, Collectors.counting()));
 
     System.out.println("📂 타입별:");
-    typeStats.entrySet().stream().sorted(Map.Entry.<String, Long>comparingByValue().reversed())
-        .forEach(entry -> System.out.printf("   %s: %d개%n", entry.getKey(), entry.getValue()));
+    typeStats.entrySet().stream().sorted(Map.Entry.<String, Long>comparingByValue().reversed()).forEach(entry -> System.out.printf("   %s: %d개%n", entry.getKey(), entry.getValue()));
 
     // 등급별 통계
     Map<ItemRarity, Long> rarityStats = itemDatabase.values().stream().collect(Collectors.groupingBy(GameItemData::getRarity, Collectors.counting()));
@@ -428,16 +421,15 @@ public class GameItemFactory {
   /**
    * 기본 아이템 추가 헬퍼 메서드 (기존 버전 - 호환성 유지)
    */
-  private void addDefaultItem(String id, String name, String description, String type, int value, ItemRarity rarity, boolean stackable,
-      List<GameEffectData> effects) {
+  private void addDefaultItem(String id, String name, String description, String type, int value, ItemRarity rarity, boolean stackable, List<GameEffectData> effects) {
     addDefaultItem(id, name, description, type, value, rarity, stackable, effects, null, null);
   }
 
   /**
    * 기본 아이템 추가 헬퍼 메서드 (확장 버전)
    */
-  private void addDefaultItem(String id, String name, String description, String type, int value, ItemRarity rarity, boolean stackable,
-      List<GameEffectData> effects, Integer cooldown, Map<String, Integer> stats) {
+  private void addDefaultItem(String id, String name, String description, String type, int value, ItemRarity rarity, boolean stackable, List<GameEffectData> effects, Integer cooldown,
+      Map<String, Integer> stats) {
     try {
       GameItemData item = new GameItemData(id, name, description, type, value, rarity.name(), stackable, effects, null, null, null, null, // 기존 장비 필드들
                                                                                                                                           // (equipmentType,
@@ -459,8 +451,7 @@ public class GameItemFactory {
   private void logLoadedItems() {
     logger.debug("=== 로드된 아이템 목록 ===");
     for (GameItemData item : itemDatabase.values()) {
-      logger.debug("아이템: {} (ID: {}, 타입: {}, 등급: {}, 효과: {}개)", item.getName(), item.getId(), item.getType(), item.getRarity(),
-          item.getEffects().size());
+      logger.debug("아이템: {} (ID: {}, 타입: {}, 등급: {}, 효과: {}개)", item.getName(), item.getId(), item.getType(), item.getRarity(), item.getEffects().size());
     }
     logger.debug("========================");
   }
@@ -607,8 +598,7 @@ public class GameItemFactory {
    */
   private ItemRarity selectRarityByWeight() {
     // 희귀도별 가중치 (낮을수록 더 흔함)
-    Map<ItemRarity, Integer> weights =
-        Map.of(ItemRarity.COMMON, 50, ItemRarity.UNCOMMON, 25, ItemRarity.RARE, 15, ItemRarity.EPIC, 7, ItemRarity.LEGENDARY, 3);
+    Map<ItemRarity, Integer> weights = Map.of(ItemRarity.COMMON, 50, ItemRarity.UNCOMMON, 25, ItemRarity.RARE, 15, ItemRarity.EPIC, 7, ItemRarity.LEGENDARY, 3);
 
     int totalWeight = weights.values().stream().mapToInt(Integer::intValue).sum();
     int randomValue = random.nextInt(totalWeight);

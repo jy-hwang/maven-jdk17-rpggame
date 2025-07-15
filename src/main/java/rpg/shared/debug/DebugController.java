@@ -496,8 +496,8 @@ public class DebugController {
   private void checkJsonFileIntegrity() {
     System.out.println("\n=== 📁 JSON 파일 무결성 검사 ===");
 
-    String[] requiredFiles = {SystemConstants.MAIN_QUESTS_CONFIG, SystemConstants.SIDE_QUESTS_CONFIG, SystemConstants.DAILY_QUESTS_CONFIG,
-        SystemConstants.BASIC_POTIONS_CONFIG, SystemConstants.BASIC_WEAPONS_CONFIG, SystemConstants.BASIC_ARMORS_CONFIG};
+    String[] requiredFiles = {SystemConstants.MAIN_QUESTS_CONFIG, SystemConstants.SIDE_QUESTS_CONFIG, SystemConstants.DAILY_QUESTS_CONFIG, SystemConstants.BASIC_POTIONS_CONFIG,
+        SystemConstants.BASIC_WEAPONS_CONFIG, SystemConstants.BASIC_ARMORS_CONFIG};
 
     int existingFiles = 0;
     int totalFiles = requiredFiles.length;
@@ -588,8 +588,7 @@ public class DebugController {
       System.out.printf("• 초기화 상태: %s\n", itemFactory.isInitialized() ? "정상" : "오류");
 
       JsonBasedQuestFactory questFactory = JsonBasedQuestFactory.getInstance();
-      System.out.printf("• 퀘스트 템플릿: 메인 %d개, 사이드 %d개, 일일 %d개\n", questFactory.getQuestCount("MAIN"), questFactory.getQuestCount("SIDE"),
-          questFactory.getQuestCount("DAILY"));
+      System.out.printf("• 퀘스트 템플릿: 메인 %d개, 사이드 %d개, 일일 %d개\n", questFactory.getQuestCount("MAIN"), questFactory.getQuestCount("SIDE"), questFactory.getQuestCount("DAILY"));
     } catch (Exception e) {
       System.out.println("• 시스템 상태: 일부 오류 발생 (" + e.getMessage() + ")");
     }
@@ -613,8 +612,7 @@ public class DebugController {
       System.out.println("\n💎 희귀도별 분포:");
       for (Map.Entry<ItemRarity, Integer> entry : rarityDist.entrySet()) {
         if (entry.getValue() > 0) {
-          System.out.printf("   %s: %d개 (%.1f%%)\n", entry.getKey().getDisplayName(), entry.getValue(),
-              (entry.getValue() * 100.0) / factory.getItemCount());
+          System.out.printf("   %s: %d개 (%.1f%%)\n", entry.getKey().getDisplayName(), entry.getValue(), (entry.getValue() * 100.0) / factory.getItemCount());
         }
       }
 
@@ -1503,8 +1501,7 @@ public class DebugController {
       String yesterdayStr = yesterday.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
 
       // 테스트용 만료된 퀘스트들
-      String[] expiredQuestIds =
-          {"daily_kill_" + yesterdayStr + "_A01", "daily_collect_" + yesterdayStr + "_A01", "daily_exploration_" + yesterdayStr + "_B01"};
+      String[] expiredQuestIds = {"daily_kill_" + yesterdayStr + "_A01", "daily_collect_" + yesterdayStr + "_A01", "daily_exploration_" + yesterdayStr + "_B01"};
 
       for (String questId : expiredQuestIds) {
         // 간단한 테스트 퀘스트 생성
@@ -1729,8 +1726,7 @@ public class DebugController {
     }
 
     // 활성 일일 퀘스트
-    List<Quest> activeDaily =
-        questManager.getActiveQuests().stream().filter(quest -> quest.getId().startsWith("daily_")).collect(Collectors.toList());
+    List<Quest> activeDaily = questManager.getActiveQuests().stream().filter(quest -> quest.getId().startsWith("daily_")).collect(Collectors.toList());
 
     System.out.printf("\n⚡ 진행 중인 일일 퀘스트: %d개\n", activeDaily.size());
     for (Quest quest : activeDaily) {

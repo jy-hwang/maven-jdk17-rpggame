@@ -187,13 +187,10 @@ public class BattleEngine {
 
     if (isCritical) {
       damage = (int) (damage * 1.5);
-      System.out.println(ConsoleColors.BOLD + ConsoleColors.BRIGHT_YELLOW + "💥 크리티컬 히트! " + ConsoleColors.RESET
-          + ConsoleColors.colorize(player.getName(), ConsoleColors.BRIGHT_CYAN) + "이(가) "
-          + ConsoleColors.colorize(monster.getName(), ConsoleColors.BRIGHT_RED) + "에게 "
-          + ConsoleColors.colorize(String.valueOf(damage), ConsoleColors.BRIGHT_YELLOW) + "의 강력한 데미지를 입혔습니다!");
+      System.out.println(ConsoleColors.BOLD + ConsoleColors.BRIGHT_YELLOW + "💥 크리티컬 히트! " + ConsoleColors.RESET + ConsoleColors.colorize(player.getName(), ConsoleColors.BRIGHT_CYAN) + "이(가) "
+          + ConsoleColors.colorize(monster.getName(), ConsoleColors.BRIGHT_RED) + "에게 " + ConsoleColors.colorize(String.valueOf(damage), ConsoleColors.BRIGHT_YELLOW) + "의 강력한 데미지를 입혔습니다!");
     } else {
-      System.out.println("⚔️ " + ConsoleColors.colorize(player.getName(), ConsoleColors.BRIGHT_CYAN) + "이(가) "
-          + ConsoleColors.colorize(monster.getName(), ConsoleColors.BRIGHT_RED) + "에게 "
+      System.out.println("⚔️ " + ConsoleColors.colorize(player.getName(), ConsoleColors.BRIGHT_CYAN) + "이(가) " + ConsoleColors.colorize(monster.getName(), ConsoleColors.BRIGHT_RED) + "에게 "
           + ConsoleColors.colorize(String.valueOf(damage), ConsoleColors.BRIGHT_RED) + "의 데미지를 입혔습니다!");
     }
 
@@ -214,8 +211,7 @@ public class BattleEngine {
     int monsterDamage = monster.getAttack() + random.nextInt(3);
     int actualDamage = player.takeDamage(monsterDamage);
 
-    System.out.println("💢 " + ConsoleColors.colorize(monster.getName(), ConsoleColors.BRIGHT_RED) + "이(가) "
-        + ConsoleColors.colorize(player.getName(), ConsoleColors.BRIGHT_CYAN) + "에게 "
+    System.out.println("💢 " + ConsoleColors.colorize(monster.getName(), ConsoleColors.BRIGHT_RED) + "이(가) " + ConsoleColors.colorize(player.getName(), ConsoleColors.BRIGHT_CYAN) + "에게 "
         + ConsoleColors.colorize(String.valueOf(actualDamage), ConsoleColors.BRIGHT_RED) + "의 데미지를 입혔습니다!");
 
     // 현재 체력 표시 (색상 적용)

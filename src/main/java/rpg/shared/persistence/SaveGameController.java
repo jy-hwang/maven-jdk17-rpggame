@@ -186,8 +186,8 @@ public class SaveGameController {
         var questManager = loadedPlayer.getQuestManager();
         questManager.synchronizeLevelQuestProgress(loadedPlayer);
         int activeCount = questManager.getActiveQuests().size();
-        
-        if(activeCount > 0) {
+
+        if (activeCount > 0) {
           // 진행도 표시 확인용 로그
           var activeQuests = questManager.getActiveQuests();
           for (var quest : activeQuests) {
@@ -481,8 +481,7 @@ public class SaveGameController {
       for (SaveSlotInfo slot : slots) {
         if (slot.isOccupied()) {
           String currentMarker = (slot.getSlotNumber() == currentSaveSlot) ? " [현재]" : "";
-          System.out.printf("   슬롯 %d: %s (레벨 %d) - %d분 플레이%s\n", slot.getSlotNumber(), slot.getCharacterName(), slot.getCharacterLevel(),
-              slot.getPlayTime(), currentMarker);
+          System.out.printf("   슬롯 %d: %s (레벨 %d) - %d분 플레이%s\n", slot.getSlotNumber(), slot.getCharacterName(), slot.getCharacterLevel(), slot.getPlayTime(), currentMarker);
         }
       }
 

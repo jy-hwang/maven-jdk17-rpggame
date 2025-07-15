@@ -157,8 +157,7 @@ public class OptimizedGameRepository {
           // 최적화된 방식으로 메타데이터만 읽기
           SimpleSaveData saveData = objectMapper.readValue(saveFilePath.toFile(), SimpleSaveData.class);
 
-          SaveSlotInfo slotInfo =
-              new SaveSlotInfo(i, true, saveData.getPlayerName(), saveData.getLevel(), saveData.getSaveTime(), saveData.getTotalPlayTime());
+          SaveSlotInfo slotInfo = new SaveSlotInfo(i, true, saveData.getPlayerName(), saveData.getLevel(), saveData.getSaveTime(), saveData.getTotalPlayTime());
           slots.add(slotInfo);
 
         } catch (IOException e) {
@@ -233,8 +232,7 @@ public class OptimizedGameRepository {
   private static void cleanupOldBackups() {
     try {
       Path saveDir = Paths.get(SystemConstants.SAVE_DIRECTORY);
-      Files.list(saveDir).filter(path -> path.getFileName().toString().startsWith(SystemConstants.BACKUP_PREFIX))
-          .filter(path -> path.getFileName().toString().endsWith(".json"))
+      Files.list(saveDir).filter(path -> path.getFileName().toString().startsWith(SystemConstants.BACKUP_PREFIX)).filter(path -> path.getFileName().toString().endsWith(".json"))
           .sorted((p1, p2) -> p2.getFileName().toString().compareTo(p1.getFileName().toString())).skip(10) // 최신 10개는 유지
           .forEach(path -> {
             try {

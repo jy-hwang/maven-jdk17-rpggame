@@ -163,8 +163,7 @@ public enum GameEffectType {
   public static void printStatistics() {
     System.out.println("\n=== 🎭 효과 타입 통계 ===");
 
-    java.util.Map<String, Long> categoryStats = java.util.Arrays.stream(values())
-        .collect(java.util.stream.Collectors.groupingBy(GameEffectType::getCategory, java.util.stream.Collectors.counting()));
+    java.util.Map<String, Long> categoryStats = java.util.Arrays.stream(values()).collect(java.util.stream.Collectors.groupingBy(GameEffectType::getCategory, java.util.stream.Collectors.counting()));
 
     long implementedCount = java.util.Arrays.stream(values()).mapToLong(type -> type.isImplemented() ? 1 : 0).sum();
 
@@ -173,8 +172,7 @@ public enum GameEffectType {
     System.out.println("미구현 효과: " + (values().length - implementedCount) + "개");
 
     System.out.println("\n📂 카테고리별:");
-    categoryStats.entrySet().stream().sorted(java.util.Map.Entry.<String, Long>comparingByValue().reversed())
-        .forEach(entry -> System.out.printf("   %s: %d개%n", entry.getKey(), entry.getValue()));
+    categoryStats.entrySet().stream().sorted(java.util.Map.Entry.<String, Long>comparingByValue().reversed()).forEach(entry -> System.out.printf("   %s: %d개%n", entry.getKey(), entry.getValue()));
 
     System.out.println("===================");
   }

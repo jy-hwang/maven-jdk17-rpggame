@@ -23,7 +23,7 @@ public class SkillMapper {
   }
 
   public static Skill fromDto(SkillDto dto) {
-    return new Skill(dto.getName(), dto.getDescription(), SkillType.valueOf(dto.getType()), dto.getRequiredLevel(), dto.getManaCost(),
-        dto.getCooldown(), dto.getDamageMultiplier(), dto.getHealAmount(), dto.getBuffDuration());
+    return new Skill(dto.getName(), dto.getDescription(), SkillType.valueOf(dto.getType()), dto.getRequiredLevel(), dto.getManaCost(), dto.getCooldown(), dto.getDamageMultiplier(),
+        dto.getHealAmount(), dto.getBuffDuration());
   }
 }

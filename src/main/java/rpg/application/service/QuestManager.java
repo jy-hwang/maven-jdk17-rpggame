@@ -1024,12 +1024,12 @@ public class QuestManager {
 
     String targetMonsterId = switch (playerLevel) {
       case 5, 6, 7 -> "FOREST_GOBLIN";
-      case 8, 9, 10, 11, 12 -> "WILD_BOAR";           // 오크 → 멧돼지
-      case 13, 14, 15, 16, 17 -> "CAVE_TROLL";        // 트롤
-      case 18, 19, 20, 21, 22 -> "SKELETON_WARRIOR";  // 스켈레톤
-      case 23, 24, 25, 26, 27 -> "FOREST_WOLF";       // 늑대
+      case 8, 9, 10, 11, 12 -> "WILD_BOAR"; // 오크 → 멧돼지
+      case 13, 14, 15, 16, 17 -> "CAVE_TROLL"; // 트롤
+      case 18, 19, 20, 21, 22 -> "SKELETON_WARRIOR"; // 스켈레톤
+      case 23, 24, 25, 26, 27 -> "FOREST_WOLF"; // 늑대
       default -> playerLevel <= 4 ? "FOREST_SLIME" : "FIRE_DRAGON";
-  };
+    };
 
     int killCount = Math.max(3, playerLevel / 3);
     objectives.put("kill_" + targetMonsterId, killCount); // ✅ "kill_FOREST_SLIME"
@@ -1066,25 +1066,25 @@ public class QuestManager {
     availableQuests.add(dailyQuest);
     logger.info("일일 처치 퀘스트 생성: {} (레벨: {})", dailyQuest.getTitle(), playerLevel);
   }
-  
+
   private String getMonsterDisplayName(String monsterId) {
     return switch (monsterId) {
-        case "FOREST_SLIME" -> "숲 슬라임";
-        case "FOREST_GOBLIN" -> "숲 고블린";
-        case "FOREST_WOLF" -> "숲늑대";
-        case "CAVE_BAT" -> "동굴 박쥐";
-        case "WILD_BOAR" -> "멧돼지";
-        case "FOREST_SPIDER" -> "숲 거미";
-        case "CAVE_TROLL" -> "동굴 트롤";
-        case "SKELETON_WARRIOR" -> "스켈레톤 전사";
-        case "FIRE_DRAGON" -> "화염 드래곤";
-        case "ICE_GIANT" -> "얼음 거인";
-        case "MAGMA_DRAGON" -> "마그마 드래곤";
-        case "VOID_REAPER" -> "공허의 사신";
-        default -> monsterId; // 폴백: ID 그대로 반환
+      case "FOREST_SLIME" -> "숲 슬라임";
+      case "FOREST_GOBLIN" -> "숲 고블린";
+      case "FOREST_WOLF" -> "숲늑대";
+      case "CAVE_BAT" -> "동굴 박쥐";
+      case "WILD_BOAR" -> "멧돼지";
+      case "FOREST_SPIDER" -> "숲 거미";
+      case "CAVE_TROLL" -> "동굴 트롤";
+      case "SKELETON_WARRIOR" -> "스켈레톤 전사";
+      case "FIRE_DRAGON" -> "화염 드래곤";
+      case "ICE_GIANT" -> "얼음 거인";
+      case "MAGMA_DRAGON" -> "마그마 드래곤";
+      case "VOID_REAPER" -> "공허의 사신";
+      default -> monsterId; // 폴백: ID 그대로 반환
     };
-}
-  
+  }
+
   /**
    * 기존 QuestManager의 createDailyCollectionQuest 메서드 (하드코딩 버전 - 호환성용)
    */
@@ -1092,26 +1092,16 @@ public class QuestManager {
     Map<String, Integer> objectives = new HashMap<>();
 
     // 기본 수집 아이템 (하드코딩)
-    String[] collectableItemIds = {
-        "HEALTH_POTION", "MANA_POTION", "IRON_ORE", 
-        "HEALING_HERB", "LEATHER", "BONE"
-    };
+    String[] collectableItemIds = {"HEALTH_POTION", "MANA_POTION", "IRON_ORE", "HEALING_HERB", "LEATHER", "BONE"};
     String targetItemId = collectableItemIds[(int) (Math.random() * collectableItemIds.length)];
     int collectCount = 3 + (int) (Math.random() * 3); // 3-5개
 
-    objectives.put("collect_" + targetItemId, collectCount); 
+    objectives.put("collect_" + targetItemId, collectCount);
 
     // 특별 일일 보상
-    List<GameEffect> dailyEffects = List.of(
-        GameEffectFactory.createHealHpEffect(50), 
-        GameEffectFactory.createGainExpEffect(150)
-    );
+    List<GameEffect> dailyEffects = List.of(GameEffectFactory.createHealHpEffect(50), GameEffectFactory.createGainExpEffect(150));
 
-    GameConsumable dailyPotion = createSpecialPotion(
-        "DAILY_SPECIAL_POTION", "일일 특제 물약", 
-        "하루 한 번 받을 수 있는 특별한 물약", 
-        100, ItemRarity.UNCOMMON, dailyEffects
-    );
+    GameConsumable dailyPotion = createSpecialPotion("DAILY_SPECIAL_POTION", "일일 특제 물약", "하루 한 번 받을 수 있는 특별한 물약", 100, ItemRarity.UNCOMMON, dailyEffects);
 
     QuestReward reward = new QuestReward(100, 150, dailyPotion, 1);
 
@@ -1119,7 +1109,7 @@ public class QuestManager {
     String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
     String questId = String.format("daily_collect_%s_A01", today);
     String displayName = getItemDisplayName(targetItemId);
-    
+
     //@formatter:off
     Quest dailyCollectionQuest = new Quest(
         questId, 
@@ -1141,19 +1131,20 @@ public class QuestManager {
    * 아이템 ID -> 표시명 매핑
    */
   private String getItemDisplayName(String itemId) {
-      return switch (itemId) {
-          case "HEALTH_POTION" -> "체력 물약";
-          case "MANA_POTION" -> "마나 물약";
-          case "IRON_ORE" -> "철광석";
-          case "HEALING_HERB" -> "치유 허브";
-          case "LEATHER" -> "가죽";
-          case "BONE" -> "뼈";
-          case "SLIME_GEL" -> "슬라임 젤";
-          case "WOLF_PELT" -> "늑대 가죽";
-          case "BAT_WING" -> "박쥐 날개";
-          default -> itemId;
-      };
+    return switch (itemId) {
+      case "HEALTH_POTION" -> "체력 물약";
+      case "MANA_POTION" -> "마나 물약";
+      case "IRON_ORE" -> "철광석";
+      case "HEALING_HERB" -> "치유 허브";
+      case "LEATHER" -> "가죽";
+      case "BONE" -> "뼈";
+      case "SLIME_GEL" -> "슬라임 젤";
+      case "WOLF_PELT" -> "늑대 가죽";
+      case "BAT_WING" -> "박쥐 날개";
+      default -> itemId;
+    };
   }
+
   /**
    * 기존 방식의 일일 퀘스트 생성 (폴백용)
    */
@@ -1255,7 +1246,7 @@ public class QuestManager {
   public void checkMerchantBasedQuests(String merchantName) {
     // TODO
   }
-  
+
   /**
    * QuestManager에 추가할 새로운 메서드 - 플레이어 정보를 활용한 진행도 표시
    */
@@ -1268,14 +1259,14 @@ public class QuestManager {
       for (int i = 0; i < activeQuests.size(); i++) {
         Quest quest = activeQuests.get(i);
         System.out.printf("%d. %s%n", i + 1, quest.getTitle());
-        
+
         // 플레이어 정보를 활용한 정확한 진행도 표시
         if (player != null && quest.getType() == Quest.QuestType.LEVEL) {
           System.out.printf("   진행도: %s%n", quest.getProgressDescription(player));
         } else {
           System.out.printf("   진행도: %s%n", quest.getProgressDescription());
         }
-        
+
         System.out.printf("   보상: %s%n", quest.getReward().getRewardDescription());
       }
     }

@@ -20,7 +20,6 @@ import rpg.infrastructure.data.loader.ItemDataLoader;
 import rpg.infrastructure.data.loader.MonsterDataLoader;
 import rpg.presentation.controller.InventoryController;
 import rpg.presentation.controller.QuestController;
-import rpg.shared.constant.SystemConstants;
 
 /**
  * 리팩토링된 탐험 시스템 엔진
@@ -62,10 +61,10 @@ public class ExploreEngine {
       logger.info("탐험 시스템 의존성 초기화 완료");
 
       // 디버그 모드에서 통계 출력
-      if (SystemConstants.DEBUG_MODE) {
-        LocationManager.printLocationStatistics();
-        MonsterDataLoader.printMonsterStatistics();
-      }
+      // if (SystemConstants.DEBUG_MODE) {
+      // LocationManager.printLocationStatistics();
+      // MonsterDataLoader.printMonsterStatistics();
+      // }
 
     } catch (Exception e) {
       logger.error("탐험 시스템 의존성 초기화 실패", e);
@@ -230,13 +229,12 @@ public class ExploreEngine {
   private ExploreResult handleLocationMonsterEncounter(Player player, String locationId, LocationData location) {
     // 해당 지역의 몬스터 중에서 플레이어 레벨에 적합한 몬스터 선택
     List<MonsterData> locationMonsters = MonsterDataLoader.getMonstersByLocation(locationId);
-    List<MonsterData> suitableMonsters = locationMonsters.stream()
-        .filter(monster -> player.getLevel() >= monster.getMinLevel() && player.getLevel() <= monster.getMaxLevel() + 2).collect(Collectors.toList());
+    List<MonsterData> suitableMonsters =
+        locationMonsters.stream().filter(monster -> player.getLevel() >= monster.getMinLevel() && player.getLevel() <= monster.getMaxLevel() + 2).collect(Collectors.toList());
 
     if (suitableMonsters.isEmpty()) {
       // 적합한 몬스터가 없으면 레벨 제한 완화
-      suitableMonsters =
-          locationMonsters.stream().filter(monster -> Math.abs(player.getLevel() - monster.getMinLevel()) <= 5).collect(Collectors.toList());
+      suitableMonsters = locationMonsters.stream().filter(monster -> Math.abs(player.getLevel() - monster.getMinLevel()) <= 5).collect(Collectors.toList());
     }
 
     if (suitableMonsters.isEmpty()) {
@@ -326,8 +324,7 @@ public class ExploreEngine {
    * 몬스터 드롭 아이템 처리
    */
   private GameItem handleMonsterDrops(Monster monster) {
-    if (monster.getMonsterData() == null || monster.getMonsterData().getRewards() == null
-        || monster.getMonsterData().getRewards().getDropItems() == null) {
+    if (monster.getMonsterData() == null || monster.getMonsterData().getRewards() == null || monster.getMonsterData().getRewards().getDropItems() == null) {
       return null;
     }
 

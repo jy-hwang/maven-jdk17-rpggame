@@ -39,11 +39,11 @@ public class MonsterDataLoader {
 
   public static List<MonsterData> getAllMonsters() {
     if (!dataLoaded) {
-        loadAllMonsters();
+      loadAllMonsters();
     }
     return new ArrayList<>(allMonsters.values());
-}
-  
+  }
+
   /**
    * 통합 JSON 파일에서 몬스터 데이터 로드
    */
@@ -111,8 +111,7 @@ public class MonsterDataLoader {
    * 특정 지역과 레벨에 적합한 몬스터 목록 반환
    */
   public static List<MonsterData> getMonstersByLocationAndLevel(String locationId, int playerLevel) {
-    return getMonstersByLocation(locationId).stream()
-        .filter(monster -> playerLevel >= monster.getMinLevel() && playerLevel <= monster.getMaxLevel() + 2) // 약간의 여유
+    return getMonstersByLocation(locationId).stream().filter(monster -> playerLevel >= monster.getMinLevel() && playerLevel <= monster.getMaxLevel() + 2) // 약간의 여유
         .collect(Collectors.toList());
   }
 
@@ -124,8 +123,7 @@ public class MonsterDataLoader {
       loadAllMonsters();
     }
 
-    return allMonsters.values().stream().filter(monster -> playerLevel >= monster.getMinLevel() && playerLevel <= monster.getMaxLevel())
-        .collect(Collectors.toList());
+    return allMonsters.values().stream().filter(monster -> playerLevel >= monster.getMinLevel() && playerLevel <= monster.getMaxLevel()).collect(Collectors.toList());
   }
 
   /**
@@ -169,8 +167,7 @@ public class MonsterDataLoader {
       loadAllMonsters();
     }
 
-    return allMonsters.values().stream().filter(monster -> monster.getMinLevel() <= maxLevel && monster.getMaxLevel() >= minLevel)
-        .collect(Collectors.toList());
+    return allMonsters.values().stream().filter(monster -> monster.getMinLevel() <= maxLevel && monster.getMaxLevel() >= minLevel).collect(Collectors.toList());
   }
 
   /**
@@ -191,8 +188,7 @@ public class MonsterDataLoader {
     rarityStats.forEach((rarity, count) -> System.out.printf("   %s: %d종%n", rarity, count));
 
     // 지역별 통계
-    Map<String, Long> locationStats = allMonsters.values().stream().flatMap(monster -> monster.getLocations().stream())
-        .collect(Collectors.groupingBy(location -> location, Collectors.counting()));
+    Map<String, Long> locationStats = allMonsters.values().stream().flatMap(monster -> monster.getLocations().stream()).collect(Collectors.groupingBy(location -> location, Collectors.counting()));
 
     System.out.println("\n🗺️ 지역별 분포:");
     locationStats.entrySet().stream().sorted(Map.Entry.<String, Long>comparingByValue().reversed()).forEach(entry -> {
@@ -201,8 +197,7 @@ public class MonsterDataLoader {
     });
 
     // 레벨 분포
-    IntSummaryStatistics levelStats =
-        allMonsters.values().stream().mapToInt(monster -> (monster.getMinLevel() + monster.getMaxLevel()) / 2).summaryStatistics();
+    IntSummaryStatistics levelStats = allMonsters.values().stream().mapToInt(monster -> (monster.getMinLevel() + monster.getMaxLevel()) / 2).summaryStatistics();
 
     System.out.println("\n📈 레벨 분포:");
     System.out.printf("   최소: %d | 최대: %d | 평균: %.1f%n", levelStats.getMin(), levelStats.getMax(), levelStats.getAverage());

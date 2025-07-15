@@ -96,7 +96,7 @@ public class Monster {
     MonsterRewards rewards = data.getRewards();
 
     Monster monster = new Monster(data.getId(), data.getName(), stats.getHp(), stats.getAttack(), rewards.getExp(), rewards.getGold(), data // ⭐ sourceData로 전달하여 참조
-                                                                                                                              // 유지
+    // 유지
     );
 
     return monster;

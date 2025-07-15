@@ -153,8 +153,8 @@ public class SkillFactory {
 
     try {
       // 템플릿에서 스킬 인스턴스 생성
-      Skill skill = new Skill(template.name, template.description, template.type, template.requiredLevel, template.manaCost, template.cooldown,
-          template.damageMultiplier, template.healAmount, template.buffDuration);
+      Skill skill = new Skill(template.name, template.description, template.type, template.requiredLevel, template.manaCost, template.cooldown, template.damageMultiplier, template.healAmount,
+          template.buffDuration);
 
       // ID 설정 (Skill 클래스에 ID 필드 추가 필요)
       skill.setId(template.id);
@@ -194,8 +194,7 @@ public class SkillFactory {
       initialize();
     }
 
-    return skillTemplates.values().stream().filter(template -> category.equalsIgnoreCase(template.category)).map(template -> template.id).sorted()
-        .toList();
+    return skillTemplates.values().stream().filter(template -> category.equalsIgnoreCase(template.category)).map(template -> template.id).sorted().toList();
   }
 
   /**
@@ -288,8 +287,7 @@ public class SkillFactory {
     stats.put("totalSkills", skillTemplates.size());
 
     // 타입별 통계
-    Map<SkillType, Long> typeStats = skillTemplates.values().stream()
-        .collect(java.util.stream.Collectors.groupingBy(template -> template.type, java.util.stream.Collectors.counting()));
+    Map<SkillType, Long> typeStats = skillTemplates.values().stream().collect(java.util.stream.Collectors.groupingBy(template -> template.type, java.util.stream.Collectors.counting()));
 
     typeStats.forEach((type, count) -> stats.put(type.name().toLowerCase() + "Skills", count.intValue()));
 

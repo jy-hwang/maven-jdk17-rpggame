@@ -38,8 +38,7 @@ public class GameItemStats {
   }
 
   public GameItemStats() {
-    this(GameConstants.NUMBER_ZERO, GameConstants.NUMBER_ZERO, GameConstants.NUMBER_ZERO, GameConstants.NUMBER_ZERO, GameConstants.NUMBER_ZERO, false,
-        GameConstants.NUMBER_ZERO, false);
+    this(GameConstants.NUMBER_ZERO, GameConstants.NUMBER_ZERO, GameConstants.NUMBER_ZERO, GameConstants.NUMBER_ZERO, GameConstants.NUMBER_ZERO, false, GameConstants.NUMBER_ZERO, false);
   }
 
   // Getters

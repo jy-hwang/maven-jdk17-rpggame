@@ -35,8 +35,8 @@ public class QuestDto {
   public QuestDto() {}
 
   // 생성자
-  public QuestDto(String id, String title, String description, String type, int requiredLevel, Map<String, Integer> objectives,
-      Map<String, Integer> currentProgress, QuestRewardDto reward, String status) {
+  public QuestDto(String id, String title, String description, String type, int requiredLevel, Map<String, Integer> objectives, Map<String, Integer> currentProgress, QuestRewardDto reward,
+      String status) {
     this.id = id;
     this.title = title;
     this.description = description;

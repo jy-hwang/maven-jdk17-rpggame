@@ -2,6 +2,7 @@ package rpg.core.engine;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.IntSummaryStatistics;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -153,7 +154,7 @@ public class GameEngine {
       logger.info("게임 종료");
     }
   }
-  
+
   /**
    * 새 게임을 시작합니다.
    */
@@ -321,7 +322,7 @@ public class GameEngine {
       gameRunning = false;
     }
   }
-  
+
   /**
    * 컨트롤러 상태 검증
    */
@@ -955,7 +956,7 @@ public class GameEngine {
     exploreController.showCurrentLocationMonsters(player.getLevel());
 
     // 지역 통계
-    showLocationStatistics(location, locationId);
+    // showLocationStatistics(location, locationId);
   }
 
   /**
@@ -974,8 +975,8 @@ public class GameEngine {
       System.out.println("   레벨: " + location.getMinLevel() + "-" + location.getMaxLevel() + " | 난이도: " + location.getDangerLevel().getDisplayName());
 
       // 해당 지역의 몬스터 수
-      List<MonsterData> locationMonsters = MonsterDataLoader.getMonstersByLocation(location.getId());
-      System.out.println("   몬스터: " + locationMonsters.size() + "종");
+      // List<MonsterData> locationMonsters = MonsterDataLoader.getMonstersByLocation(location.getId());
+      // System.out.println(" 몬스터: " + locationMonsters.size() + "종");
 
       // 접근 가능 여부
       if (player.getLevel() >= location.getMinLevel()) {
@@ -1080,8 +1081,6 @@ public class GameEngine {
     }
   }
 
-
-
   /**
    * 스킬을 관리합니다.
    */
@@ -1178,6 +1177,15 @@ public class GameEngine {
     System.out.println("• 상점: 레벨이 높아질수록 더 좋은 아이템을 판매합니다");
     System.out.println("• 저장: 중요한 순간에는 꼭 저장하여 진행 상황을 보존하세요");
 
+    // 🆕 추가: 도움말에서만 표시되는 통계 정보
+    System.out.println("\n📊 === 게임 세계 통계 ===");
+
+    // 지역 통계
+    showHelpLocationStatistics();
+
+    // 몬스터 통계
+    showHelpMonsterStatistics();
+
     // 시스템 정보
     showSystemInfo();
 
@@ -1200,8 +1208,9 @@ public class GameEngine {
       System.out.printf("• 로드된 아이템 수: %d개\n", itemFactory.getItemCount());
       System.out.printf("• 초기화 상태: %s\n", itemFactory.isInitialized() ? "정상" : "오류");
 
-      JsonBasedQuestFactory questFactory = JsonBasedQuestFactory.getInstance();
-      System.out.printf("• 퀘스트 템플릿: 메인 %d개, 사이드 %d개, 일일 %d개\n", questFactory.getQuestCount("MAIN"), questFactory.getQuestCount("SIDE"), questFactory.getQuestCount("DAILY"));
+      // JsonBasedQuestFactory questFactory = JsonBasedQuestFactory.getInstance();
+      // System.out.printf("• 퀘스트 템플릿: 메인 %d개, 사이드 %d개, 일일 %d개\n", questFactory.getQuestCount("MAIN"),
+      // questFactory.getQuestCount("SIDE"), questFactory.getQuestCount("DAILY"));
     } catch (Exception e) {
       System.out.println("• 시스템 상태: 일부 오류 발생 (" + e.getMessage() + ")");
     }
@@ -1218,18 +1227,18 @@ public class GameEngine {
       System.out.println("2. 레벨별 몬스터");
       System.out.println("3. 희귀도별 몬스터");
       System.out.println("4. 몬스터 검색");
-      System.out.println("5. 몬스터 통계");
-      System.out.println("6. 나가기");
+      // System.out.println("5. 몬스터 통계");
+      System.out.println("5. 나가기");
 
-      int choice = InputValidator.getIntInput("선택: ", 1, 6);
+      int choice = InputValidator.getIntInput("선택: ", 1, 5);
 
       switch (choice) {
         case 1 -> showMonstersByLocation();
         case 2 -> showMonstersByLevel();
         case 3 -> showMonstersByRarity();
         case 4 -> searchMonsters();
-        case 5 -> MonsterDataLoader.printMonsterStatistics();
-        case 6 -> {
+        // case 5 -> MonsterDataLoader.printMonsterStatistics();
+        case 5 -> {
           return;
         }
       }
@@ -1380,5 +1389,55 @@ public class GameEngine {
 
     System.out.println("========================");
   }
-  
+
+  // 5. 도움말 전용 지역 통계 메서드 추가
+  private void showHelpLocationStatistics() {
+    System.out.println("\n🗺️ 지역 통계:");
+
+    List<LocationData> allLocations = LocationManager.getAllLocations();
+    System.out.println("• 총 지역 수: " + allLocations.size() + "개");
+
+    // 난이도별 분포
+    Map<String, Long> dangerLevelStats = allLocations.stream().collect(Collectors.groupingBy(location -> location.getDangerLevel().getDisplayName(), Collectors.counting()));
+
+    System.out.println("• 난이도별 분포:");
+    dangerLevelStats.forEach((level, count) -> System.out.println("  " + level + ": " + count + "개"));
+
+    // 레벨 범위
+    int minLocationLevel = allLocations.stream().mapToInt(LocationData::getMinLevel).min().orElse(1);
+    int maxLocationLevel = allLocations.stream().mapToInt(LocationData::getMaxLevel).max().orElse(50);
+
+    System.out.println("• 레벨 범위: " + minLocationLevel + " ~ " + maxLocationLevel);
+  }
+
+  // 6. 도움말 전용 몬스터 통계 메서드 추가
+  private void showHelpMonsterStatistics() {
+    System.out.println("\n👹 몬스터 통계:");
+
+    // MonsterDataLoader의 printMonsterStatistics() 내용을 여기로 이동
+    List<MonsterData> allMonsters = MonsterDataLoader.getAllMonsters();
+    System.out.println("• 총 몬스터 종류: " + allMonsters.size() + "종");
+
+    // 희귀도별 통계
+    Map<String, Long> rarityStats = allMonsters.stream().collect(Collectors.groupingBy(MonsterData::getRarity, Collectors.counting()));
+
+    System.out.println("• 희귀도별 분포:");
+    rarityStats.forEach((rarity, count) -> System.out.println("  " + rarity + ": " + count + "종"));
+
+    // 지역별 통계 (상위 5개만)
+    Map<String, Long> locationStats = allMonsters.stream().flatMap(monster -> monster.getLocations().stream()).collect(Collectors.groupingBy(location -> location, Collectors.counting()));
+
+    System.out.println("• 주요 지역별 분포:");
+    locationStats.entrySet().stream().sorted(Map.Entry.<String, Long>comparingByValue().reversed()).limit(5) // 상위 5개만 표시
+        .forEach(entry -> {
+          String locationName = LocationManager.getLocationName(entry.getKey());
+          System.out.println("  " + locationName + ": " + entry.getValue() + "종");
+        });
+
+    // 레벨 분포
+    IntSummaryStatistics levelStats = allMonsters.stream().mapToInt(monster -> (monster.getMinLevel() + monster.getMaxLevel()) / 2).summaryStatistics();
+
+    System.out.println("• 레벨 분포: 최소 " + levelStats.getMin() + " | 최대 " + levelStats.getMax() + " | 평균 " + String.format("%.1f", levelStats.getAverage()));
+  }
+
 }

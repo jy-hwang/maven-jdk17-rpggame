@@ -28,8 +28,8 @@ public class GameQuestFactory {
   private final GameEffectFactory effectFactory;
   private final DynamicQuestDataProvider dataProvider;
 
-  private Random random;  
-  
+  private Random random;
+
   private GameQuestFactory() {
     this.itemFactory = GameItemFactory.getInstance();
     this.effectFactory = new GameEffectFactory();
@@ -125,44 +125,28 @@ public class GameQuestFactory {
   private Quest createDailyKillQuest(String questId) {
     // JSON 데이터에서 적절한 몬스터 선택
     MonsterData targetMonster = dataProvider.selectRandomMonsterForLevel(1);
-    
+
     Map<String, Integer> objectives = new HashMap<>();
     objectives.put("kill_" + targetMonster.getId(), 8 + random.nextInt(5));
-    
+
     QuestReward reward = new QuestReward(80, 120);
-    
-    return new Quest(
-        questId, 
-        "일일 " + targetMonster.getName() + " 사냥", 
-        "오늘의 목표인 " + targetMonster.getName() + "을(를) 처치하세요.", 
-        Quest.QuestType.KILL, 
-        1, 
-        objectives, 
-        reward
-    );
-}
+
+    return new Quest(questId, "일일 " + targetMonster.getName() + " 사냥", "오늘의 목표인 " + targetMonster.getName() + "을(를) 처치하세요.", Quest.QuestType.KILL, 1, objectives, reward);
+  }
 
   /**
    * 일일 수집 퀘스트 생성 (개선된 버전)
    */
   private Quest createDailyCollectionQuest(String questId) {
-      // JSON 데이터에서 적절한 아이템 선택
-      GameItemData targetItem = dataProvider.selectRandomCollectableItem();
-      
-      Map<String, Integer> objectives = new HashMap<>();
-      objectives.put("collect_" + targetItem.getId(), 3 + random.nextInt(3));
-      
-      QuestReward reward = new QuestReward(60, 80);
-      
-      return new Quest(
-          questId, 
-          "일일 " + targetItem.getName() + " 수집", 
-          "오늘의 목표인 " + targetItem.getName() + "을(를) 수집하세요.", 
-          Quest.QuestType.COLLECT, 
-          1, 
-          objectives, 
-          reward
-      );
+    // JSON 데이터에서 적절한 아이템 선택
+    GameItemData targetItem = dataProvider.selectRandomCollectableItem();
+
+    Map<String, Integer> objectives = new HashMap<>();
+    objectives.put("collect_" + targetItem.getId(), 3 + random.nextInt(3));
+
+    QuestReward reward = new QuestReward(60, 80);
+
+    return new Quest(questId, "일일 " + targetItem.getName() + " 수집", "오늘의 목표인 " + targetItem.getName() + "을(를) 수집하세요.", Quest.QuestType.COLLECT, 1, objectives, reward);
   }
 
   /**
