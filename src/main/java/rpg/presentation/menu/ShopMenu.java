@@ -1,6 +1,7 @@
 package rpg.presentation.menu;
 
 import rpg.domain.player.Player;
+import rpg.domain.shop.CategoryStats;
 import rpg.domain.shop.ShopEvent;
 import rpg.domain.shop.ShopItemCategory;
 
@@ -73,24 +74,6 @@ public class ShopMenu {
     };
   }
 
-  /**
-   * 카테고리별 아이템 수를 담는 간단한 데이터 클래스
-   */
-  public static class CategoryStats {
-    private final java.util.Map<ShopItemCategory, Integer> stats;
-
-    public CategoryStats() {
-      this.stats = new java.util.HashMap<>();
-    }
-
-    public void setCount(ShopItemCategory category, int count) {
-      stats.put(category, count);
-    }
-
-    public int getCount(ShopItemCategory category) {
-      return stats.getOrDefault(category, 0);
-    }
-  }
 
   /**
    * 활성화된 이벤트 정보를 표시합니다.

@@ -17,6 +17,7 @@ import rpg.domain.item.GameItem;
 import rpg.domain.item.ItemRarity;
 import rpg.domain.item.effect.GameEffect;
 import rpg.domain.player.Player;
+import rpg.domain.shop.CategoryStats;
 import rpg.domain.shop.ShopEvent;
 import rpg.domain.shop.ShopItem;
 import rpg.domain.shop.ShopItemCategory;
@@ -152,19 +153,23 @@ public class ShopController {
       // 고급 장비들 - 현재는 GameEquipment만 지원
       // TODO: GameEquipment도 팩토리 시스템으로 전환 예정
 
-      GameEquipment steelSword = new GameEquipment("STEEL_SWORD", "강철검", "단단한 강철로 만든 검", 200, ItemRarity.UNCOMMON, GameEquipment.EquipmentType.WEAPON, 15, 0, 0);
+      GameEquipment steelSword =
+          new GameEquipment("STEEL_SWORD", "강철검", "단단한 강철로 만든 검", 200, ItemRarity.UNCOMMON, GameEquipment.EquipmentType.WEAPON, 15, 0, 0);
       addItemToShop(steelSword, "STEEL_SWORD_SHOP");
 
-      GameEquipment ironArmor = new GameEquipment("IRON_ARMOR", "철갑옷", "튼튼한 철로 만든 갑옷", 160, ItemRarity.UNCOMMON, GameEquipment.EquipmentType.ARMOR, 0, 12, 25);
+      GameEquipment ironArmor =
+          new GameEquipment("IRON_ARMOR", "철갑옷", "튼튼한 철로 만든 갑옷", 160, ItemRarity.UNCOMMON, GameEquipment.EquipmentType.ARMOR, 0, 12, 25);
       addItemToShop(ironArmor, "IRON_ARMOR_SHOP");
 
-      GameEquipment healthRing = new GameEquipment("HEALTH_RING", "체력의 반지", "체력을 증가시켜주는 반지", 150, ItemRarity.RARE, GameEquipment.EquipmentType.ACCESSORY, 0, 0, 15);
+      GameEquipment healthRing =
+          new GameEquipment("HEALTH_RING", "체력의 반지", "체력을 증가시켜주는 반지", 150, ItemRarity.RARE, GameEquipment.EquipmentType.ACCESSORY, 0, 0, 15);
       addItemToShop(healthRing, "HEALTH_RING_SHOP");
 
       // 특별 소비 아이템들 (GameEffectFactory 사용)
       List<GameEffect> superHealEffect = List.of(GameEffectFactory.createHealHpEffect(100));
 
-      GameConsumable superHealthPotion = new GameConsumable("SUPER_HEALTH_POTION", "고급 체력 물약", "HP를 100 회복합니다", 80, ItemRarity.UNCOMMON, superHealEffect, 0);
+      GameConsumable superHealthPotion =
+          new GameConsumable("SUPER_HEALTH_POTION", "고급 체력 물약", "HP를 100 회복합니다", 80, ItemRarity.UNCOMMON, superHealEffect, 0);
       addItemToShop(superHealthPotion, "SUPER_HEALTH_POTION_SHOP");
 
       // 복합 효과 물약 (HP + MP 동시 회복)
@@ -250,31 +255,7 @@ public class ShopController {
    * 상점 메인 메뉴를 표시합니다.
    */
   private void displayShopMenuMain(Player player) {
-
-    // System.out.println("\n🏪 === 마을 상점 ===");
-    // System.out.println("💰 보유 골드: " + player.getGold());
-    //
-    // // GameItemFactory 상태 표시
-    // System.out.println("📦 상품 종류: " + shopItems.size() + "개 (팩토리 기반)");
-    //
-    // // 이벤트가 활성화되어 있으면 표시
-    // if (currentEventActive && currentEvent != null) {
-    // displayActiveEventInfo();
-    // }
-    //
-    // System.out.println();
-    // System.out.println("1. 🛒 아이템 사기");
-    // System.out.println("2. 💰 아이템 팔기");
-    // System.out.println("3. 📊 판매 시세 확인");
-    // System.out.println("4. 📈 상점 통계");
-    // System.out.println("5. 🚪 상점 나가기");
-    // System.out.println("====================");
-    // boolean hasEvent = true;
-
     shopMenu.displayShopMenuMain(player, shopItems.size(), currentEventActive, currentEvent);
-
-
-
   }
 
   /**
@@ -312,33 +293,17 @@ public class ShopController {
    * 구매 메뉴를 표시합니다.
    */
   private void displayShopMenuBuy(Player player) {
-    System.out.println("\n🏪 === 마을 상점 구매 ===");
-    System.out.println("💰 보유 골드: " + player.getGold());
-
-    // 카테고리별 아이템 수 표시
-    displayCategoryStats();
-
-    System.out.println();
-    System.out.println("1. 🧪 소비 아이템");
-    System.out.println("2. ⚔️ 무기");
-    System.out.println("3. 🛡️ 방어구");
-    System.out.println("4. 💍 장신구");
-    System.out.println("5. 🎲 랜덤 추천");
-    System.out.println("6. 🔙 돌아가기");
-    System.out.println("========================");
-  }
-
-  /**
-   * 카테고리별 통계 표시
-   */
-  private void displayCategoryStats() {
+    CategoryStats stats = new CategoryStats();
     for (ShopItemCategory category : ShopItemCategory.values()) {
-      long count = shopItems.stream().filter(item -> item.getCategory() == category).filter(item -> item.getStock() > 0).count();
-
-      if (count > 0) {
-        System.out.printf("   %s: %d개%n", getCategoryKorean(category), count);
-      }
+      //@formatter:off
+      long count = shopItems.stream()
+          .filter(item -> item.getCategory() == category)
+          .filter(item -> item.getStock() > 0)
+          .count();
+      stats.setCount(category, (int) count);
+      //@formatter:off
     }
+   shopMenu.displayShopMenuBuy(player, stats);
   }
 
   /**
