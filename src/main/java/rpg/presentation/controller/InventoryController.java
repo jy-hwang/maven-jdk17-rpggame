@@ -223,16 +223,14 @@ public class InventoryController {
    * 체력 회복 아이템인지 확인
    */
   private boolean isHealingItem(GameConsumable item) {
-    return item.getEffectsDescription().toLowerCase().contains("hp") || item.getName().toLowerCase().contains("체력")
-        || item.getName().toLowerCase().contains("health");
+    return item.getEffectsDescription().toLowerCase().contains("hp") || item.getName().toLowerCase().contains("체력") || item.getName().toLowerCase().contains("health");
   }
 
   /**
    * 마나 회복 아이템인지 확인
    */
   private boolean isManaItem(GameConsumable item) {
-    return item.getEffectsDescription().toLowerCase().contains("mp") || item.getName().toLowerCase().contains("마나")
-        || item.getName().toLowerCase().contains("mana");
+    return item.getEffectsDescription().toLowerCase().contains("mp") || item.getName().toLowerCase().contains("마나") || item.getName().toLowerCase().contains("mana");
   }
 
   /**
@@ -445,8 +443,7 @@ public class InventoryController {
       return;
     }
 
-    GameEquipment.EquipmentType[] types =
-        {GameEquipment.EquipmentType.WEAPON, GameEquipment.EquipmentType.ARMOR, GameEquipment.EquipmentType.ACCESSORY};
+    GameEquipment.EquipmentType[] types = {GameEquipment.EquipmentType.WEAPON, GameEquipment.EquipmentType.ARMOR, GameEquipment.EquipmentType.ACCESSORY};
 
     String[] typeNames = {"무기", "방어구", "장신구"};
 
@@ -528,8 +525,7 @@ public class InventoryController {
     // 총 장비 보너스 표시
     PlayerInventory.EquipmentBonus bonus = inventory.getTotalBonus();
     System.out.println("\n📊 총 장비 보너스:");
-    if (bonus.getAttackBonus() > GameConstants.NUMBER_ZERO || bonus.getDefenseBonus() > GameConstants.NUMBER_ZERO
-        || bonus.getHpBonus() > GameConstants.NUMBER_ZERO) {
+    if (bonus.getAttackBonus() > GameConstants.NUMBER_ZERO || bonus.getDefenseBonus() > GameConstants.NUMBER_ZERO || bonus.getHpBonus() > GameConstants.NUMBER_ZERO) {
       if (bonus.getAttackBonus() > GameConstants.NUMBER_ZERO)
         System.out.println("⚔️ 공격력: +" + bonus.getAttackBonus());
       if (bonus.getDefenseBonus() > GameConstants.NUMBER_ZERO)
@@ -725,8 +721,7 @@ public class InventoryController {
    * 비교용 장비 포맷을 생성합니다.
    */
   private String formatEquipmentForComparison(GameEquipment equipment) {
-    return String.format("%s [%s] (공격+%d, 방어+%d, HP+%d)", equipment.getName(), getRarityKorean(equipment.getRarity()), equipment.getAttackBonus(),
-        equipment.getDefenseBonus(), equipment.getHpBonus());
+    return String.format("%s [%s] (공격+%d, 방어+%d, HP+%d)", equipment.getName(), getRarityKorean(equipment.getRarity()), equipment.getAttackBonus(), equipment.getDefenseBonus(), equipment.getHpBonus());
   }
 
   /**
@@ -989,7 +984,6 @@ public class InventoryController {
    */
   public String getInventorySummary(Player player) {
     PlayerInventory inventory = player.getInventory();
-    return String.format("인벤토리: %d/%d (%.0f%%) | 골드: %dG", inventory.getCurrentSize(), inventory.getMaxSize(), inventory.getUsageRate() * 100,
-        player.getGold());
+    return String.format("인벤토리: %d/%d (%.0f%%) | 골드: %dG", inventory.getCurrentSize(), inventory.getMaxSize(), inventory.getUsageRate() * 100, player.getGold());
   }
 }

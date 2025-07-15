@@ -207,8 +207,8 @@ public class SaveSystemMigrator {
       Path saveDir = Paths.get(SystemConstants.SAVE_DIRECTORY);
       String backupPattern = "migration_backup_slot" + slotNumber + "_";
 
-      Path backupFile = Files.list(saveDir).filter(path -> path.getFileName().toString().startsWith(backupPattern))
-          .max((p1, p2) -> p1.getFileName().toString().compareTo(p2.getFileName().toString())).orElse(null);
+      Path backupFile =
+          Files.list(saveDir).filter(path -> path.getFileName().toString().startsWith(backupPattern)).max((p1, p2) -> p1.getFileName().toString().compareTo(p2.getFileName().toString())).orElse(null);
 
       if (backupFile == null) {
         logger.warn("슬롯 {} 백업 파일을 찾을 수 없음", slotNumber);

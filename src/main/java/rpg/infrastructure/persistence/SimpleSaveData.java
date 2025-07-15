@@ -143,14 +143,11 @@ public class SimpleSaveData {
     try {
       logger.debug("Player를 SimpleSaveData로 변환 시작: {}", player.getName());
 
-      return new SimpleSaveData(String.valueOf(SystemConstants.GAME_VERSION),
-          LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), slotNumber, player.getName(), player.getLevel(),
-          player.getExp(), player.getHp(), player.getMaxHp(), player.getMana(), player.getMaxMana(), player.getBaseAttack(), player.getBaseDefense(),
-          player.getGold(), player.getRestoreHp(), player.getRestoreMana(), player.getPlayerStatusCondition().name(),
-          extractItemEntries(player.getInventory()), extractEquipmentSlots(player.getInventory()), player.getInventory().getMaxSize(),
-          extractQuestProgress(player.getQuestManager()), extractCompletedQuestIds(player.getQuestManager()),
-          extractClaimedRewardIds(player.getQuestManager()), extractLearnedSkillIds(player.getSkillManager()),
-          extractSkillCooldowns(player.getSkillManager()), gameState.getTotalPlayTime(), gameState.getMonstersKilled(),
+      return new SimpleSaveData(String.valueOf(SystemConstants.GAME_VERSION), LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), slotNumber, player.getName(),
+          player.getLevel(), player.getExp(), player.getHp(), player.getMaxHp(), player.getMana(), player.getMaxMana(), player.getBaseAttack(), player.getBaseDefense(), player.getGold(),
+          player.getRestoreHp(), player.getRestoreMana(), player.getPlayerStatusCondition().name(), extractItemEntries(player.getInventory()), extractEquipmentSlots(player.getInventory()),
+          player.getInventory().getMaxSize(), extractQuestProgress(player.getQuestManager()), extractCompletedQuestIds(player.getQuestManager()), extractClaimedRewardIds(player.getQuestManager()),
+          extractLearnedSkillIds(player.getSkillManager()), extractSkillCooldowns(player.getSkillManager()), gameState.getTotalPlayTime(), gameState.getMonstersKilled(),
           gameState.getQuestsCompleted(), gameState.getCurrentLocation());
 
     } catch (Exception e) {
@@ -175,11 +172,9 @@ public class SimpleSaveData {
       // === 3. 퀘스트 매니저 복원 ===
       QuestManager questManager = restoreQuestManagerWithFactory();
 
-   // === 4. Player 생성 ===
-      Player player = new Player(playerName, level, hp, maxHp, mana, maxMana, 
-                                restoreHp, restoreMp, experience, attack, defense, 
-                                gold, inventory, skillManager, 
-                                PlayerStatusCondition.valueOf(statusCondition), questManager);
+      // === 4. Player 생성 ===
+      Player player = new Player(playerName, level, hp, maxHp, mana, maxMana, restoreHp, restoreMp, experience, attack, defense, gold, inventory, skillManager,
+          PlayerStatusCondition.valueOf(statusCondition), questManager);
 
       // 상태 조건 설정
       try {
@@ -189,11 +184,11 @@ public class SimpleSaveData {
         logger.warn("잘못된 상태 조건, 기본값으로 설정: {}", statusCondition);
         player.setPlayerStatusCondition(PlayerStatusCondition.NORMAL);
       }
-      
+
       // 인벤토리, 스킬, 퀘스트 매니저 설정
       player.setInventory(inventory);
       player.setSkillManager(skillManager);
-      
+
       try {
         // 모든 활성 레벨 퀘스트의 진행도를 현재 플레이어 레벨과 동기화
         questManager.synchronizeLevelQuestProgress(player);
@@ -204,7 +199,7 @@ public class SimpleSaveData {
       } catch (Exception e) {
         logger.error("퀘스트 진행도 동기화 중 오류", e);
       }
-      
+
       player.setQuestManager(questManager);
 
       logger.info("Player 복원 완료: {} (레벨: {}, 스킬: {}개)", playerName, level, learnedSkillIds.size());
@@ -301,8 +296,7 @@ public class SimpleSaveData {
   /**
    * 개별 장비 아이템 복원
    */
-  private void restoreEquippedItem(PlayerInventory inventory, GameItemFactory itemFactory, String itemId, String equipmentType,
-      EquipmentSetter setter) {
+  private void restoreEquippedItem(PlayerInventory inventory, GameItemFactory itemFactory, String itemId, String equipmentType, EquipmentSetter setter) {
     try {
       GameItem item = itemFactory.createItem(itemId);
 

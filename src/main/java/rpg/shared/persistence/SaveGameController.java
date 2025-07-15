@@ -186,8 +186,8 @@ public class SaveGameController {
         var questManager = loadedPlayer.getQuestManager();
         questManager.synchronizeLevelQuestProgress(loadedPlayer);
         int activeCount = questManager.getActiveQuests().size();
-        
-        if(activeCount > 0) {
+
+        if (activeCount > 0) {
           // 진행도 표시 확인용 로그
           var activeQuests = questManager.getActiveQuests();
           for (var quest : activeQuests) {
@@ -198,18 +198,18 @@ public class SaveGameController {
         }
         int completedCount = questManager.getCompletedQuests().size();
 
-        // 만료된 일일 퀘스트가 있는지 확인
-        questManager.validateQuestData();
-        questManager.cleanupExpiredQuests();
-
-        // 새로운 일일 퀘스트가 필요한지 확인
-        String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-        boolean hasTodaysQuests = questManager.getAvailableQuests(loadedPlayer).stream().anyMatch(quest -> quest.getId().contains(today));
-
-        if (!hasTodaysQuests) {
-          System.out.println("📅 새로운 일일 퀘스트를 생성합니다...");
-          questManager.generateDailyQuests(loadedPlayer);
-        }
+//        // 만료된 일일 퀘스트가 있는지 확인
+//        questManager.validateQuestData();
+//        questManager.cleanupExpiredQuests();
+//
+//        // 새로운 일일 퀘스트가 필요한지 확인
+//        String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+//        boolean hasTodaysQuests = questManager.getAvailableQuests(loadedPlayer).stream().anyMatch(quest -> quest.getId().contains(today));
+//
+//        if (!hasTodaysQuests) {
+//          System.out.println("📅 새로운 일일 퀘스트를 생성합니다...");
+//          questManager.generateDailyQuests(loadedPlayer);
+//        }
 
         // 착용 장비 상태 확인
         PlayerInventory inventory = loadedPlayer.getInventory();
@@ -481,8 +481,7 @@ public class SaveGameController {
       for (SaveSlotInfo slot : slots) {
         if (slot.isOccupied()) {
           String currentMarker = (slot.getSlotNumber() == currentSaveSlot) ? " [현재]" : "";
-          System.out.printf("   슬롯 %d: %s (레벨 %d) - %d분 플레이%s\n", slot.getSlotNumber(), slot.getCharacterName(), slot.getCharacterLevel(),
-              slot.getPlayTime(), currentMarker);
+          System.out.printf("   슬롯 %d: %s (레벨 %d) - %d분 플레이%s\n", slot.getSlotNumber(), slot.getCharacterName(), slot.getCharacterLevel(), slot.getPlayTime(), currentMarker);
         }
       }
 

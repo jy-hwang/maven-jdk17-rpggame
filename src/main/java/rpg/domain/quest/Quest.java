@@ -8,7 +8,11 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import rpg.domain.item.GameItem;
+import rpg.domain.item.GameItemData;
+import rpg.domain.monster.MonsterData;
 import rpg.domain.player.Player;
+import rpg.infrastructure.data.loader.ItemDataLoader;
+import rpg.infrastructure.data.loader.MonsterDataLoader;
 import rpg.shared.constant.GameConstants;
 
 /**
@@ -207,10 +211,12 @@ public class Quest {
         desc.append(", ");
 
       if (key.startsWith("kill_")) {
-        String monsterName = key.substring(5);
+        String monsterId = key.substring(5);
+        String monsterName = getMonsterDisplayName(monsterId);
         desc.append(monsterName).append(" ").append(target).append("마리 처치");
       } else if (key.startsWith("collect_")) {
-        String itemName = key.substring(8);
+        String itemId = key.substring(8);
+        String itemName = getItemDisplayName(itemId);
         desc.append(itemName).append(" ").append(target).append("개 수집");
       } else if (key.equals("reach_level")) {
         desc.append("레벨 ").append(target).append(" 달성");
@@ -223,7 +229,55 @@ public class Quest {
   }
 
   /**
-   * 퀘스트 진행도 설명을 반환합니다.
+   * 몬스터 ID를 한국어 표시명으로 변환 MonsterDataLoader를 사용하여 동적으로 조회
+   */
+  private String getMonsterDisplayName(String monsterId) {
+    try {
+      MonsterData monsterData = MonsterDataLoader.getMonsterById(monsterId);
+      if (monsterData != null && monsterData.getName() != null) {
+        return monsterData.getName();
+      }
+    } catch (Exception e) {
+      logger.debug("몬스터 데이터 조회 실패: {}", monsterId, e);
+    }
+
+    // 폴백: 최소한의 하드코딩된 매핑 (JSON 데이터 로드 실패 시에만 사용)
+    return switch (monsterId) {
+      case "FOREST_SLIME" -> "숲 슬라임";
+      case "FOREST_GOBLIN" -> "숲 고블린";
+      case "forest_goblin" -> "숲 고블린";
+      case "orc" -> "오크";
+      case "dragon" -> "드래곤";
+      case "slime" -> "슬라임";
+      default -> monsterId; // 최종 폴백: ID 그대로 반환
+    };
+  }
+
+  /**
+   * 아이템 ID를 한국어 표시명으로 변환 ItemDataLoader.getItemDataById()를 사용하여 동적으로 조회 - 올바른 방법!
+   */
+  private String getItemDisplayName(String itemId) {
+    try {
+      // ItemDataLoader에서 직접 GameItemData 조회
+      GameItemData itemData = ItemDataLoader.getItemDataById(itemId);
+      if (itemData != null && itemData.getName() != null) {
+        return itemData.getName();
+      }
+    } catch (Exception e) {
+      logger.debug("아이템 데이터 조회 실패: {}", itemId, e);
+    }
+
+    // 폴백: 최소한의 하드코딩된 매핑 (JSON 데이터 로드 실패 시에만 사용)
+    return switch (itemId) {
+      case "HEALTH_POTION" -> "체력 물약";
+      case "MANA_POTION" -> "마나 물약";
+      case "IRON_ORE" -> "철광석";
+      default -> itemId; // 최종 폴백: ID 그대로 반환
+    };
+  }
+
+  /**
+   * 퀘스트 진행도 설명을 반환합니다. (개선된 버전 - 동적 이름 조회)
    */
   public String getProgressDescription() {
     StringBuilder desc = new StringBuilder();
@@ -235,18 +289,30 @@ public class Quest {
 
       // 레벨 퀘스트의 경우 특별 처리
       if (type == QuestType.LEVEL && key.equals("reach_level")) {
-        // 현재 진행도가 0이면 최소 1로 설정 (현재 레벨을 반영)
         current = Math.max(currentProgress.getOrDefault(key, 1), 1);
-        // 목표 레벨보다 높으면 목표 레벨로 제한
         current = Math.min(current, target);
       } else {
-        // 기존 로직 (처치, 수집 등)
         current = currentProgress.getOrDefault(key, GameConstants.NUMBER_ZERO);
       }
 
       if (desc.length() > GameConstants.NUMBER_ZERO)
         desc.append(", ");
-      desc.append(current).append("/").append(target);
+
+      // 진행도를 한국어 이름과 함께 표시
+      if (key.startsWith("kill_")) {
+        String monsterId = key.substring(5);
+        String monsterName = getMonsterDisplayName(monsterId);
+        desc.append(monsterName).append(": ").append(current).append("/").append(target);
+      } else if (key.startsWith("collect_")) {
+        String itemId = key.substring(8);
+        String itemName = getItemDisplayName(itemId);
+        desc.append(itemName).append(": ").append(current).append("/").append(target);
+      } else if (key.equals("reach_level")) {
+        desc.append("레벨: ").append(current).append("/").append(target);
+      } else {
+        // 기본 형태 유지
+        desc.append(current).append("/").append(target);
+      }
     }
 
     return desc.toString();
@@ -254,7 +320,7 @@ public class Quest {
 
 
   /**
-   * 플레이어 정보를 사용한 진행도 설명 반환 (새로운 메서드)
+   * 플레이어 정보를 사용한 진행도 설명 반환 (개선된 버전 - 동적 이름 조회)
    */
   public String getProgressDescription(Player player) {
     StringBuilder desc = new StringBuilder();
@@ -268,13 +334,27 @@ public class Quest {
       if (type == QuestType.LEVEL && key.equals("reach_level") && player != null) {
         current = Math.min(player.getLevel(), target);
       } else {
-        // 기존 로직
         current = currentProgress.getOrDefault(key, GameConstants.NUMBER_ZERO);
       }
 
       if (desc.length() > GameConstants.NUMBER_ZERO)
         desc.append(", ");
-      desc.append(current).append("/").append(target);
+
+      // 진행도를 한국어 이름과 함께 표시
+      if (key.startsWith("kill_")) {
+        String monsterId = key.substring(5);
+        String monsterName = getMonsterDisplayName(monsterId);
+        desc.append(monsterName).append(": ").append(current).append("/").append(target);
+      } else if (key.startsWith("collect_")) {
+        String itemId = key.substring(8);
+        String itemName = getItemDisplayName(itemId);
+        desc.append(itemName).append(": ").append(current).append("/").append(target);
+      } else if (key.equals("reach_level")) {
+        desc.append("레벨: ").append(current).append("/").append(target);
+      } else {
+        // 기본 형태 유지
+        desc.append(current).append("/").append(target);
+      }
     }
 
     return desc.toString();

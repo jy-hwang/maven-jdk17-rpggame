@@ -77,8 +77,7 @@ public class JsonBasedQuestFactory {
    * 카테고리별 템플릿 필터링
    */
   private Map<String, QuestTemplateData> filterByCategory(String category) {
-    return allTemplates.entrySet().stream().filter(entry -> category.equals(entry.getValue().getCategory()))
-        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    return allTemplates.entrySet().stream().filter(entry -> category.equals(entry.getValue().getCategory())).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
   }
 
   // ==================== 기본 퀘스트 생성 메서드들 ====================
@@ -169,14 +168,14 @@ public class JsonBasedQuestFactory {
    */
   public Quest createLevelAppropriateQuest(int playerLevel) {
     // 플레이어 레벨에 맞는 템플릿 찾기
-    List<QuestTemplateData> suitableTemplates = allTemplates.values().stream().filter(template -> template.getRequiredLevel() <= playerLevel)
-        .filter(template -> template.getRequiredLevel() >= Math.max(1, playerLevel - 3)) // 너무 낮은 레벨 제외
-        .filter(template -> !"DAILY".equals(template.getCategory()) && !"WEEKLY".equals(template.getCategory())) // 일일/주간 제외
-        .collect(Collectors.toList());
+    List<QuestTemplateData> suitableTemplates =
+        allTemplates.values().stream().filter(template -> template.getRequiredLevel() <= playerLevel).filter(template -> template.getRequiredLevel() >= Math.max(1, playerLevel - 3)) // 너무 낮은 레벨 제외
+            .filter(template -> !"DAILY".equals(template.getCategory()) && !"WEEKLY".equals(template.getCategory())) // 일일/주간 제외
+            .collect(Collectors.toList());
 
     if (suitableTemplates.isEmpty()) {
       logger.warn("레벨 {}에 적합한 퀘스트 템플릿이 없음", playerLevel);
-      return createDynamicLevelQuest(playerLevel);
+      // return createDynamicLevelQuest(playerLevel);
     }
 
     // 랜덤 선택
@@ -193,8 +192,8 @@ public class JsonBasedQuestFactory {
    * 랜덤 퀘스트 생성
    */
   public Quest createRandomQuest(Quest.QuestType type, int playerLevel) {
-    List<QuestTemplateData> typeTemplates = allTemplates.values().stream().filter(template -> type.name().equals(template.getType()))
-        .filter(template -> template.getRequiredLevel() <= playerLevel).collect(Collectors.toList());
+    List<QuestTemplateData> typeTemplates =
+        allTemplates.values().stream().filter(template -> type.name().equals(template.getType())).filter(template -> template.getRequiredLevel() <= playerLevel).collect(Collectors.toList());
 
     if (typeTemplates.isEmpty()) {
       logger.warn("타입 {} 레벨 {}에 적합한 템플릿이 없음", type, playerLevel);
@@ -209,6 +208,46 @@ public class JsonBasedQuestFactory {
     }
     return quest;
   }
+
+  private Quest createDynamicQuest(String category, int playerLevel) {
+    String questId = category + "_dynamic_" + System.currentTimeMillis();
+    String title = switch (category) {
+      case "MAIN" -> "긴급 처치 명령";
+      case "SIDE" -> "사냥꾼의 의뢰";
+      case "DAILY" -> "일일 사냥 임무";
+      default -> "특별 임무";
+    };
+
+    String description = switch (category) {
+      case "MAIN" -> "마을을 위협하는 몬스터를 처치하세요.";
+      case "SIDE" -> "사냥꾼 길드에서 몬스터 처치를 의뢰했습니다.";
+      case "DAILY" -> "오늘의 일일 사냥 임무를 완료하세요.";
+      default -> "특별한 임무를 완료하세요.";
+    };
+
+    // 🔧 수정: 한국어 키 → 영어 몬스터 ID 사용
+    Map<String, Integer> objectives = new HashMap<>();
+    if (playerLevel <= 3) {
+      objectives.put("kill_FOREST_SLIME", Math.max(3, playerLevel * 2));
+    } else if (playerLevel <= 6) {
+      objectives.put("kill_FOREST_GOBLIN", Math.max(2, playerLevel));
+    } else if (playerLevel <= 10) {
+      objectives.put("kill_WILD_BOAR", Math.max(2, playerLevel / 2));
+    } else {
+      objectives.put("kill_CAVE_TROLL", Math.max(1, playerLevel / 3));
+    }
+
+    // 레벨 기반 보상
+    int baseExp = 50 * playerLevel;
+    int baseGold = 30 * playerLevel;
+    QuestReward reward = new QuestReward(baseExp, baseGold);
+
+    Quest dynamicQuest = new Quest(questId, title, description, Quest.QuestType.KILL, playerLevel, objectives, reward);
+
+    logger.info("동적 퀘스트 생성 완료: {}", title);
+    return dynamicQuest;
+  }
+
 
   // ==================== 헬퍼 메서드들 ====================
 
@@ -277,8 +316,7 @@ public class JsonBasedQuestFactory {
    * 레벨별 사용 가능한 퀘스트 ID 목록
    */
   public List<String> getAvailableQuestIds(int playerLevel) {
-    return allTemplates.entrySet().stream().filter(entry -> entry.getValue().getRequiredLevel() <= playerLevel).map(Map.Entry::getKey).sorted()
-        .collect(Collectors.toList());
+    return allTemplates.entrySet().stream().filter(entry -> entry.getValue().getRequiredLevel() <= playerLevel).map(Map.Entry::getKey).sorted().collect(Collectors.toList());
   }
 
   /**
@@ -431,11 +469,9 @@ public class JsonBasedQuestFactory {
 
     // 레벨별 분포
     System.out.println("\n📈 레벨별 분포:");
-    Map<Integer, Long> levelDistribution =
-        allTemplates.values().stream().collect(Collectors.groupingBy(QuestTemplateData::getRequiredLevel, Collectors.counting()));
+    Map<Integer, Long> levelDistribution = allTemplates.values().stream().collect(Collectors.groupingBy(QuestTemplateData::getRequiredLevel, Collectors.counting()));
 
-    levelDistribution.entrySet().stream().sorted(Map.Entry.comparingByKey())
-        .forEach(entry -> System.out.printf("   레벨 %d: %d개%n", entry.getKey(), entry.getValue()));
+    levelDistribution.entrySet().stream().sorted(Map.Entry.comparingByKey()).forEach(entry -> System.out.printf("   레벨 %d: %d개%n", entry.getKey(), entry.getValue()));
 
     // 템플릿 검증 상태
     System.out.println("\n🔍 검증 상태:");

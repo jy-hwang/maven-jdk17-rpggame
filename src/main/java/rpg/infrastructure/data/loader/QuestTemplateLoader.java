@@ -202,13 +202,13 @@ public class QuestTemplateLoader {
     QuestTemplateData template = new QuestTemplateData();
     template.setId("quest_001");
     template.setTitle("슬라임 사냥꾼");
-    template.setDescription("마을 근처의 슬라임 5마리를 처치하세요.");
+    template.setDescription("마을 근처의 슬라임 3마리를 처치하세요.");
     template.setType("KILL");
     template.setRequiredLevel(1);
     template.setCategory("MAIN");
 
     Map<String, Integer> objectives = new HashMap<>();
-    objectives.put("kill_슬라임", 5);
+    objectives.put("kill_FOREST_SLIME", 3);
     template.setObjectives(objectives);
 
     QuestRewardData reward = new QuestRewardData();

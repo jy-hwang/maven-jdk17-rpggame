@@ -61,8 +61,8 @@ public class GameDataRepository {
     List<SaveSlotInfo> optimizedSlots = OptimizedGameRepository.getAllSaveSlots();
 
     // 기존 형식으로 변환
-    return optimizedSlots.stream().map(slot -> new SaveSlotInfo(slot.getSlotNumber(), slot.isOccupied(), slot.getCharacterName(),
-        slot.getCharacterLevel(), slot.getSaveTime(), slot.getPlayTime())).toList();
+    return optimizedSlots.stream().map(slot -> new SaveSlotInfo(slot.getSlotNumber(), slot.isOccupied(), slot.getCharacterName(), slot.getCharacterLevel(), slot.getSaveTime(), slot.getPlayTime()))
+        .toList();
   }
 
   /**
@@ -74,8 +74,7 @@ public class GameDataRepository {
     System.out.println("\n=== 📁 저장 슬롯 목록 ===");
     for (SaveSlotInfo slot : slots) {
       if (slot.isOccupied()) {
-        System.out.printf("%d. %s (레벨 %d) - %s (플레이 시간: %d분)%n", slot.getSlotNumber(), slot.getCharacterName(), slot.getCharacterLevel(),
-            slot.getSaveTime(), slot.getPlayTime());
+        System.out.printf("%d. %s (레벨 %d) - %s (플레이 시간: %d분)%n", slot.getSlotNumber(), slot.getCharacterName(), slot.getCharacterLevel(), slot.getSaveTime(), slot.getPlayTime());
       } else {
         System.out.printf("%d. [빈 슬롯]%n", slot.getSlotNumber());
       }

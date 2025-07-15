@@ -45,8 +45,7 @@ public class SkillService {
    * 저장된 데이터로 SkillService 생성자 (기본 스킬 초기화 안함)
    */
   @JsonCreator
-  public SkillService(@JsonProperty("learnedSkillIds") List<String> learnedSkillIds,
-      @JsonProperty("skillCooldowns") Map<String, Integer> skillCooldowns) {
+  public SkillService(@JsonProperty("learnedSkillIds") List<String> learnedSkillIds, @JsonProperty("skillCooldowns") Map<String, Integer> skillCooldowns) {
     this.learnedSkillIds = learnedSkillIds != null ? new ArrayList<>(learnedSkillIds) : new ArrayList<>();
     this.skillCooldowns = skillCooldowns != null ? new HashMap<>(skillCooldowns) : new HashMap<>();
     this.defaultSkillsInitialized = true; // 저장된 데이터에서 로드할 때는 기본 스킬 초기화 안함
@@ -241,8 +240,7 @@ public class SkillService {
    * 사용 가능한 스킬 목록을 반환합니다.
    */
   public List<Skill> getAvailableSkills(Player character) {
-    return learnedSkillIds.stream().filter(skillId -> canUseSkill(skillId, character)).map(SkillFactory::createSkill).filter(skill -> skill != null)
-        .collect(Collectors.toList());
+    return learnedSkillIds.stream().filter(skillId -> canUseSkill(skillId, character)).map(SkillFactory::createSkill).filter(skill -> skill != null).collect(Collectors.toList());
   }
 
   /**
@@ -365,8 +363,7 @@ public class SkillService {
         String skillId = learnedSkillIds.get(i);
         Map<String, Object> skillInfo = SkillFactory.getSkillInfo(skillId);
         if (skillInfo != null) {
-          logger.debug("{}. {} ({}) - 레벨: {}, 마나: {}", i + 1, skillInfo.get("name"), skillId, skillInfo.get("requiredLevel"),
-              skillInfo.get("manaCost"));
+          logger.debug("{}. {} ({}) - 레벨: {}, 마나: {}", i + 1, skillInfo.get("name"), skillId, skillInfo.get("requiredLevel"), skillInfo.get("manaCost"));
         }
       }
       logger.debug("총 {}개 스킬", learnedSkillIds.size());

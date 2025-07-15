@@ -193,16 +193,14 @@ public class PlayerInventory {
    * 사용 가능한 아이템 목록 (소비 아이템만)
    */
   public List<GameConsumable> getUsableItems() {
-    return items.stream().map(ItemStack::getItem).filter(item -> item instanceof GameConsumable).map(item -> (GameConsumable) item).distinct()
-        .collect(Collectors.toList());
+    return items.stream().map(ItemStack::getItem).filter(item -> item instanceof GameConsumable).map(item -> (GameConsumable) item).distinct().collect(Collectors.toList());
   }
 
   /**
    * 착용 가능한 장비 목록
    */
   public List<GameEquipment> getEquippableItems() {
-    return items.stream().map(ItemStack::getItem).filter(item -> item instanceof GameEquipment).map(item -> (GameEquipment) item).distinct()
-        .collect(Collectors.toList());
+    return items.stream().map(ItemStack::getItem).filter(item -> item instanceof GameEquipment).map(item -> (GameEquipment) item).distinct().collect(Collectors.toList());
   }
 
   /**

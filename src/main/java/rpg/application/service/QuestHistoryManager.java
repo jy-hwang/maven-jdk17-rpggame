@@ -1,7 +1,5 @@
 /**
- * 퀘스트 히스토리 및 만료 관리 시스템
- * - 완료된/만료된 일일 퀘스트 추적
- * - 로드 시 퀘스트 상태 복원 및 검증
+ * 퀘스트 히스토리 및 만료 관리 시스템 - 완료된/만료된 일일 퀘스트 추적 - 로드 시 퀘스트 상태 복원 및 검증
  */
 package rpg.application.service;
 
@@ -38,8 +36,8 @@ public class QuestHistoryManager {
       FAILED // 실패함
     }
 
-    public QuestHistoryEntry(String questId, String title, String description, String questType, QuestTier tier, String completedDate,
-        QuestStatus finalStatus, boolean rewardClaimed, Map<String, Object> metadata) {
+    public QuestHistoryEntry(String questId, String title, String description, String questType, QuestTier tier, String completedDate, QuestStatus finalStatus, boolean rewardClaimed,
+        Map<String, Object> metadata) {
       this.questId = questId;
       this.title = title;
       this.description = description;
@@ -239,9 +237,8 @@ public class QuestHistoryManager {
 
   private QuestHistoryEntry createHistoryEntry(ExtendedQuestProgress questProgress, QuestHistoryEntry.QuestStatus status, boolean rewardClaimed) {
     Map<String, Object> details = questProgress.getQuestDetails();
-    return new QuestHistoryEntry(questProgress.getQuestId(), (String) details.get("title"), (String) details.get("description"),
-        questProgress.getQuestType(), questProgress.getTier(), LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")), status,
-        rewardClaimed, new HashMap<>(details));
+    return new QuestHistoryEntry(questProgress.getQuestId(), (String) details.get("title"), (String) details.get("description"), questProgress.getQuestType(), questProgress.getTier(),
+        LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")), status, rewardClaimed, new HashMap<>(details));
   }
 
   /**
@@ -303,8 +300,8 @@ public class QuestHistoryManager {
 
       QuestReward reward = new QuestReward((Integer) rewardInfo.get("exp"), (Integer) rewardInfo.get("gold"));
 
-      Quest quest = new Quest(questProgress.getQuestId(), (String) details.get("title"), (String) details.get("description"),
-          Quest.QuestType.valueOf(questProgress.getQuestType()), (Integer) details.get("requiredLevel"), objectives, reward);
+      Quest quest = new Quest(questProgress.getQuestId(), (String) details.get("title"), (String) details.get("description"), Quest.QuestType.valueOf(questProgress.getQuestType()),
+          (Integer) details.get("requiredLevel"), objectives, reward);
 
       // 진행도 복원
       quest.setCurrentProgress(questProgress.getProgress());
@@ -335,13 +332,13 @@ public class QuestHistoryManager {
   }
 
   public List<QuestHistoryEntry> getExpiredQuests() {
-    return questHistory.stream().filter(entry -> entry.getFinalStatus() == QuestHistoryEntry.QuestStatus.EXPIRED)
-        .sorted((a, b) -> b.getCompletedDate().compareTo(a.getCompletedDate())).collect(Collectors.toList());
+    return questHistory.stream().filter(entry -> entry.getFinalStatus() == QuestHistoryEntry.QuestStatus.EXPIRED).sorted((a, b) -> b.getCompletedDate().compareTo(a.getCompletedDate()))
+        .collect(Collectors.toList());
   }
 
   public List<QuestHistoryEntry> getCompletedQuests() {
-    return questHistory.stream().filter(entry -> entry.getFinalStatus() == QuestHistoryEntry.QuestStatus.COMPLETED)
-        .sorted((a, b) -> b.getCompletedDate().compareTo(a.getCompletedDate())).collect(Collectors.toList());
+    return questHistory.stream().filter(entry -> entry.getFinalStatus() == QuestHistoryEntry.QuestStatus.COMPLETED).sorted((a, b) -> b.getCompletedDate().compareTo(a.getCompletedDate()))
+        .collect(Collectors.toList());
   }
 
   /**
@@ -358,8 +355,7 @@ public class QuestHistoryManager {
       for (QuestHistoryEntry entry : recentDaily) {
         String statusIcon = entry.getFinalStatus() == QuestHistoryEntry.QuestStatus.COMPLETED ? "✅" : "⏰";
         String rewardText = entry.isRewardClaimed() ? " (보상 수령)" : "";
-        System.out.printf("   %s [%s] %s - %s%s\n", statusIcon, entry.getCompletedDate(), entry.getTitle(), entry.getFinalStatus().name(),
-            rewardText);
+        System.out.printf("   %s [%s] %s - %s%s\n", statusIcon, entry.getCompletedDate(), entry.getTitle(), entry.getFinalStatus().name(), rewardText);
       }
     }
 

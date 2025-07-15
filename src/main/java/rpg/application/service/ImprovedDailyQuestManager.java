@@ -1,7 +1,5 @@
 /**
- * 개선된 일일 퀘스트 생성 시스템
- * - 플레이어 레벨에 따른 계층적 퀘스트 생성
- * - 명확한 ID 체계로 저장/로드 최적화
+ * 개선된 일일 퀘스트 생성 시스템 - 플레이어 레벨에 따른 계층적 퀘스트 생성 - 명확한 ID 체계로 저장/로드 최적화
  */
 package rpg.application.service;
 
@@ -146,13 +144,30 @@ public class ImprovedDailyQuestManager {
   private List<Quest> generateKillQuests(String date, QuestTier tier, int playerLevel) {
     List<Quest> killQuests = new ArrayList<>();
 
-    // 티어별 몬스터 및 수량 정의
-    Map<QuestTier, List<MonsterTarget>> tierMonsters =
-        Map.of(QuestTier.TIER_A, Arrays.asList(new MonsterTarget("슬라임", 5, 50, 30), new MonsterTarget("고블린", 3, 80, 50)), QuestTier.TIER_B,
-            Arrays.asList(new MonsterTarget("오크", 4, 120, 80), new MonsterTarget("스켈레톤", 5, 100, 70)), QuestTier.TIER_C,
-            Arrays.asList(new MonsterTarget("트롤", 3, 200, 150), new MonsterTarget("리치", 2, 300, 200)), QuestTier.TIER_D,
-            Arrays.asList(new MonsterTarget("드레이크", 2, 500, 350), new MonsterTarget("바이퍼", 3, 400, 300)), QuestTier.TIER_S,
-            Arrays.asList(new MonsterTarget("드래곤", 1, 1000, 800), new MonsterTarget("데몬로드", 1, 1200, 1000)));
+    //@formatter:off
+    Map<QuestTier, List<MonsterTarget>> tierMonsters = Map.of(
+        QuestTier.TIER_A, Arrays.asList(
+            new MonsterTarget("FOREST_SLIME", 5, 50, 30), 
+            new MonsterTarget("FOREST_GOBLIN", 3, 80, 50)
+        ),
+        QuestTier.TIER_B, Arrays.asList(
+            new MonsterTarget("WILD_BOAR", 4, 120, 80), 
+            new MonsterTarget("CAVE_TROLL", 3, 150, 100)
+        ),
+        QuestTier.TIER_C, Arrays.asList(
+            new MonsterTarget("FOREST_WOLF", 4, 200, 150), 
+            new MonsterTarget("SKELETON_WARRIOR", 3, 250, 180)
+        ),
+        QuestTier.TIER_D, Arrays.asList(
+            new MonsterTarget("FIRE_DRAGON", 2, 500, 350), 
+            new MonsterTarget("ICE_GIANT", 3, 400, 300)
+        ),
+        QuestTier.TIER_S, Arrays.asList(
+            new MonsterTarget("MAGMA_DRAGON", 1, 1000, 800), 
+            new MonsterTarget("VOID_REAPER", 1, 1200, 1000)
+        )
+    );
+    //@formatter:on
 
     List<MonsterTarget> monsters = tierMonsters.get(tier);
     if (monsters != null) {
@@ -167,8 +182,8 @@ public class ImprovedDailyQuestManager {
             monster.gold + (playerLevel * 5) // 레벨별 골드 보정
         );
 
-        Quest quest = new Quest(questId, String.format("[%s] %s 사냥", tier.getDescription(), monster.name),
-            String.format("%s을(를) %d마리 처치하세요.", monster.name, monster.count), Quest.QuestType.KILL, tier.getMinLevel(), objectives, reward);
+        Quest quest = new Quest(questId, String.format("[%s] %s 사냥", tier.getDescription(), monster.name), String.format("%s을(를) %d마리 처치하세요.", monster.name, monster.count), Quest.QuestType.KILL,
+            tier.getMinLevel(), objectives, reward);
 
         killQuests.add(quest);
       }
@@ -185,9 +200,8 @@ public class ImprovedDailyQuestManager {
 
     // 티어별 수집 아이템 정의
     Map<QuestTier, List<CollectTarget>> tierItems = Map.of(QuestTier.TIER_A, Arrays.asList(new CollectTarget("체력 물약", 3, 60, 40)), QuestTier.TIER_B,
-        Arrays.asList(new CollectTarget("마나 물약", 5, 100, 70)), QuestTier.TIER_C, Arrays.asList(new CollectTarget("희귀 광석", 3, 200, 150)),
-        QuestTier.TIER_D, Arrays.asList(new CollectTarget("전설 재료", 2, 400, 300)), QuestTier.TIER_S,
-        Arrays.asList(new CollectTarget("신화 파편", 1, 800, 600)));
+        Arrays.asList(new CollectTarget("마나 물약", 5, 100, 70)), QuestTier.TIER_C, Arrays.asList(new CollectTarget("희귀 광석", 3, 200, 150)), QuestTier.TIER_D,
+        Arrays.asList(new CollectTarget("전설 재료", 2, 400, 300)), QuestTier.TIER_S, Arrays.asList(new CollectTarget("신화 파편", 1, 800, 600)));
 
     List<CollectTarget> items = tierItems.get(tier);
     if (items != null && !items.isEmpty()) {
@@ -199,8 +213,8 @@ public class ImprovedDailyQuestManager {
 
       QuestReward reward = new QuestReward(item.exp + (playerLevel * 8), item.gold + (playerLevel * 4));
 
-      Quest quest = new Quest(questId, String.format("[%s] %s 수집", tier.getDescription(), item.name),
-          String.format("%s을(를) %d개 수집하세요.", item.name, item.count), Quest.QuestType.COLLECT, tier.getMinLevel(), objectives, reward);
+      Quest quest = new Quest(questId, String.format("[%s] %s 수집", tier.getDescription(), item.name), String.format("%s을(를) %d개 수집하세요.", item.name, item.count), Quest.QuestType.COLLECT,
+          tier.getMinLevel(), objectives, reward);
 
       collectQuests.add(quest);
     }
@@ -222,8 +236,7 @@ public class ImprovedDailyQuestManager {
 
       QuestReward reward = new QuestReward(500 + (playerLevel * 20), 300 + (playerLevel * 15));
 
-      Quest quest = new Quest(questId, String.format("[%s] 던전 클리어", tier.getDescription()), "던전을 1회 클리어하세요.", QuestType.EXPLORE, tier.getMinLevel(),
-          objectives, reward);
+      Quest quest = new Quest(questId, String.format("[%s] 던전 클리어", tier.getDescription()), "던전을 1회 클리어하세요.", QuestType.EXPLORE, tier.getMinLevel(), objectives, reward);
 
       specialQuests.add(quest);
     }

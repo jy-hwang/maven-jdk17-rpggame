@@ -164,8 +164,7 @@ public class LocationManager {
       initialize();
     }
 
-    return locations.values().stream().filter(location -> location.getMinLevel() <= maxLevel && location.getMaxLevel() >= minLevel)
-        .collect(Collectors.toList());
+    return locations.values().stream().filter(location -> location.getMinLevel() <= maxLevel && location.getMaxLevel() >= minLevel).collect(Collectors.toList());
   }
 
   /**
@@ -180,8 +179,7 @@ public class LocationManager {
     System.out.println("총 지역 수: " + locations.size() + "개");
 
     // 난이도별 통계
-    Map<DangerLevel, Long> dangerStats =
-        locations.values().stream().collect(Collectors.groupingBy(LocationData::getDangerLevel, Collectors.counting()));
+    Map<DangerLevel, Long> dangerStats = locations.values().stream().collect(Collectors.groupingBy(LocationData::getDangerLevel, Collectors.counting()));
 
     System.out.println("\n📊 난이도별 분포:");
     dangerStats.forEach((danger, count) -> System.out.printf("   %s %s: %d개%n", danger.getEmoji(), danger.getDisplayName(), count));
@@ -197,8 +195,7 @@ public class LocationManager {
       initialize();
     }
 
-    return locations.entrySet().stream().filter(entry -> entry.getValue().getNameKo().equals(koreanName)).map(Map.Entry::getKey).findFirst()
-        .orElse(null);
+    return locations.entrySet().stream().filter(entry -> entry.getValue().getNameKo().equals(koreanName)).map(Map.Entry::getKey).findFirst().orElse(null);
   }
 
   /**

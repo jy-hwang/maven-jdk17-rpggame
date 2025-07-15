@@ -36,9 +36,8 @@ public class PlayerMapper {
 
   public static Player fromDto(PlayerDto dto) {
     // GameCharacter의 @JsonCreator 생성자 사용 (getter 사용)
-    Player character = new Player(dto.getName(), dto.getLevel(), dto.getHp(), dto.getMaxHp(), dto.getMana(), dto.getMaxMana(), dto.getRestoreHp(),
-        dto.getRestoreMana(), dto.getExp(), dto.getBaseAttack(), dto.getBaseDefense(), dto.getGold(),
-        PlayerInventoryMapper.fromDto(dto.getInventory()), SkillManagerMapper.fromDto(dto.getSkillManager()),
+    Player character = new Player(dto.getName(), dto.getLevel(), dto.getHp(), dto.getMaxHp(), dto.getMana(), dto.getMaxMana(), dto.getRestoreHp(), dto.getRestoreMana(), dto.getExp(),
+        dto.getBaseAttack(), dto.getBaseDefense(), dto.getGold(), PlayerInventoryMapper.fromDto(dto.getInventory()), SkillManagerMapper.fromDto(dto.getSkillManager()),
         PlayerStatusCondition.valueOf(dto.getPlayerStatusCondition()), QuestManagerMapper.fromDto(dto.getQuestManager()));
 
     logger.debug("GameCharacter 변환 완료: {}", dto.getName());

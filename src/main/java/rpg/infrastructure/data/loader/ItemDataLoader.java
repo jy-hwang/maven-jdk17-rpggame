@@ -97,8 +97,7 @@ public class ItemDataLoader {
     }
 
     // 보물 카테고리 아이템들만 필터링
-    List<GameItemData> treasureList =
-        treasureItems.values().stream().filter(item -> "treasure".equals(getItemCategory(item))).collect(Collectors.toList());
+    List<GameItemData> treasureList = treasureItems.values().stream().filter(item -> "treasure".equals(getItemCategory(item))).collect(Collectors.toList());
 
     if (treasureList.isEmpty()) {
       treasureList = new ArrayList<>(treasureItems.values());
@@ -144,9 +143,8 @@ public class ItemDataLoader {
     }
 
     // 일반적인 드롭 아이템들 선택 (COMMON, UNCOMMON 위주)
-    List<GameItemData> commonDrops = dropItems.values().stream()
-        .filter(item -> "COMMON".equals(item.getRarity().getDisplayName()) || "UNCOMMON".equals(item.getRarity().getDisplayName()))
-        .collect(Collectors.toList());
+    List<GameItemData> commonDrops =
+        dropItems.values().stream().filter(item -> "COMMON".equals(item.getRarity().getDisplayName()) || "UNCOMMON".equals(item.getRarity().getDisplayName())).collect(Collectors.toList());
 
     if (commonDrops.isEmpty()) {
       commonDrops = new ArrayList<>(dropItems.values());
@@ -197,8 +195,7 @@ public class ItemDataLoader {
     System.out.println("총 아이템: " + (treasureItems.size() + equipmentItems.size() + dropItems.size()) + "개");
 
     // 등급별 통계
-    Map<String, Long> rarityStats =
-        getAllItems().stream().collect(Collectors.groupingBy(item -> item.getRarity().getDisplayName(), Collectors.counting()));
+    Map<String, Long> rarityStats = getAllItems().stream().collect(Collectors.groupingBy(item -> item.getRarity().getDisplayName(), Collectors.counting()));
 
     System.out.println("\n📊 등급별 분포:");
     rarityStats.forEach((rarity, count) -> System.out.printf("   %s: %d개%n", rarity, count));
@@ -278,6 +275,7 @@ public class ItemDataLoader {
       return createFallbackDropItem();
     }
   }
+
   /**
    * 소비 아이템 생성 (수정된 버전)
    */
@@ -289,70 +287,54 @@ public class ItemDataLoader {
       // 🆕 cooldown 정보 추출 (새로운 방식)
       int cooldown = itemData.getCooldown();
 
-      return new GameConsumable(
-          itemData.getId(),
-          itemData.getName(),
-          itemData.getDescription(),
-          itemData.getValue(),
-          itemData.getRarity(),
-          effects,
-          cooldown
-      );
+      return new GameConsumable(itemData.getId(), itemData.getName(), itemData.getDescription(), itemData.getValue(), itemData.getRarity(), effects, cooldown);
 
     } catch (Exception e) {
       logger.error("소비 아이템 생성 실패: {}", itemData.getName(), e);
       return createFallbackConsumableItem(itemData);
     }
   }
- /**
-  * 장비 아이템 생성 (수정된 버전)
-  */
- private static GameEquipment createEquipmentItem(GameItemData itemData) {
-   // 1. 장비 타입 결정
-   String equipTypeStr = itemData.getEquipmentType();
-   GameEquipment.EquipmentType equipType;
-   
-   try {
-     equipType = GameEquipment.EquipmentType.valueOf(equipTypeStr != null ? equipTypeStr.toUpperCase() : "WEAPON");
-   } catch (IllegalArgumentException e) {
-     logger.warn("잘못된 장비 타입: {} - WEAPON으로 대체", equipTypeStr);
-     equipType = GameEquipment.EquipmentType.WEAPON;
-   }
 
-   // 2. 🆕 스탯 정보 추출 (stats 필드 우선 사용)
-   Map<String, Integer> stats = itemData.getStats();
-   
-   // stats가 비어있거나 null이면 기존 방식 사용
-   if (stats.isEmpty()) {
-     // properties에서 stats 찾기 (기존 방식과 호환성 유지)
-     Map<String, Object> properties = itemData.getProperties();
-     if (properties != null && properties.containsKey("stats")) {
-       @SuppressWarnings("unchecked")
-       Map<String, Integer> legacyStats = (Map<String, Integer>) properties.get("stats");
-       if (legacyStats != null) {
-         stats = legacyStats;
-       }
-     }
-   }
-   
-   // 3. 스탯 값 추출
-   int attack = stats.getOrDefault("attack", itemData.getAttackBonus());
-   int defense = stats.getOrDefault("defense", itemData.getDefenseBonus());
-   int magic = stats.getOrDefault("magic", itemData.getMagicBonus());
+  /**
+   * 장비 아이템 생성 (수정된 버전)
+   */
+  private static GameEquipment createEquipmentItem(GameItemData itemData) {
+    // 1. 장비 타입 결정
+    String equipTypeStr = itemData.getEquipmentType();
+    GameEquipment.EquipmentType equipType;
 
-   // 4. GameEquipment 객체 생성
-   return new GameEquipment(
-       itemData.getId(),
-       itemData.getName(),
-       itemData.getDescription(),
-       itemData.getValue(),
-       itemData.getRarity(),
-       equipType,
-       attack,
-       defense,
-       magic // hpBonus 대신 magic 사용
-   );
- }
+    try {
+      equipType = GameEquipment.EquipmentType.valueOf(equipTypeStr != null ? equipTypeStr.toUpperCase() : "WEAPON");
+    } catch (IllegalArgumentException e) {
+      logger.warn("잘못된 장비 타입: {} - WEAPON으로 대체", equipTypeStr);
+      equipType = GameEquipment.EquipmentType.WEAPON;
+    }
+
+    // 2. 🆕 스탯 정보 추출 (stats 필드 우선 사용)
+    Map<String, Integer> stats = itemData.getStats();
+
+    // stats가 비어있거나 null이면 기존 방식 사용
+    if (stats.isEmpty()) {
+      // properties에서 stats 찾기 (기존 방식과 호환성 유지)
+      Map<String, Object> properties = itemData.getProperties();
+      if (properties != null && properties.containsKey("stats")) {
+        @SuppressWarnings("unchecked")
+        Map<String, Integer> legacyStats = (Map<String, Integer>) properties.get("stats");
+        if (legacyStats != null) {
+          stats = legacyStats;
+        }
+      }
+    }
+
+    // 3. 스탯 값 추출
+    int attack = stats.getOrDefault("attack", itemData.getAttackBonus());
+    int defense = stats.getOrDefault("defense", itemData.getDefenseBonus());
+    int magic = stats.getOrDefault("magic", itemData.getMagicBonus());
+
+    // 4. GameEquipment 객체 생성
+    return new GameEquipment(itemData.getId(), itemData.getName(), itemData.getDescription(), itemData.getValue(), itemData.getRarity(), equipType, attack, defense, magic // hpBonus 대신 magic 사용
+    );
+  }
 
 
   private static int extractEffectValue(GameItemData itemData, String effectType) {
@@ -360,8 +342,7 @@ public class ItemDataLoader {
       return 0;
     }
 
-    return itemData.getEffects().stream().filter(effect -> effect != null && effectType.equals(effect.getType()))
-        .mapToInt(effect -> effect.getValue()).findFirst().orElse(0);
+    return itemData.getEffects().stream().filter(effect -> effect != null && effectType.equals(effect.getType())).mapToInt(effect -> effect.getValue()).findFirst().orElse(0);
   }
 
   private static void validateItemData() {
@@ -415,16 +396,29 @@ public class ItemDataLoader {
   @SuppressWarnings("deprecation")
   private static GameConsumable createFallbackConsumableItem(GameItemData itemData) {
     logger.warn("폴백 소비 아이템 생성: {}", itemData.getName());
-    return new GameConsumable(
-        itemData.getId(),
-        itemData.getName(),
-        itemData.getDescription(),
-        itemData.getValue(),
-        itemData.getRarity(),
-        50, // 기본 HP 회복
-        0,  // MP 회복 없음
-        0,  // 쿨다운 없음
+    return new GameConsumable(itemData.getId(), itemData.getName(), itemData.getDescription(), itemData.getValue(), itemData.getRarity(), 50, // 기본 HP 회복
+        0, // MP 회복 없음
+        0, // 쿨다운 없음
         true // 스택 가능
     );
   }
+
+  // ItemDataLoader에 추가할 새로운 메서드
+  public static GameItemData getItemDataById(String itemId) {
+    if (!dataLoaded) {
+      loadAllItemData();
+    }
+
+    // 모든 카테고리에서 검색
+    GameItemData itemData = treasureItems.get(itemId);
+    if (itemData == null) {
+      itemData = equipmentItems.get(itemId);
+    }
+    if (itemData == null) {
+      itemData = dropItems.get(itemId);
+    }
+
+    return itemData; // null일 수 있음
+  }
+
 }

@@ -122,8 +122,7 @@ public class SkillManagerMapper {
     // 쿨다운 정보 검증
     if (dto.getSkillCooldowns() != null) {
       for (SkillCooldownDto cooldownDto : dto.getSkillCooldowns()) {
-        if (cooldownDto == null || cooldownDto.getSkillName() == null || cooldownDto.getSkillName().trim().isEmpty()
-            || cooldownDto.getRemainingTurns() < 0) {
+        if (cooldownDto == null || cooldownDto.getSkillName() == null || cooldownDto.getSkillName().trim().isEmpty() || cooldownDto.getRemainingTurns() < 0) {
           logger.warn("유효하지 않은 쿨다운 데이터 발견");
           return false;
         }
@@ -150,8 +149,7 @@ public class SkillManagerMapper {
     logger.debug("활성 쿨다운: {}", cooldowns.size());
 
     // 스킬 타입별 통계
-    Map<SkillType, Long> typeStats =
-        skills.stream().collect(java.util.stream.Collectors.groupingBy(Skill::getType, java.util.stream.Collectors.counting()));
+    Map<SkillType, Long> typeStats = skills.stream().collect(java.util.stream.Collectors.groupingBy(Skill::getType, java.util.stream.Collectors.counting()));
 
     typeStats.forEach((type, count) -> logger.debug("  {}: {}개", type.getDisplayName(), count));
 

@@ -275,8 +275,7 @@ public class GameEffectFactory {
    * 레벨에 맞는 랜덤 효과 생성
    */
   public static GameEffect createRandomEffectForLevel(int level) {
-    List<GameEffectType> availableTypes =
-        getImplementedEffectTypes().stream().filter(type -> level >= type.getMinimumLevel()).collect(java.util.stream.Collectors.toList());
+    List<GameEffectType> availableTypes = getImplementedEffectTypes().stream().filter(type -> level >= type.getMinimumLevel()).collect(java.util.stream.Collectors.toList());
 
     if (availableTypes.isEmpty()) {
       return createHealHpEffect(level * GameConstants.NUMBER_TEN); // 기본값
@@ -358,8 +357,7 @@ public class GameEffectFactory {
     System.out.println("미구현 효과: " + (allTypes.size() - implementedTypes.size()) + "개");
 
     System.out.println("\n✅ 구현된 효과:");
-    implementedTypes.stream().sorted(Comparator.comparing(GameEffectType::getCategory))
-        .forEach(type -> System.out.printf("   %s %s%n", type.getEmoji(), type.getDisplayName()));
+    implementedTypes.stream().sorted(Comparator.comparing(GameEffectType::getCategory)).forEach(type -> System.out.printf("   %s %s%n", type.getEmoji(), type.getDisplayName()));
 
     System.out.println("\n🚧 미구현 효과:");
     allTypes.stream().filter(type -> !implementedTypes.contains(type)).sorted(Comparator.comparing(GameEffectType::getCategory))
@@ -377,8 +375,7 @@ public class GameEffectFactory {
       return;
     }
 
-    System.out.printf("DEBUG: 효과 - 타입: %s, 값: %d, 퍼센트: %b, 설명: %s%n", effect.getType().getDisplayName(), effect.getValue(), effect.isPercentage(),
-        effect.getDescription());
+    System.out.printf("DEBUG: 효과 - 타입: %s, 값: %d, 퍼센트: %b, 설명: %s%n", effect.getType().getDisplayName(), effect.getValue(), effect.isPercentage(), effect.getDescription());
   }
 
   public static GameEffect createEffect(String type, int value) {

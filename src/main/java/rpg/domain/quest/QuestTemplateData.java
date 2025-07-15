@@ -25,9 +25,9 @@ public class QuestTemplateData {
   // 기본 생성자
   public QuestTemplateData() {}
 
-//JsonCreator 생성자 추가
- @JsonCreator
- public QuestTemplateData(
+  // JsonCreator 생성자 추가
+  @JsonCreator
+  public QuestTemplateData(
 //@formatter:off
  @JsonProperty("id") String id
  , @JsonProperty("title") String title
@@ -45,24 +45,24 @@ public class QuestTemplateData {
  , @JsonProperty("variableTargets") List<String> variableTargets
  , @JsonProperty("variableQuantity") VariableQuantity variableQuantity
 //@formatter:on
- ) {
-   this.id = id;
-   this.title = title;
-   this.description = description;
-   this.type = type;
-   this.requiredLevel = requiredLevel != null ? requiredLevel : 1;
-   this.category = category;
-   this.objectives = objectives;
-   this.reward = reward;
-   this.prerequisites = prerequisites;
-   this.unlocks = unlocks;
-   this.isRepeatable = isRepeatable != null ? isRepeatable : false;
-   this.timeLimit = timeLimit != null ? timeLimit : 0;
-   this.tags = tags;
-   this.variableTargets = variableTargets;
-   this.variableQuantity = variableQuantity;
- }
-  
+  ) {
+    this.id = id;
+    this.title = title;
+    this.description = description;
+    this.type = type;
+    this.requiredLevel = requiredLevel != null ? requiredLevel : 1;
+    this.category = category;
+    this.objectives = objectives;
+    this.reward = reward;
+    this.prerequisites = prerequisites;
+    this.unlocks = unlocks;
+    this.isRepeatable = isRepeatable != null ? isRepeatable : false;
+    this.timeLimit = timeLimit != null ? timeLimit : 0;
+    this.tags = tags;
+    this.variableTargets = variableTargets;
+    this.variableQuantity = variableQuantity;
+  }
+
   // Getters and Setters
   public String getId() {
     return id;

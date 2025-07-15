@@ -241,6 +241,7 @@ public class ConfigDataLoader {
       return createDefaultAccessories();
     }
   }
+
   /**
    * 기본 무기 생성 (JSON 파일이 없을 때) - 수정된 버전
    */
@@ -275,7 +276,7 @@ public class ConfigDataLoader {
 
       logger.info("기본 무기 생성 완료: {}개", defaultWeapons.size());
       return defaultWeapons;
-      
+
     } catch (Exception e) {
       logger.error("기본 무기 생성 실패", e);
       return new HashMap<>();
@@ -310,7 +311,7 @@ public class ConfigDataLoader {
 
       logger.info("기본 방어구 생성 완료: {}개", defaultArmors.size());
       return defaultArmors;
-      
+
     } catch (Exception e) {
       logger.error("기본 방어구 생성 실패", e);
       return new HashMap<>();
@@ -339,7 +340,7 @@ public class ConfigDataLoader {
 
       logger.info("기본 액세서리 생성 완료: {}개", defaultAccessories.size());
       return defaultAccessories;
-      
+
     } catch (Exception e) {
       logger.error("기본 액세서리 생성 실패", e);
       return new HashMap<>();
@@ -372,7 +373,7 @@ public class ConfigDataLoader {
           )
       );
       //@formatter:on
-      
+
       logger.info("기본 물약 생성 완료: {}개", defaultPotions.size());
       validateLoadedData(List.copyOf(defaultPotions.values()));
       return defaultPotions;
@@ -382,7 +383,7 @@ public class ConfigDataLoader {
       return Map.of(); // 빈 맵 반환
     }
   }
-  
+
   /**
    * 장비 데이터 검증
    */
@@ -412,8 +413,7 @@ public class ConfigDataLoader {
 
       if (isValid) {
         validCount++;
-        logger.debug("유효한 {}: {} (공격: {}, 방어: {}, 체력: {})", type, equipment.getName(), equipment.getAttackBonus(), equipment.getDefenseBonus(),
-            equipment.getHpBonus());
+        logger.debug("유효한 {}: {} (공격: {}, 방어: {}, 체력: {})", type, equipment.getName(), equipment.getAttackBonus(), equipment.getDefenseBonus(), equipment.getHpBonus());
       } else {
         invalidCount++;
       }
@@ -435,15 +435,13 @@ public class ConfigDataLoader {
     Map<String, Long> typeStats = potions.values().stream().collect(Collectors.groupingBy(GameItemData::getType, Collectors.counting()));
 
     // 등급별 통계
-    Map<String, Long> rarityStats =
-        potions.values().stream().collect(Collectors.groupingBy(item -> item.getRarity().getDisplayName(), Collectors.counting()));
+    Map<String, Long> rarityStats = potions.values().stream().collect(Collectors.groupingBy(item -> item.getRarity().getDisplayName(), Collectors.counting()));
 
     // 중첩 가능 통계
     long stackableCount = potions.values().stream().mapToLong(item -> item.isStackable() ? 1 : 0).sum();
 
     // 효과별 통계
-    Map<String, Long> effectStats = potions.values().stream().flatMap(item -> item.getEffects().stream())
-        .collect(Collectors.groupingBy(GameEffectData::getType, Collectors.counting()));
+    Map<String, Long> effectStats = potions.values().stream().flatMap(item -> item.getEffects().stream()).collect(Collectors.groupingBy(GameEffectData::getType, Collectors.counting()));
 
     logger.info("=== 데이터 통계 ===");
     logger.info("총 아이템: {}개", potions.size());
@@ -460,8 +458,7 @@ public class ConfigDataLoader {
   public static Map<String, GameItemData> loadItemsByType(String itemType) {
     Map<String, GameItemData> allItems = loadBasicPotions();
 
-    return allItems.entrySet().stream().filter(entry -> entry.getValue().getType().equalsIgnoreCase(itemType))
-        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    return allItems.entrySet().stream().filter(entry -> entry.getValue().getType().equalsIgnoreCase(itemType)).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
   }
 
   /**

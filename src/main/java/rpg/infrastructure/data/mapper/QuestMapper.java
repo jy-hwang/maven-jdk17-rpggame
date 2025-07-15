@@ -50,8 +50,7 @@ public class QuestMapper {
     try {
       // Quest 생성
       QuestReward reward = QuestRewardMapper.fromDto(dto.getReward());
-      Quest quest = new Quest(dto.getId(), dto.getTitle(), dto.getDescription(), Quest.QuestType.valueOf(dto.getType()), dto.getRequiredLevel(),
-          dto.getObjectives(), reward);
+      Quest quest = new Quest(dto.getId(), dto.getTitle(), dto.getDescription(), Quest.QuestType.valueOf(dto.getType()), dto.getRequiredLevel(), dto.getObjectives(), reward);
 
       // 진행도와 상태 복원
       if (dto.getCurrentProgress() != null) {
