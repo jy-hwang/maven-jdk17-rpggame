@@ -6,22 +6,31 @@ import java.util.Map;
 import java.util.Random;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import rpg.application.manager.LocationManager;
+import rpg.application.service.DynamicQuestDataProvider;
 import rpg.domain.item.GameItem;
+import rpg.domain.item.GameItemData;
+import rpg.domain.location.LocationData;
+import rpg.domain.monster.MonsterData;
 import rpg.domain.quest.Quest;
 import rpg.domain.quest.QuestItemReward;
 import rpg.domain.quest.QuestReward;
 import rpg.domain.quest.QuestRewardData;
 import rpg.domain.quest.QuestTemplateData;
 import rpg.domain.quest.VariableQuantity;
+import rpg.infrastructure.data.loader.ConfigDataLoader;
+import rpg.infrastructure.data.loader.MonsterDataLoader;
 
 public class QuestTemplateConverter {
   private static final Logger logger = LoggerFactory.getLogger(QuestTemplateConverter.class);
   private static final Random random = new Random();
 
   private final GameItemFactory itemFactory;
-
+  private final DynamicQuestDataProvider dataProvider;
+  
   public QuestTemplateConverter(GameItemFactory itemFactory) {
     this.itemFactory = itemFactory;
+    this.dataProvider = DynamicQuestDataProvider.getInstance();
   }
 
   /**
@@ -103,49 +112,6 @@ public class QuestTemplateConverter {
   private Map<String, Integer> processObjectives(QuestTemplateData template) {
     return new HashMap<>(template.getObjectives());
   }
-
-  /**
-   * 동적 목표 생성 (일일/주간 퀘스트용)
-   */
-  private Map<String, Integer> generateDynamicObjectives(QuestTemplateData template) {
-    Map<String, Integer> dynamicObjectives = new HashMap<>();
-
-    // 가변 타겟이 있는 경우
-    if (template.getVariableTargets() != null && !template.getVariableTargets().isEmpty()) {
-      List<String> targets = template.getVariableTargets();
-      String selectedTarget = targets.get(random.nextInt(targets.size()));
-
-      // 가변 수량 적용
-      int quantity = getRandomQuantity(template.getVariableQuantity());
-
-      // 동적 목표 키 생성
-      String objectiveKey = generateObjectiveKey(template.getType(), selectedTarget);
-      dynamicObjectives.put(objectiveKey, quantity);
-
-    } else {
-      // 가변 타겟이 없으면 기본 목표 사용
-      dynamicObjectives.putAll(template.getObjectives());
-    }
-
-    return dynamicObjectives;
-  }
-
-  /**
-   * 목표 키 생성
-   */
-  private String generateObjectiveKey(String questType, String target) {
-    switch (questType.toUpperCase()) {
-      case "KILL":
-        return "kill_" + target;
-      case "COLLECT":
-        return "collect_" + target;
-      case "EXPLORE":
-        return "explore_" + target;
-      default:
-        return "complete_" + target;
-    }
-  }
-
   /**
    * 랜덤 수량 생성
    */
@@ -284,5 +250,122 @@ public class QuestTemplateConverter {
     }
 
     return reward;
+  }
+  
+  /**
+   * 동적 목표 생성 (개선된 버전)
+   */
+  private Map<String, Integer> generateDynamicObjectives(QuestTemplateData template) {
+      Map<String, Integer> dynamicObjectives = new HashMap<>();
+      
+      // 가변 타겟이 있는 경우 JSON 데이터 기반 선택
+      if (template.getVariableTargets() != null && !template.getVariableTargets().isEmpty()) {
+          String questType = template.getType().toUpperCase();
+          int quantity = getRandomQuantity(template.getVariableQuantity());
+          
+          switch (questType) {
+              case "KILL" -> {
+                  // JSON 몬스터 데이터에서 선택
+                  MonsterData selectedMonster = selectMonsterFromVariableTargets(template.getVariableTargets());
+                  if (selectedMonster != null) {
+                      String objectiveKey = "kill_" + selectedMonster.getId();
+                      dynamicObjectives.put(objectiveKey, quantity);
+                      logger.debug("동적 KILL 목표 생성: {} x{}", objectiveKey, quantity);
+                  }
+              }
+              case "COLLECT" -> {
+                  // JSON 아이템 데이터에서 선택
+                  GameItemData selectedItem = selectItemFromVariableTargets(template.getVariableTargets());
+                  if (selectedItem != null) {
+                      String objectiveKey = "collect_" + selectedItem.getId();
+                      dynamicObjectives.put(objectiveKey, quantity);
+                      logger.debug("동적 COLLECT 목표 생성: {} x{}", objectiveKey, quantity);
+                  }
+              }
+              case "EXPLORE" -> {
+                  // JSON 지역 데이터에서 선택
+                  LocationData selectedLocation = selectLocationFromVariableTargets(template.getVariableTargets());
+                  if (selectedLocation != null) {
+                      String objectiveKey = "explore_" + selectedLocation.getId();
+                      dynamicObjectives.put(objectiveKey, quantity);
+                      logger.debug("동적 EXPLORE 목표 생성: {} x{}", objectiveKey, quantity);
+                  }
+              }
+          }
+      } else {
+          // 가변 타겟이 없으면 기본 목표 사용
+          dynamicObjectives.putAll(template.getObjectives());
+      }
+      
+      return dynamicObjectives;
+  }
+  
+  /**
+   * variableTargets에서 실제 몬스터 데이터 선택
+   */
+  private MonsterData selectMonsterFromVariableTargets(List<String> targets) {
+      for (String target : targets) {
+          // 영문 ID인 경우 직접 검색
+          if (isEnglishId(target)) {
+              MonsterData monster = MonsterDataLoader.getMonsterById(target);
+              if (monster != null) return monster;
+          }
+      }
+      
+      // 적합한 몬스터가 없으면 레벨 기반 선택
+      return dataProvider.selectRandomMonsterForLevel(1); // 기본 레벨 1
+  }
+  
+  /**
+   * variableTargets에서 실제 아이템 데이터 선택
+   */
+  private GameItemData selectItemFromVariableTargets(List<String> targets) {
+      Map<String, GameItemData> allItems = ConfigDataLoader.loadAllItems();
+      
+      for (String target : targets) {
+          // 영문 ID인 경우 직접 검색
+          if (isEnglishId(target)) {
+              GameItemData item = allItems.get(target);
+              if (item != null) return item;
+          }
+      }
+      
+      // 적합한 아이템이 없으면 랜덤 선택
+      return dataProvider.selectRandomCollectableItem();
+  }
+  
+  /**
+   * variableTargets에서 실제 지역 데이터 선택
+   */
+  private LocationData selectLocationFromVariableTargets(List<String> targets) {
+      for (String target : targets) {
+          // 영문 ID인 경우 직접 검색
+          if (isEnglishId(target)) {
+              LocationData location = LocationManager.getLocation(target);
+              if (location != null) return location;
+          }
+      }
+      
+      // 적합한 지역이 없으면 랜덤 선택
+      return dataProvider.selectRandomLocationForLevel(1); // 기본 레벨 1
+  }
+  
+  /**
+   * 영문 ID 형식 확인 (상세 버전)
+   */
+  public static boolean isEnglishId(String target) {
+      if (target == null || target.trim().isEmpty()) {
+          return false;
+      }
+      
+      String trimmed = target.trim();
+      
+      // 패턴 체크: 대문자로 시작, 대문자/숫자/언더스코어만 허용
+      if (!trimmed.matches("^[A-Z][A-Z0-9_]*$")) {
+          return false;
+      }
+      
+      // 최소/최대 길이 체크
+      return trimmed.length() >= 2 && trimmed.length() <= 50;
   }
 }

@@ -20,7 +20,12 @@
     "timeLimit": 86400,
     "tags": ["daily", "combat"],
     "variableTargets": [
-      "슬라임", "고블린", "오크", "스켈레톤", "거미", "늑대"
+      "FOREST_SLIME",
+      "FOREST_GOBLIN", 
+      "FOREST_WOLF",
+      "CAVE_BAT",
+      "WILD_BOAR",
+      "FOREST_SPIDER"
     ],
     "variableQuantity": {
       "min": 5,
@@ -54,7 +59,18 @@
     "timeLimit": 86400,
     "tags": ["daily", "collection"],
     "variableTargets": [
-      "체력 물약", "마나 물약", "철광석", "허브", "가죽", "뼈"
+      "HEALTH_POTION",
+      "MANA_POTION", 
+      "BASIC_HEALTH_POTION",
+      "BASIC_MANA_POTION",
+      "ENERGY_DRINK",
+      "EXPERIENCE_CRYSTAL",
+      "IRON_SWORD",
+      "WOODEN_SWORD",
+      "PREMIUM_HEALTH_POTION",
+      "SLIME_GEL",
+      "WOLF_PELT",
+      "BAT_WING"
     ],
     "variableQuantity": {
       "min": 3,
@@ -88,7 +104,11 @@
     "timeLimit": 86400,
     "tags": ["daily", "exploration"],
     "variableTargets": [
-      "숲속 깊은 곳", "어두운 동굴", "높은 산", "신비한 유적", "용암 지대"
+      "DEEP_FOREST",
+      "DARK_CAVE", 
+      "ANCIENT_RUINS",
+      "LAVA_FIELDS",
+      "MAGICAL_FOREST"
     ],
     "variableQuantity": {
       "min": 2,

@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import rpg.application.factory.GameEffectFactory;
 import rpg.application.factory.GameItemFactory;
-import rpg.application.factory.GameQuestFactory;
 import rpg.application.factory.JsonBasedQuestFactory;
 import rpg.application.service.ImprovedDailyQuestManager.QuestTier;
 import rpg.domain.item.GameConsumable;
@@ -45,7 +44,6 @@ public class QuestManager {
   // 팩토리 인스턴스 - JsonBasedQuestFactory 사용
   private final GameItemFactory itemFactory;
   private final JsonBasedQuestFactory jsonQuestFactory; // 변경
-  private final GameQuestFactory gameQuestFactory; // 동적 퀘스트용으로 유지
 
   // 🆕 추가된 필드들
   private final ImprovedDailyQuestManager dailyQuestManager;
@@ -56,7 +54,6 @@ public class QuestManager {
   public QuestManager() {
     this.itemFactory = GameItemFactory.getInstance();
     this.jsonQuestFactory = JsonBasedQuestFactory.getInstance(); // 추가
-    this.gameQuestFactory = GameQuestFactory.getInstance(); // 동적 퀘스트용
 
     this.availableQuests = new ArrayList<>();
     this.activeQuests = new ArrayList<>();
@@ -136,7 +133,7 @@ public class QuestManager {
       List<Quest> availableForPlayer = getAvailableQuests(player);
 
       if (availableForPlayer.size() < 3) { // 최소 3개의 퀘스트 유지
-        Quest dynamicQuest = gameQuestFactory.createLevelAppropriateQuest(player.getLevel());
+        Quest dynamicQuest = jsonQuestFactory.createLevelAppropriateQuest(player.getLevel());
         if (dynamicQuest != null) {
           availableQuests.add(dynamicQuest);
           logger.info("동적 퀘스트 생성: {} (레벨 {})", dynamicQuest.getTitle(), player.getLevel());
@@ -455,7 +452,7 @@ public class QuestManager {
 
   private void generateQuestForLevel(int level) {
     // JSON 템플릿에 없는 동적 퀘스트만 생성
-    Quest dynamicQuest = gameQuestFactory.createLevelAppropriateQuest(level);
+    Quest dynamicQuest = jsonQuestFactory.createLevelAppropriateQuest(level);
     if (dynamicQuest != null) {
       availableQuests.add(dynamicQuest);
       logger.info("동적 퀘스트 생성: {} (레벨: {})", dynamicQuest.getTitle(), level);
@@ -1025,23 +1022,23 @@ public class QuestManager {
   private void createDailyKillQuest(int playerLevel) {
     Map<String, Integer> objectives = new HashMap<>();
 
-    // 레벨에 따른 적절한 몬스터 선택 (기존 하드코딩 방식)
-    String targetMonster = switch (playerLevel) {
-      case 5, 6, 7 -> "고블린";
-      case 8, 9, 10, 11, 12 -> "오크";
-      case 13, 14, 15, 16, 17 -> "트롤";
-      case 18, 19, 20, 21, 22 -> "스켈레톤";
-      case 23, 24, 25, 26, 27 -> "늑대";
-      default -> playerLevel <= 4 ? "슬라임" : "드래곤";
-    };
+    String targetMonsterId = switch (playerLevel) {
+      case 5, 6, 7 -> "FOREST_GOBLIN";
+      case 8, 9, 10, 11, 12 -> "WILD_BOAR";           // 오크 → 멧돼지
+      case 13, 14, 15, 16, 17 -> "CAVE_TROLL";        // 트롤
+      case 18, 19, 20, 21, 22 -> "SKELETON_WARRIOR";  // 스켈레톤
+      case 23, 24, 25, 26, 27 -> "FOREST_WOLF";       // 늑대
+      default -> playerLevel <= 4 ? "FOREST_SLIME" : "FIRE_DRAGON";
+  };
 
     int killCount = Math.max(3, playerLevel / 3);
-    objectives.put("kill_" + targetMonster, killCount);
+    objectives.put("kill_" + targetMonsterId, killCount); // ✅ "kill_FOREST_SLIME"
+
 
     // 일일 퀘스트 보상 (레벨에 맞게 스케일링)
     GameItem dailyReward = itemFactory.createItem("HEALTH_POTION");
     if (dailyReward == null) {
-      dailyReward = createFallbackConsumableItem("DAILY_POTION", "일일 보상 물약", "HP를 40 회복", 40);
+      dailyReward = createFallbackConsumableItem("DAILY_POTION", "일일 보상 물약", "HP를 50 회복", 50);
     }
 
     QuestReward reward = new QuestReward(playerLevel * 10 + 50, // 경험치 (기본 50 + 레벨당 10)
@@ -1053,15 +1050,39 @@ public class QuestManager {
     String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
     QuestTier tier = QuestTier.getTierForLevel(playerLevel);
     String questId = String.format("daily_kill_%s_%s01", today, tier.getCode());
+    String displayName = getMonsterDisplayName(targetMonsterId);
 
-    Quest dailyQuest = new Quest(questId, String.format("[%s] 일일 사냥 - %s", tier.getDescription(), targetMonster), String.format("%s을(를) %d마리 처치하세요.", targetMonster, killCount), Quest.QuestType.KILL,
+    //@formatter:off
+    Quest dailyQuest = new Quest(
+        questId, 
+        String.format("[%s] 일일 사냥 - %s", tier.getDescription(), displayName), 
+        String.format("%s을(를) %d마리 처치하세요.", displayName, killCount),
+        Quest.QuestType.KILL,
         Math.max(1, playerLevel - 2), // 최소 레벨 요구사항
-        objectives, reward);
-
+        objectives, 
+        reward
+    );
+    //@formatter:on
     availableQuests.add(dailyQuest);
     logger.info("일일 처치 퀘스트 생성: {} (레벨: {})", dailyQuest.getTitle(), playerLevel);
   }
-
+  /**
+   * 몬스터 ID -> 표시명 매핑
+   */
+  private String getMonsterDisplayName(String monsterId) {
+      return switch (monsterId) {
+          case "FOREST_SLIME" -> "숲 슬라임";
+          case "FOREST_GOBLIN" -> "숲 고블린";
+          case "FOREST_WOLF" -> "숲늑대";
+          case "CAVE_BAT" -> "동굴 박쥐";
+          case "WILD_BOAR" -> "멧돼지";
+          case "FOREST_SPIDER" -> "숲 거미";
+          case "CAVE_TROLL" -> "동굴 트롤";
+          case "SKELETON_WARRIOR" -> "스켈레톤 전사";
+          case "FIRE_DRAGON" -> "화염 드래곤";
+          default -> monsterId; // 폴백: ID 그대로 반환
+      };
+  }
   /**
    * 기존 QuestManager의 createDailyCollectionQuest 메서드 (하드코딩 버전 - 호환성용)
    */
@@ -1069,31 +1090,68 @@ public class QuestManager {
     Map<String, Integer> objectives = new HashMap<>();
 
     // 기본 수집 아이템 (하드코딩)
-    String[] collectableItems = {"체력 물약", "마나 물약", "철광석", "허브", "가죽"};
-    String targetItem = collectableItems[(int) (Math.random() * collectableItems.length)];
+    String[] collectableItemIds = {
+        "HEALTH_POTION", "MANA_POTION", "IRON_ORE", 
+        "HEALING_HERB", "LEATHER", "BONE"
+    };
+    String targetItemId = collectableItemIds[(int) (Math.random() * collectableItemIds.length)];
     int collectCount = 3 + (int) (Math.random() * 3); // 3-5개
 
-    objectives.put("collect_" + targetItem, collectCount);
+    objectives.put("collect_" + targetItemId, collectCount); 
 
     // 특별 일일 보상
-    List<GameEffect> dailyEffects = List.of(GameEffectFactory.createHealHpEffect(60), GameEffectFactory.createGainExpEffect(30));
+    List<GameEffect> dailyEffects = List.of(
+        GameEffectFactory.createHealHpEffect(50), 
+        GameEffectFactory.createGainExpEffect(150)
+    );
 
-    GameConsumable dailyPotion = createSpecialPotion("DAILY_SPECIAL_POTION", "일일 특제 물약", "하루 한 번 받을 수 있는 특별한 물약", 100, ItemRarity.UNCOMMON, dailyEffects);
+    GameConsumable dailyPotion = createSpecialPotion(
+        "DAILY_SPECIAL_POTION", "일일 특제 물약", 
+        "하루 한 번 받을 수 있는 특별한 물약", 
+        100, ItemRarity.UNCOMMON, dailyEffects
+    );
 
     QuestReward reward = new QuestReward(100, 150, dailyPotion, 1);
 
     // 오늘 날짜 기반 ID 생성
     String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
     String questId = String.format("daily_collect_%s_A01", today);
+    String displayName = getItemDisplayName(targetItemId);
+    
+    //@formatter:off
+    Quest dailyCollectionQuest = new Quest(
+        questId, 
+        String.format("[초급] 일일 수집 - %s", displayName), 
+        String.format("%s을(를) %d개 수집하세요.", displayName, collectCount),
+        Quest.QuestType.COLLECT, 
+        5, // 최소 레벨 5
+        objectives, 
+        reward
+    );
+    //@formatter:on
 
-    Quest dailyCollectionQuest = new Quest(questId, String.format("[초급] 일일 수집 - %s", targetItem), String.format("%s을(를) %d개 수집하세요.", targetItem, collectCount), Quest.QuestType.COLLECT, 10, // 최소 레벨 10
-        objectives, reward);
 
     availableQuests.add(dailyCollectionQuest);
     logger.info("일일 수집 퀘스트 생성: {}", dailyCollectionQuest.getTitle());
   }
 
-
+  /**
+   * 아이템 ID -> 표시명 매핑
+   */
+  private String getItemDisplayName(String itemId) {
+      return switch (itemId) {
+          case "HEALTH_POTION" -> "체력 물약";
+          case "MANA_POTION" -> "마나 물약";
+          case "IRON_ORE" -> "철광석";
+          case "HEALING_HERB" -> "치유 허브";
+          case "LEATHER" -> "가죽";
+          case "BONE" -> "뼈";
+          case "SLIME_GEL" -> "슬라임 젤";
+          case "WOLF_PELT" -> "늑대 가죽";
+          case "BAT_WING" -> "박쥐 날개";
+          default -> itemId;
+      };
+  }
   /**
    * 기존 방식의 일일 퀘스트 생성 (폴백용)
    */

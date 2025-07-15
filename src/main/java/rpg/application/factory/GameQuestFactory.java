@@ -3,10 +3,14 @@ package rpg.application.factory;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import rpg.application.service.DynamicQuestDataProvider;
 import rpg.domain.item.GameItem;
+import rpg.domain.item.GameItemData;
 import rpg.domain.item.ItemRarity;
+import rpg.domain.monster.MonsterData;
 import rpg.domain.quest.Quest;
 import rpg.domain.quest.QuestReward;
 
@@ -22,10 +26,14 @@ public class GameQuestFactory {
 
   private final GameItemFactory itemFactory;
   private final GameEffectFactory effectFactory;
+  private final DynamicQuestDataProvider dataProvider;
 
+  private Random random;  
+  
   private GameQuestFactory() {
     this.itemFactory = GameItemFactory.getInstance();
     this.effectFactory = new GameEffectFactory();
+    this.dataProvider = DynamicQuestDataProvider.getInstance();
   }
 
   public static GameQuestFactory getInstance() {
@@ -115,27 +123,46 @@ public class GameQuestFactory {
 
   // 일일 퀘스트 구체 생성 메서드들
   private Quest createDailyKillQuest(String questId) {
-    String[] monsters = {"슬라임", "고블린", "오크", "스켈레톤"};
-    String targetMonster = monsters[(int) (Math.random() * monsters.length)];
-
+    // JSON 데이터에서 적절한 몬스터 선택
+    MonsterData targetMonster = dataProvider.selectRandomMonsterForLevel(1);
+    
     Map<String, Integer> objectives = new HashMap<>();
-    objectives.put("kill_" + targetMonster, 8 + (int) (Math.random() * 5));
-
+    objectives.put("kill_" + targetMonster.getId(), 8 + random.nextInt(5));
+    
     QuestReward reward = new QuestReward(80, 120);
+    
+    return new Quest(
+        questId, 
+        "일일 " + targetMonster.getName() + " 사냥", 
+        "오늘의 목표인 " + targetMonster.getName() + "을(를) 처치하세요.", 
+        Quest.QuestType.KILL, 
+        1, 
+        objectives, 
+        reward
+    );
+}
 
-    return new Quest(questId, "일일 " + targetMonster + " 사냥", "오늘의 목표인 " + targetMonster + "을(를) 처치하세요.", Quest.QuestType.KILL, 1, objectives, reward);
-  }
-
+  /**
+   * 일일 수집 퀘스트 생성 (개선된 버전)
+   */
   private Quest createDailyCollectionQuest(String questId) {
-    String[] items = {"체력 물약", "마나 물약", "철광석", "허브"};
-    String targetItem = items[(int) (Math.random() * items.length)];
-
-    Map<String, Integer> objectives = new HashMap<>();
-    objectives.put("collect_" + targetItem, 3 + (int) (Math.random() * 3));
-
-    QuestReward reward = new QuestReward(60, 80);
-
-    return new Quest(questId, "일일 " + targetItem + " 수집", "오늘의 목표인 " + targetItem + "을(를) 수집하세요.", Quest.QuestType.COLLECT, 1, objectives, reward);
+      // JSON 데이터에서 적절한 아이템 선택
+      GameItemData targetItem = dataProvider.selectRandomCollectableItem();
+      
+      Map<String, Integer> objectives = new HashMap<>();
+      objectives.put("collect_" + targetItem.getId(), 3 + random.nextInt(3));
+      
+      QuestReward reward = new QuestReward(60, 80);
+      
+      return new Quest(
+          questId, 
+          "일일 " + targetItem.getName() + " 수집", 
+          "오늘의 목표인 " + targetItem.getName() + "을(를) 수집하세요.", 
+          Quest.QuestType.COLLECT, 
+          1, 
+          objectives, 
+          reward
+      );
   }
 
   /**

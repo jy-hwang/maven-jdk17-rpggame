@@ -299,7 +299,7 @@ public class QuestTemplateLoader {
     template.setTimeLimit(86400); // 24시간
 
     template.setTags(List.of("daily", "combat"));
-    template.setVariableTargets(List.of("슬라임", "고블린", "오크", "스켈레톤", "거미", "늑대"));
+    template.setVariableTargets(List.of("FOREST_SLIME", "FOREST_GOBLIN", "FOREST_WOLF", "CAVE_BAT", "WILD_BOAR", "FOREST_SPIDER"));
 
     VariableQuantity variableQuantity = new VariableQuantity();
     variableQuantity.setMin(5);
@@ -343,8 +343,7 @@ public class QuestTemplateLoader {
    * 특정 카테고리의 퀘스트 필터링
    */
   public static Map<String, QuestTemplateData> filterByCategory(Map<String, QuestTemplateData> templates, String category) {
-    return templates.entrySet().stream().filter(entry -> category.equals(entry.getValue().getCategory()))
-        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    return templates.entrySet().stream().filter(entry -> category.equals(entry.getValue().getCategory())).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
   }
 
   /**

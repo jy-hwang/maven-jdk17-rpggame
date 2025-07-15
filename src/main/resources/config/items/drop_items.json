@@ -87,5 +87,215 @@
       "crystalline": true,
       "glowing": true
     }
+  },
+  {
+    "id": "HEALTH_POTION",
+    "name": "체력 물약",
+    "description": "HP를 50 회복합니다",
+    "type": "CONSUMABLE",
+    "value": 50,
+    "rarity": "COMMON",
+    "stackable": true,
+    "effects": [
+      {
+        "type": "HEAL_HP",
+        "value": 50
+      }
+    ],
+    "cooldown": 0,
+    "category": "drop",
+    "properties": {
+      "source": "monster_drop",
+      "common_find": true
+    }
+  },
+  {
+    "id": "MANA_POTION",
+    "name": "마나 물약",
+    "description": "MP를 40 회복합니다",
+    "type": "CONSUMABLE",
+    "value": 60,
+    "rarity": "COMMON",
+    "stackable": true,
+    "effects": [
+      {
+        "type": "HEAL_MP",
+        "value": 40
+      }
+    ],
+    "cooldown": 0,
+    "category": "drop",
+    "properties": {
+      "source": "monster_drop",
+      "blue_liquid": true
+    }
+  },
+  {
+    "id": "IRON_SWORD",
+    "name": "철 검",
+    "description": "날카로운 철로 만든 검입니다",
+    "type": "WEAPON",
+    "value": 100,
+    "rarity": "UNCOMMON",
+    "stackable": false,
+    "equipmentType": "WEAPON",
+    "attackBonus": 12,
+    "defenseBonus": 0,
+    "hpBonus": 0,
+    "category": "drop",
+    "properties": {
+      "source": "monster_drop",
+      "metal_weapon": true
+    }
+  },
+  {
+    "id": "WOODEN_SWORD",
+    "name": "나무 검",
+    "description": "초보자용 나무 검입니다",
+    "type": "WEAPON",
+    "value": 30,
+    "rarity": "COMMON",
+    "stackable": false,
+    "equipmentType": "WEAPON",
+    "attackBonus": 5,
+    "defenseBonus": 0,
+    "hpBonus": 0,
+    "category": "drop",
+    "properties": {
+      "source": "monster_drop",
+      "wooden_weapon": true
+    }
+  },
+  {
+    "id": "PREMIUM_HEALTH_POTION",
+    "name": "고급 체력 물약",
+    "description": "HP를 100 회복합니다",
+    "type": "CONSUMABLE",
+    "value": 120,
+    "rarity": "UNCOMMON",
+    "stackable": true,
+    "effects": [
+      {
+        "type": "HEAL_HP",
+        "value": 100
+      }
+    ],
+    "cooldown": 0,
+    "category": "drop",
+    "properties": {
+      "source": "rare_monster_drop",
+      "premium_quality": true
+    }
+  },
+  {
+    "id": "SLIME_GEL",
+    "name": "슬라임 젤",
+    "description": "끈끈한 슬라임의 체액",
+    "type": "MATERIAL",
+    "value": 15,
+    "rarity": "COMMON",
+    "stackable": true,
+    "category": "drop",
+    "properties": {
+      "source": "FOREST_SLIME",
+      "monster_material": true,
+      "crafting_component": true
+    }
+  },
+  {
+    "id": "WOLF_PELT",
+    "name": "늑대 가죽",
+    "description": "질긴 늑대의 가죽",
+    "type": "MATERIAL",
+    "value": 25,
+    "rarity": "COMMON",
+    "stackable": true,
+    "category": "drop",
+    "properties": {
+      "source": "FOREST_WOLF",
+      "monster_material": true,
+      "crafting_component": true,
+      "armor_material": true
+    }
+  },
+  {
+    "id": "BAT_WING",
+    "name": "박쥐 날개",
+    "description": "얇고 질긴 박쥐의 날개",
+    "type": "MATERIAL",
+    "value": 18,
+    "rarity": "COMMON",
+    "stackable": true,
+    "category": "drop",
+    "properties": {
+      "source": "CAVE_BAT",
+      "monster_material": true,
+      "crafting_component": true,
+      "flying_material": true
+    }
+  },
+  {
+    "id": "SHARP_FANG",
+    "name": "날카로운 엄니",
+    "description": "예리한 야생동물의 엄니",
+    "type": "MATERIAL",
+    "value": 30,
+    "rarity": "UNCOMMON",
+    "stackable": true,
+    "category": "drop",
+    "properties": {
+      "source": "FOREST_WOLF",
+      "monster_material": true,
+      "crafting_component": true,
+      "weapon_material": true
+    }
+  },
+  {
+    "id": "SPIDER_SILK",
+    "name": "거미줄",
+    "description": "질기고 끈끈한 거미줄",
+    "type": "MATERIAL",
+    "value": 22,
+    "rarity": "COMMON",
+    "stackable": true,
+    "category": "drop",
+    "properties": {
+      "source": "FOREST_SPIDER",
+      "monster_material": true,
+      "crafting_component": true,
+      "rope_material": true
+    }
+  },
+  {
+    "id": "ANCIENT_CRYSTAL",
+    "name": "고대 수정",
+    "description": "고대의 마력이 깃든 수정",
+    "type": "MATERIAL",
+    "value": 80,
+    "rarity": "RARE",
+    "stackable": true,
+    "category": "drop",
+    "properties": {
+      "source": "ANCIENT_RUINS",
+      "magical_material": true,
+      "crafting_component": true,
+      "ancient_artifact": true
+    }
+  },
+  {
+    "id": "FIRE_ESSENCE",
+    "name": "화염 정수",
+    "description": "화염의 힘이 응축된 정수",
+    "type": "MATERIAL",
+    "value": 65,
+    "rarity": "UNCOMMON",
+    "stackable": true,
+    "category": "drop",
+    "properties": {
+      "source": "LAVA_FIELDS",
+      "elemental_material": true,
+      "crafting_component": true,
+      "fire_element": true
+    }
   }
 ]
