@@ -37,6 +37,13 @@ public class MonsterDataLoader {
     return new HashMap<>(allMonsters);
   }
 
+  public static List<MonsterData> getAllMonsters() {
+    if (!dataLoaded) {
+        loadAllMonsters();
+    }
+    return new ArrayList<>(allMonsters.values());
+}
+  
   /**
    * 통합 JSON 파일에서 몬스터 데이터 로드
    */
