@@ -245,7 +245,7 @@ public class QuestManager {
 
   private void createBasicSlimeQuest() {
     Map<String, Integer> objectives = new HashMap<>();
-    objectives.put("kill_slime", 3); // JSON과 일치하도록 수정
+    objectives.put("kill_FOREST_SLIME", 3); // JSON과 일치하도록 수정
 
     QuestReward reward = new QuestReward(50, 100);
 
@@ -1066,23 +1066,25 @@ public class QuestManager {
     availableQuests.add(dailyQuest);
     logger.info("일일 처치 퀘스트 생성: {} (레벨: {})", dailyQuest.getTitle(), playerLevel);
   }
-  /**
-   * 몬스터 ID -> 표시명 매핑
-   */
+  
   private String getMonsterDisplayName(String monsterId) {
-      return switch (monsterId) {
-          case "FOREST_SLIME" -> "숲 슬라임";
-          case "FOREST_GOBLIN" -> "숲 고블린";
-          case "FOREST_WOLF" -> "숲늑대";
-          case "CAVE_BAT" -> "동굴 박쥐";
-          case "WILD_BOAR" -> "멧돼지";
-          case "FOREST_SPIDER" -> "숲 거미";
-          case "CAVE_TROLL" -> "동굴 트롤";
-          case "SKELETON_WARRIOR" -> "스켈레톤 전사";
-          case "FIRE_DRAGON" -> "화염 드래곤";
-          default -> monsterId; // 폴백: ID 그대로 반환
-      };
-  }
+    return switch (monsterId) {
+        case "FOREST_SLIME" -> "숲 슬라임";
+        case "FOREST_GOBLIN" -> "숲 고블린";
+        case "FOREST_WOLF" -> "숲늑대";
+        case "CAVE_BAT" -> "동굴 박쥐";
+        case "WILD_BOAR" -> "멧돼지";
+        case "FOREST_SPIDER" -> "숲 거미";
+        case "CAVE_TROLL" -> "동굴 트롤";
+        case "SKELETON_WARRIOR" -> "스켈레톤 전사";
+        case "FIRE_DRAGON" -> "화염 드래곤";
+        case "ICE_GIANT" -> "얼음 거인";
+        case "MAGMA_DRAGON" -> "마그마 드래곤";
+        case "VOID_REAPER" -> "공허의 사신";
+        default -> monsterId; // 폴백: ID 그대로 반환
+    };
+}
+  
   /**
    * 기존 QuestManager의 createDailyCollectionQuest 메서드 (하드코딩 버전 - 호환성용)
    */

@@ -146,14 +146,31 @@ public class ImprovedDailyQuestManager {
   private List<Quest> generateKillQuests(String date, QuestTier tier, int playerLevel) {
     List<Quest> killQuests = new ArrayList<>();
 
-    // 티어별 몬스터 및 수량 정의
-    Map<QuestTier, List<MonsterTarget>> tierMonsters =
-        Map.of(QuestTier.TIER_A, Arrays.asList(new MonsterTarget("슬라임", 5, 50, 30), new MonsterTarget("고블린", 3, 80, 50)), QuestTier.TIER_B,
-            Arrays.asList(new MonsterTarget("오크", 4, 120, 80), new MonsterTarget("스켈레톤", 5, 100, 70)), QuestTier.TIER_C,
-            Arrays.asList(new MonsterTarget("트롤", 3, 200, 150), new MonsterTarget("리치", 2, 300, 200)), QuestTier.TIER_D,
-            Arrays.asList(new MonsterTarget("드레이크", 2, 500, 350), new MonsterTarget("바이퍼", 3, 400, 300)), QuestTier.TIER_S,
-            Arrays.asList(new MonsterTarget("드래곤", 1, 1000, 800), new MonsterTarget("데몬로드", 1, 1200, 1000)));
-
+    //@formatter:off
+    Map<QuestTier, List<MonsterTarget>> tierMonsters = Map.of(
+        QuestTier.TIER_A, Arrays.asList(
+            new MonsterTarget("FOREST_SLIME", 5, 50, 30), 
+            new MonsterTarget("FOREST_GOBLIN", 3, 80, 50)
+        ),
+        QuestTier.TIER_B, Arrays.asList(
+            new MonsterTarget("WILD_BOAR", 4, 120, 80), 
+            new MonsterTarget("CAVE_TROLL", 3, 150, 100)
+        ),
+        QuestTier.TIER_C, Arrays.asList(
+            new MonsterTarget("FOREST_WOLF", 4, 200, 150), 
+            new MonsterTarget("SKELETON_WARRIOR", 3, 250, 180)
+        ),
+        QuestTier.TIER_D, Arrays.asList(
+            new MonsterTarget("FIRE_DRAGON", 2, 500, 350), 
+            new MonsterTarget("ICE_GIANT", 3, 400, 300)
+        ),
+        QuestTier.TIER_S, Arrays.asList(
+            new MonsterTarget("MAGMA_DRAGON", 1, 1000, 800), 
+            new MonsterTarget("VOID_REAPER", 1, 1200, 1000)
+        )
+    );
+    //@formatter:on
+    
     List<MonsterTarget> monsters = tierMonsters.get(tier);
     if (monsters != null) {
       for (int i = 0; i < Math.min(2, monsters.size()); i++) {
