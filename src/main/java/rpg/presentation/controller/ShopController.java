@@ -79,9 +79,6 @@ public class ShopController {
         }
       }
 
-      // 추가 특별 아이템들 (상점 전용)
-      addSpecialShopItems();
-
       logger.info("상점 아이템 초기화 완료: {}개 아이템", shopItems.size());
 
     } catch (Exception e) {
@@ -140,51 +137,6 @@ public class ShopController {
       case WEAPON, ARMOR -> 5; // 제한적
       case ACCESSORY -> 3; // 더 제한적
     };
-  }
-
-  /**
-   * 특별 상점 전용 아이템 추가
-   */
-  private void addSpecialShopItems() {
-    try {
-      // 상점에서만 구매할 수 있는 특별 아이템들
-      // (GameItemFactory에 없는 아이템들)
-
-      // 고급 장비들 - 현재는 GameEquipment만 지원
-      // TODO: GameEquipment도 팩토리 시스템으로 전환 예정
-
-      GameEquipment steelSword =
-          new GameEquipment("STEEL_SWORD", "강철검", "단단한 강철로 만든 검", 200, ItemRarity.UNCOMMON, GameEquipment.EquipmentType.WEAPON, 15, 0, 0);
-      addItemToShop(steelSword, "STEEL_SWORD_SHOP");
-
-      GameEquipment ironArmor =
-          new GameEquipment("IRON_ARMOR", "철갑옷", "튼튼한 철로 만든 갑옷", 160, ItemRarity.UNCOMMON, GameEquipment.EquipmentType.ARMOR, 0, 12, 25);
-      addItemToShop(ironArmor, "IRON_ARMOR_SHOP");
-
-      GameEquipment healthRing =
-          new GameEquipment("HEALTH_RING", "체력의 반지", "체력을 증가시켜주는 반지", 150, ItemRarity.RARE, GameEquipment.EquipmentType.ACCESSORY, 0, 0, 15);
-      addItemToShop(healthRing, "HEALTH_RING_SHOP");
-
-      // 특별 소비 아이템들 (GameEffectFactory 사용)
-      List<GameEffect> superHealEffect = List.of(GameEffectFactory.createHealHpEffect(100));
-
-      GameConsumable superHealthPotion =
-          new GameConsumable("SUPER_HEALTH_POTION", "고급 체력 물약", "HP를 100 회복합니다", 80, ItemRarity.UNCOMMON, superHealEffect, 0);
-      addItemToShop(superHealthPotion, "SUPER_HEALTH_POTION_SHOP");
-
-      // 복합 효과 물약 (HP + MP 동시 회복)
-      List<GameEffect> hybridEffects = List.of(GameEffectFactory.createHealHpEffect(60), GameEffectFactory.createHealMpEffect(40));
-
-      GameConsumable hybridPotion = new GameConsumable("HYBRID_POTION", "만능 물약", "HP를 60, MP를 40 회복합니다", 120, ItemRarity.RARE, hybridEffects, 1 // 1턴
-                                                                                                                                                // 쿨다운
-      );
-      addItemToShop(hybridPotion, "HYBRID_POTION_SHOP");
-
-      logger.debug("특별 상점 아이템 {}개 추가 (GameEffectFactory 기반 포함)", 5);
-
-    } catch (Exception e) {
-      logger.error("특별 상점 아이템 추가 실패", e);
-    }
   }
 
   /**
