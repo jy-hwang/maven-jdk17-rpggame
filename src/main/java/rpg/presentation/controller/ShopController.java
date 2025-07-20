@@ -332,7 +332,7 @@ public class ShopController {
       System.out.printf("   ⭐ %s | 💰 구매 가능: %s%n", getRarityKorean(item.getRarity()), player.getGold() >= shopItem.getPrice() ? "예" : "아니오");
 
       if (item instanceof GameEquipment equipment) {
-        System.out.printf("   🔥 효과: %s%n", getEquipmentEffectDescription(equipment));
+        System.out.printf("   🔥 효과: %s%n", equipment.getEffectDescription());
       } else if (item instanceof GameConsumable consumable) {
         System.out.printf("   ✨ 효과: %s%n", consumable.getEffectsDescription());
       }
@@ -525,7 +525,7 @@ public class ShopController {
 
       // 아이템 효과 표시
       if (item instanceof GameEquipment equipment) {
-        System.out.printf("   🔥 효과: %s%n", getEquipmentEffectDescription(equipment));
+        System.out.printf("   🔥 효과: %s%n", equipment.getEffectDescription());
       } else if (item instanceof GameConsumable consumable) {
         System.out.printf("   ✨ 효과: %s%n", consumable.getEffectsDescription());
       }
@@ -770,7 +770,7 @@ public class ShopController {
 
       // 아이템 정보 표시
       if (item instanceof GameEquipment equipment) {
-        System.out.printf("   📊 효과: %s%n", getEquipmentEffectDescription(equipment));
+        System.out.printf("   📊 효과: %s%n", equipment.getEffectDescription());
       } else if (item instanceof GameConsumable consumable) {
         System.out.printf("   ✨ 효과: %s%n", consumable.getEffectsDescription());
       }
@@ -807,7 +807,7 @@ public class ShopController {
       int sellPrice = calculateSellPrice(equipment);
 
       System.out.printf("%d. %s [%s] - %d골드%n", i + 1, equipment.getName(), getRarityKorean(equipment.getRarity()), sellPrice);
-      System.out.printf("   📊 효과: %s%n", getEquipmentEffectDescription(equipment));
+      System.out.printf("   📊 효과: %s%n", equipment.getEffectDescription());
 
       // 현재 착용 중인지 확인
       if (isCurrentlyEquipped(player, equipment)) {
@@ -1144,28 +1144,7 @@ public class ShopController {
     };
   }
 
-  /**
-   * 장비 효과 설명을 생성합니다.
-   */
-  private String getEquipmentEffectDescription(GameEquipment equipment) {
-    StringBuilder effects = new StringBuilder();
-
-    if (equipment.getAttackBonus() > 0) {
-      effects.append("공격력 +").append(equipment.getAttackBonus()).append(" ");
-    }
-
-    if (equipment.getDefenseBonus() > 0) {
-      effects.append("방어력 +").append(equipment.getDefenseBonus()).append(" ");
-    }
-
-    if (equipment.getHpBonus() > 0) {
-      effects.append("체력 +").append(equipment.getHpBonus()).append(" ");
-    }
-
-    return effects.length() > 0 ? effects.toString().trim() : "특별한 효과 없음";
-  }
-
-  // ==================== Getters ====================
+   // ==================== Getters ====================
 
   /**
    * 특정 아이템의 재고를 확인합니다.

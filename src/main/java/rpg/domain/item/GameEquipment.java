@@ -60,14 +60,93 @@ public class GameEquipment extends GameItem {
     StringBuilder info = new StringBuilder();
     info.append(toString()).append("\n");
     info.append("종류: ").append(equipmentType.getDisplayName()).append("\n");
-    if (attackBonus > GameConstants.NUMBER_ZERO)
-      info.append("공격력 +").append(attackBonus).append("\n");
-    if (defenseBonus > GameConstants.NUMBER_ZERO)
-      info.append("방어력 +").append(defenseBonus).append("\n");
-    if (hpBonus > GameConstants.NUMBER_ZERO)
-      info.append("체력 +").append(hpBonus).append("\n");
+    getEffectDescription();
     info.append("가격: ").append(getValue()).append(" 골드");
     return info.toString();
+  }
+
+  public String getEffectDescription() {
+    StringBuilder effects = new StringBuilder();
+
+    if (attackBonus != GameConstants.NUMBER_ZERO) {
+      effects.append("공격력 ");
+      if (attackBonus > GameConstants.NUMBER_ZERO) {
+        effects.append("+");
+      }
+      effects.append(attackBonus);
+    }
+    effects.append(" ");
+    
+    if (defenseBonus != GameConstants.NUMBER_ZERO) {
+      effects.append("방어력 ");
+      if (defenseBonus > GameConstants.NUMBER_ZERO) {
+        effects.append("+");
+      }
+      effects.append(defenseBonus);
+    }
+    effects.append(" ");
+
+    if (hpBonus != GameConstants.NUMBER_ZERO) {
+      effects.append("체력 ");
+      if (hpBonus > GameConstants.NUMBER_ZERO) {
+        effects.append("+");
+      }
+      effects.append(hpBonus);
+    }
+
+    return effects.length() > GameConstants.NUMBER_ZERO ? effects.toString().trim() : "특별한 효과 없음";
+
+  }
+
+  public String compareWith(GameEquipment other) {
+    if (other == null) {
+      return "✨ 새로운 장비!";
+    }
+
+    StringBuilder comparison = new StringBuilder();
+
+    int attackChange = this.attackBonus - other.attackBonus;
+    int defenseChange = this.defenseBonus - other.defenseBonus;
+    int hpChange = this.hpBonus - other.hpBonus;
+
+    if (attackChange != GameConstants.NUMBER_ZERO || defenseChange != GameConstants.NUMBER_ZERO || hpChange != GameConstants.NUMBER_ZERO) {
+
+      comparison.append("변화: ");
+
+      if (attackChange != GameConstants.NUMBER_ZERO) {
+        comparison.append("공격").append(attackChange > GameConstants.NUMBER_ZERO ? "+" : "").append(attackChange).append(" ");
+      }
+
+      if (defenseChange != GameConstants.NUMBER_ZERO) {
+        comparison.append("방어").append(defenseChange > GameConstants.NUMBER_ZERO ? "+" : "").append(defenseChange).append(" ");
+      }
+
+      if (hpChange != GameConstants.NUMBER_ZERO) {
+        comparison.append("HP").append(hpChange > GameConstants.NUMBER_ZERO ? "+" : "").append(hpChange).append(" ");
+      }
+    } else {
+      comparison.append("스탯 변화 없음");
+    }
+
+    return comparison.toString().trim();
+  }
+
+  public boolean isBetterThan(GameEquipment other) {
+    if (other == null) {
+      return true;
+    }
+
+    // 등급 비교
+    int rarityCompare = this.getRarity().ordinal() - other.getRarity().ordinal();
+    if (rarityCompare != 0) {
+      return rarityCompare > 0;
+    }
+
+    // 총 스탯 합계 비교
+    int thisTotal = this.attackBonus + this.defenseBonus + this.hpBonus;
+    int otherTotal = other.attackBonus + other.defenseBonus + other.hpBonus;
+
+    return thisTotal > otherTotal;
   }
 
   // Getters
