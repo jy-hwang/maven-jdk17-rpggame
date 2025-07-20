@@ -219,48 +219,6 @@ public class GameEngine {
 
 
   /**
-   * 새 게임을 시작합니다.
-   */
-  // private void startNewGame() {
-  // try {
-  // String name = InputValidator.getStringInput("캐릭터 이름을 입력하세요: ", 1, 20);
-  // player = new Player(name);
-  //
-  // // 게임 상태 초기화
-  // gameState = new GameState();
-  // gameStartTime = System.currentTimeMillis();
-  // currentSaveSlot = 0;
-  //
-  // // 🔥 시작 아이템으로 기본 물약 지급
-  // giveStartingItems();
-  //
-  // // 컨트롤러들에 새로운 게임 상태 적용
-  // updateControllersWithNewGameState();
-  //
-  // System.out.println("🎉 새로운 모험가 " + name + "님, 환영합니다!");
-  // player.displayStats();
-  //
-  // // 🆕 일일 퀘스트 초기 생성
-  // player.getQuestManager().generateDailyQuests(player);
-  //
-  // logger.info("새 게임 초기화 완료 - 일일 퀘스트 포함");
-  //
-  // // 시작 퀘스트 안내
-  // System.out.println("\n💡 퀘스트 메뉴에서 첫 번째 퀘스트를 수락해보세요!");
-  //
-  // logger.info("새 캐릭터 생성: {}", name);
-  //
-  // // 인게임 루프 시작
-  // startGameLoop();
-  //
-  // } catch (Exception e) {
-  // logger.error("새 게임 시작 실패", e);
-  // System.out.println("새 게임 시작 중 오류가 발생했습니다.");
-  // InputValidator.waitForAnyKey("계속하려면 Enter를 누르세요...");
-  // }
-  // }
-
-  /**
    * 시작 아이템 지급
    */
   private void giveStartingItems() {
