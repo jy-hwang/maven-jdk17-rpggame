@@ -17,6 +17,7 @@ import rpg.domain.item.GameItem;
 import rpg.domain.item.ItemRarity;
 import rpg.domain.item.effect.GameEffect;
 import rpg.domain.player.Player;
+import rpg.domain.shop.CategoryStats;
 import rpg.domain.shop.ShopEvent;
 import rpg.domain.shop.ShopItem;
 import rpg.domain.shop.ShopItemCategory;
@@ -78,9 +79,6 @@ public class ShopController {
         }
       }
 
-      // 추가 특별 아이템들 (상점 전용)
-      addSpecialShopItems();
-
       logger.info("상점 아이템 초기화 완료: {}개 아이템", shopItems.size());
 
     } catch (Exception e) {
@@ -139,47 +137,6 @@ public class ShopController {
       case WEAPON, ARMOR -> 5; // 제한적
       case ACCESSORY -> 3; // 더 제한적
     };
-  }
-
-  /**
-   * 특별 상점 전용 아이템 추가
-   */
-  private void addSpecialShopItems() {
-    try {
-      // 상점에서만 구매할 수 있는 특별 아이템들
-      // (GameItemFactory에 없는 아이템들)
-
-      // 고급 장비들 - 현재는 GameEquipment만 지원
-      // TODO: GameEquipment도 팩토리 시스템으로 전환 예정
-
-      GameEquipment steelSword = new GameEquipment("STEEL_SWORD", "강철검", "단단한 강철로 만든 검", 200, ItemRarity.UNCOMMON, GameEquipment.EquipmentType.WEAPON, 15, 0, 0);
-      addItemToShop(steelSword, "STEEL_SWORD_SHOP");
-
-      GameEquipment ironArmor = new GameEquipment("IRON_ARMOR", "철갑옷", "튼튼한 철로 만든 갑옷", 160, ItemRarity.UNCOMMON, GameEquipment.EquipmentType.ARMOR, 0, 12, 25);
-      addItemToShop(ironArmor, "IRON_ARMOR_SHOP");
-
-      GameEquipment healthRing = new GameEquipment("HEALTH_RING", "체력의 반지", "체력을 증가시켜주는 반지", 150, ItemRarity.RARE, GameEquipment.EquipmentType.ACCESSORY, 0, 0, 15);
-      addItemToShop(healthRing, "HEALTH_RING_SHOP");
-
-      // 특별 소비 아이템들 (GameEffectFactory 사용)
-      List<GameEffect> superHealEffect = List.of(GameEffectFactory.createHealHpEffect(100));
-
-      GameConsumable superHealthPotion = new GameConsumable("SUPER_HEALTH_POTION", "고급 체력 물약", "HP를 100 회복합니다", 80, ItemRarity.UNCOMMON, superHealEffect, 0);
-      addItemToShop(superHealthPotion, "SUPER_HEALTH_POTION_SHOP");
-
-      // 복합 효과 물약 (HP + MP 동시 회복)
-      List<GameEffect> hybridEffects = List.of(GameEffectFactory.createHealHpEffect(60), GameEffectFactory.createHealMpEffect(40));
-
-      GameConsumable hybridPotion = new GameConsumable("HYBRID_POTION", "만능 물약", "HP를 60, MP를 40 회복합니다", 120, ItemRarity.RARE, hybridEffects, 1 // 1턴
-                                                                                                                                                // 쿨다운
-      );
-      addItemToShop(hybridPotion, "HYBRID_POTION_SHOP");
-
-      logger.debug("특별 상점 아이템 {}개 추가 (GameEffectFactory 기반 포함)", 5);
-
-    } catch (Exception e) {
-      logger.error("특별 상점 아이템 추가 실패", e);
-    }
   }
 
   /**
@@ -250,31 +207,7 @@ public class ShopController {
    * 상점 메인 메뉴를 표시합니다.
    */
   private void displayShopMenuMain(Player player) {
-
-    // System.out.println("\n🏪 === 마을 상점 ===");
-    // System.out.println("💰 보유 골드: " + player.getGold());
-    //
-    // // GameItemFactory 상태 표시
-    // System.out.println("📦 상품 종류: " + shopItems.size() + "개 (팩토리 기반)");
-    //
-    // // 이벤트가 활성화되어 있으면 표시
-    // if (currentEventActive && currentEvent != null) {
-    // displayActiveEventInfo();
-    // }
-    //
-    // System.out.println();
-    // System.out.println("1. 🛒 아이템 사기");
-    // System.out.println("2. 💰 아이템 팔기");
-    // System.out.println("3. 📊 판매 시세 확인");
-    // System.out.println("4. 📈 상점 통계");
-    // System.out.println("5. 🚪 상점 나가기");
-    // System.out.println("====================");
-    // boolean hasEvent = true;
-
     shopMenu.displayShopMenuMain(player, shopItems.size(), currentEventActive, currentEvent);
-
-
-
   }
 
   /**
@@ -312,33 +245,17 @@ public class ShopController {
    * 구매 메뉴를 표시합니다.
    */
   private void displayShopMenuBuy(Player player) {
-    System.out.println("\n🏪 === 마을 상점 구매 ===");
-    System.out.println("💰 보유 골드: " + player.getGold());
-
-    // 카테고리별 아이템 수 표시
-    displayCategoryStats();
-
-    System.out.println();
-    System.out.println("1. 🧪 소비 아이템");
-    System.out.println("2. ⚔️ 무기");
-    System.out.println("3. 🛡️ 방어구");
-    System.out.println("4. 💍 장신구");
-    System.out.println("5. 🎲 랜덤 추천");
-    System.out.println("6. 🔙 돌아가기");
-    System.out.println("========================");
-  }
-
-  /**
-   * 카테고리별 통계 표시
-   */
-  private void displayCategoryStats() {
+    CategoryStats stats = new CategoryStats();
     for (ShopItemCategory category : ShopItemCategory.values()) {
-      long count = shopItems.stream().filter(item -> item.getCategory() == category).filter(item -> item.getStock() > 0).count();
-
-      if (count > 0) {
-        System.out.printf("   %s: %d개%n", getCategoryKorean(category), count);
-      }
+      //@formatter:off
+      long count = shopItems.stream()
+          .filter(item -> item.getCategory() == category)
+          .filter(item -> item.getStock() > 0)
+          .count();
+      stats.setCount(category, (int) count);
+      //@formatter:off
     }
+   shopMenu.displayShopMenuBuy(player, stats);
   }
 
   /**
@@ -367,7 +284,7 @@ public class ShopController {
       System.out.printf("   ⭐ %s | 💰 구매 가능: %s%n", getRarityKorean(item.getRarity()), player.getGold() >= shopItem.getPrice() ? "예" : "아니오");
 
       if (item instanceof GameEquipment equipment) {
-        System.out.printf("   🔥 효과: %s%n", getEquipmentEffectDescription(equipment));
+        System.out.printf("   🔥 효과: %s%n", equipment.getEffectDescription());
       } else if (item instanceof GameConsumable consumable) {
         System.out.printf("   ✨ 효과: %s%n", consumable.getEffectsDescription());
       }
@@ -560,7 +477,7 @@ public class ShopController {
 
       // 아이템 효과 표시
       if (item instanceof GameEquipment equipment) {
-        System.out.printf("   🔥 효과: %s%n", getEquipmentEffectDescription(equipment));
+        System.out.printf("   🔥 효과: %s%n", equipment.getEffectDescription());
       } else if (item instanceof GameConsumable consumable) {
         System.out.printf("   ✨ 효과: %s%n", consumable.getEffectsDescription());
       }
@@ -685,22 +602,10 @@ public class ShopController {
    * 판매 메뉴를 표시합니다.
    */
   private void displaySellMenu(Player player) {
-    System.out.println("\n💰 === 아이템 판매 ===");
-    System.out.println("💰 보유 골드: " + player.getGold());
-    System.out.println();
-    System.out.println("1. 🧪 소비 아이템 판매");
-    System.out.println("2. ⚔️ 무기 판매");
-    System.out.println("3. 🛡️ 방어구 판매");
-    System.out.println("4. 💍 장신구 판매");
-    System.out.println("5. ⚡ 일반 아이템 일괄 판매");
-    System.out.println("6. 🔙 돌아가기");
-    System.out.println("====================");
-
-    // 예상 수익 표시
+    // 예상 수익 계산
     int totalSellValue = calculateTotalSellValue(player);
-    if (totalSellValue > 0) {
-      System.out.println("💡 전체 아이템 판매 시 예상 수익: " + totalSellValue + "골드");
-    }
+   
+    shopMenu.displaySellMenu(player, totalSellValue);
   }
 
   // ==================== 이벤트 관련 메서드들 ====================
@@ -723,41 +628,9 @@ public class ShopController {
     currentEvent = events[random.nextInt(events.length)];
     currentEventActive = true;
 
-    displayEventNotification();
+    shopMenu.displayEventNotification(currentEvent);
     logger.info("상점 이벤트 발생: {}", currentEvent);
   }
-
-  /**
-   * 이벤트 알림을 표시합니다.
-   */
-  private void displayEventNotification() {
-    System.out.println("\n" + "🎉".repeat(20));
-    System.out.println("✨ 특별 이벤트 발생! ✨");
-
-    switch (currentEvent) {
-      case DISCOUNT_SALE -> {
-        System.out.println("🏷️ 할인 세일!");
-        System.out.println("💥 모든 아이템 20% 할인!");
-      }
-      case BONUS_SELL -> {
-        System.out.println("💰 고가 매입 이벤트!");
-        System.out.println("📈 판매 시 30% 보너스!");
-      }
-      case FREE_POTION -> {
-        System.out.println("🎁 무료 증정 이벤트!");
-        System.out.println("🧪 체력 물약 1개 무료 증정!");
-      }
-      case RARE_ITEMS -> {
-        System.out.println("⭐ 희귀 아이템 입고!");
-        System.out.println("🔥 특별한 아이템들이 입고되었습니다!");
-      }
-    }
-
-    System.out.println("🎉".repeat(20));
-    InputValidator.waitForAnyKey("계속하려면 Enter를 누르세요...");
-  }
-
-
 
   /**
    * 이벤트 할인을 적용합니다.
@@ -849,7 +722,7 @@ public class ShopController {
 
       // 아이템 정보 표시
       if (item instanceof GameEquipment equipment) {
-        System.out.printf("   📊 효과: %s%n", getEquipmentEffectDescription(equipment));
+        System.out.printf("   📊 효과: %s%n", equipment.getEffectDescription());
       } else if (item instanceof GameConsumable consumable) {
         System.out.printf("   ✨ 효과: %s%n", consumable.getEffectsDescription());
       }
@@ -886,7 +759,7 @@ public class ShopController {
       int sellPrice = calculateSellPrice(equipment);
 
       System.out.printf("%d. %s [%s] - %d골드%n", i + 1, equipment.getName(), getRarityKorean(equipment.getRarity()), sellPrice);
-      System.out.printf("   📊 효과: %s%n", getEquipmentEffectDescription(equipment));
+      System.out.printf("   📊 효과: %s%n", equipment.getEffectDescription());
 
       // 현재 착용 중인지 확인
       if (isCurrentlyEquipped(player, equipment)) {
@@ -1223,28 +1096,7 @@ public class ShopController {
     };
   }
 
-  /**
-   * 장비 효과 설명을 생성합니다.
-   */
-  private String getEquipmentEffectDescription(GameEquipment equipment) {
-    StringBuilder effects = new StringBuilder();
-
-    if (equipment.getAttackBonus() > 0) {
-      effects.append("공격력 +").append(equipment.getAttackBonus()).append(" ");
-    }
-
-    if (equipment.getDefenseBonus() > 0) {
-      effects.append("방어력 +").append(equipment.getDefenseBonus()).append(" ");
-    }
-
-    if (equipment.getHpBonus() > 0) {
-      effects.append("체력 +").append(equipment.getHpBonus()).append(" ");
-    }
-
-    return effects.length() > 0 ? effects.toString().trim() : "특별한 효과 없음";
-  }
-
-  // ==================== Getters ====================
+   // ==================== Getters ====================
 
   /**
    * 특정 아이템의 재고를 확인합니다.

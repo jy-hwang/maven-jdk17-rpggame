@@ -10,7 +10,8 @@
     "equipmentType": "WEAPON",
     "attackBonus": 5,
     "defenseBonus": 0,
-    "hpBonus": 0
+    "hpBonus": 0,
+    "mpBonus": 0
   },
   {
     "id": "IRON_SWORD",
@@ -23,7 +24,8 @@
     "equipmentType": "WEAPON",
     "attackBonus": 12,
     "defenseBonus": 0,
-    "hpBonus": 0
+    "hpBonus": 0,
+    "mpBonus": 0
   },
   {
     "id": "STEEL_SWORD",
@@ -36,7 +38,8 @@
     "equipmentType": "WEAPON",
     "attackBonus": 20,
     "defenseBonus": 0,
-    "hpBonus": 0
+    "hpBonus": 0,
+    "mpBonus": 0
   },
   {
     "id": "MITHRIL_SWORD",
@@ -49,7 +52,8 @@
     "equipmentType": "WEAPON",
     "attackBonus": 35,
     "defenseBonus": 0,
-    "hpBonus": 0
+    "hpBonus": 0,
+    "mpBonus": 0
   },
   {
     "id": "WOODEN_BOW",
@@ -62,7 +66,8 @@
     "equipmentType": "WEAPON",
     "attackBonus": 7,
     "defenseBonus": 0,
-    "hpBonus": 0
+    "hpBonus": 0,
+    "mpBonus": 0
   },
   {
     "id": "COMPOSITE_BOW",
@@ -75,7 +80,8 @@
     "equipmentType": "WEAPON",
     "attackBonus": 16,
     "defenseBonus": 0,
-    "hpBonus": 0
+    "hpBonus": 0,
+    "mpBonus": 0
   },
   {
     "id": "MAGIC_STAFF",
@@ -88,7 +94,8 @@
     "equipmentType": "WEAPON",
     "attackBonus": 8,
     "defenseBonus": 0,
-    "hpBonus": 15
+    "hpBonus": 5,
+    "mpBonus": 10
   },
   {
     "id": "CRYSTAL_STAFF",
@@ -101,6 +108,7 @@
     "equipmentType": "WEAPON",
     "attackBonus": 18,
     "defenseBonus": 0,
-    "hpBonus": 25
+    "hpBonus": 15,
+    "mpBonus": 30
   }
 ]

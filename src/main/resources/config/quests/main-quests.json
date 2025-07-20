@@ -39,7 +39,7 @@
     "requiredLevel": 2,
     "category": "MAIN",
     "objectives": {
-      "kill_forest_goblin": 2
+      "kill_FOREST_GOBLIN": 2
     },
     "reward": {
       "experience": 100,
@@ -73,7 +73,7 @@
     "requiredLevel": 5,
     "category": "MAIN",
     "objectives": {
-      "kill_orc": 2
+      "kill_ORC_WARRIOR": 2
     },
     "reward": {
       "experience": 200,
@@ -107,7 +107,7 @@
     "requiredLevel": 8,
     "category": "MAIN",
     "objectives": {
-      "kill_dragon": 1
+      "kill_ANCIENT_DRAGON": 1
     },
     "reward": {
       "experience": 1000,

@@ -323,8 +323,8 @@ private void showBattleStatus(Player player, Monster monster) {
       player.setGold(player.getGold() + monster.getGoldReward());
 
       // 보상 표시 (색상 적용)
-      System.out.println(monster.getExpReward() + " 획득!");
-      System.out.println(monster.getGoldReward() + " 획득!");
+      System.out.println("경험치 : " + monster.getExpReward() + " 획득!");
+      System.out.println("골드 : " + monster.getGoldReward() + " 획득!");
 
       if (levelUp) {
         System.out.println("🎉 축하합니다! 레벨이 올랐습니다! 🎉");
@@ -355,9 +355,9 @@ private void showBattleStatus(Player player, Monster monster) {
       }
 
       // 아이템 드롭 (20% 확률)
-      if (random.nextInt(100) < 20) {
-        dropRandomItem(player);
-      }
+      // if (random.nextInt(100) < 20) {
+      // dropRandomItem(player);
+      // }
 
       logger.info("전투 승리: {} (경험치: {}, 골드: {})", monster.getName(), monster.getExpReward(), monster.getGoldReward());
 
@@ -373,8 +373,8 @@ private void showBattleStatus(Player player, Monster monster) {
   private void dropRandomItem(Player player) {
     GameItem[] possibleDrops = {new GameConsumable("HEALTH_POTION", "체력 물약", "HP를 50 회복합니다", 20, ItemRarity.COMMON, 50, 0, 0, true),
         new GameConsumable("MANA_POTION", "마나 물약", "마나를 30 회복합니다", 25, ItemRarity.COMMON, 0, 30, 0, true),
-        new GameEquipment("IRON_SWORD", "철 검", "날카로운 철검", 80, ItemRarity.UNCOMMON, GameEquipment.EquipmentType.WEAPON, 8, 0, 0),
-        new GameEquipment("LEATHER_ARMOR", "가죽 갑옷", "질긴 가죽으로 만든 갑옷", 60, ItemRarity.COMMON, GameEquipment.EquipmentType.ARMOR, 0, 6, 10)};
+        new GameEquipment("IRON_SWORD", "철 검", "날카로운 철검", 80, ItemRarity.UNCOMMON, GameEquipment.EquipmentType.WEAPON, 8, 0, 0, 0),
+        new GameEquipment("LEATHER_ARMOR", "가죽 갑옷", "질긴 가죽으로 만든 갑옷", 60, ItemRarity.COMMON, GameEquipment.EquipmentType.ARMOR, 0, 6, 10, 0)};
 
     GameItem droppedItem = possibleDrops[random.nextInt(possibleDrops.length)];
 

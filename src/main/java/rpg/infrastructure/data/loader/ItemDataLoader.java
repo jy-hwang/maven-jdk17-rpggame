@@ -329,11 +329,11 @@ public class ItemDataLoader {
     // 3. 스탯 값 추출
     int attack = stats.getOrDefault("attack", itemData.getAttackBonus());
     int defense = stats.getOrDefault("defense", itemData.getDefenseBonus());
-    int magic = stats.getOrDefault("magic", itemData.getMagicBonus());
+    int hpBonus = stats.getOrDefault("hpBonus", itemData.getHpBonus());
+    int mpBonus = stats.getOrDefault("mpBonus", itemData.getMpBonus());
 
     // 4. GameEquipment 객체 생성
-    return new GameEquipment(itemData.getId(), itemData.getName(), itemData.getDescription(), itemData.getValue(), itemData.getRarity(), equipType, attack, defense, magic // hpBonus 대신 magic 사용
-    );
+    return new GameEquipment(itemData.getId(), itemData.getName(), itemData.getDescription(), itemData.getValue(), itemData.getRarity(), equipType, attack, defense, hpBonus, mpBonus);
   }
 
 

@@ -174,7 +174,11 @@ public class QuestController {
     System.out.println("📋 퀘스트: " + quest.getTitle());
     System.out.println("📝 설명: " + quest.getDescription());
     System.out.println("🎯 목표: " + quest.getObjectiveDescription());
-    System.out.println("📊 진행도: " + quest.getProgressDescription());
+    if (quest.getType() == Quest.QuestType.LEVEL && currentPlayer != null) {
+      System.out.println("📊 진행도: " + quest.getProgressDescription(currentPlayer));
+  } else {
+      System.out.println("📊 진행도: " + quest.getProgressDescription());
+  }
     System.out.println("🏆 상태: " + getQuestStatusKorean(quest.getStatus()));
     System.out.println("⭐ 필요 레벨: " + quest.getRequiredLevel());
     System.out.println("🏷️ 타입: " + getQuestTypeKorean(quest.getType()));

@@ -22,6 +22,7 @@ public class GameItemData {
   private final Integer attackBonus; // null이면 0으로 처리
   private final Integer defenseBonus; // null이면 0으로 처리
   private final Integer hpBonus; // null이면 0으로 처리
+  private final Integer mpBonus;
 
   // 🆕 추가된 필드들
   private final Integer cooldown; // 소비 아이템 쿨다운
@@ -45,6 +46,7 @@ public class GameItemData {
 , @JsonProperty("attackBonus") Integer attackBonus
 , @JsonProperty("defenseBonus") Integer defenseBonus
 , @JsonProperty("hpBonus") Integer hpBonus
+, @JsonProperty("mpBonus") Integer mpBonus
 // 🆕 새로 추가된 필드들
 , @JsonProperty("cooldown") Integer cooldown
 , @JsonProperty("stats") Map<String, Integer> stats
@@ -63,6 +65,7 @@ public class GameItemData {
     this.attackBonus = attackBonus;
     this.defenseBonus = defenseBonus;
     this.hpBonus = hpBonus;
+    this.mpBonus = mpBonus;
 
     // 🆕 새 필드들 초기화
     this.cooldown = cooldown;
@@ -127,6 +130,10 @@ public class GameItemData {
   public int getHpBonus() {
     return hpBonus != null ? hpBonus : 0;
   }
+  
+  public int getMpBonus() {
+    return mpBonus != null ? mpBonus : 0;
+  }
 
   // 🆕 새로 추가된 getter 메서드들
   public int getCooldown() {
@@ -154,11 +161,6 @@ public class GameItemData {
 
   public Map<String, Integer> getStats() {
     return new HashMap<>(stats);
-  }
-
-  public int getMagicBonus() {
-    // stats 필드에서 magic 값 반환
-    return stats.getOrDefault("magic", 0);
   }
 
   public Map<String, Object> getProperties() {

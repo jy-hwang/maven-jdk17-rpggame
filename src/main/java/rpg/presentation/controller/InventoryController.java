@@ -12,6 +12,7 @@ import rpg.domain.item.GameEquipment;
 import rpg.domain.item.GameItem;
 import rpg.domain.item.ItemRarity;
 import rpg.domain.player.Player;
+import rpg.presentation.menu.InventoryMenu;
 import rpg.shared.constant.GameConstants;
 
 /**
@@ -20,9 +21,11 @@ import rpg.shared.constant.GameConstants;
 public class InventoryController {
   private static final Logger logger = LoggerFactory.getLogger(InventoryController.class);
   private final GameItemFactory itemFactory;
+  private final InventoryMenu inventoryMenu;
 
   public InventoryController() {
     this.itemFactory = GameItemFactory.getInstance();
+    this.inventoryMenu = new InventoryMenu();
     logger.debug("InventoryController 초기화 완료");
   }
 
@@ -92,14 +95,7 @@ public class InventoryController {
   private void displayInventoryMenu(Player player) {
     player.getInventory().displayInventory();
 
-    System.out.println("\n=== 인벤토리 관리 ===");
-    System.out.println("1. 🧪 아이템 사용");
-    System.out.println("2. ⚔️ 장비 관리");
-    System.out.println("3. 📋 아이템 정보");
-    System.out.println("4. 📦 인벤토리 정렬");
-    System.out.println("5. 📊 인벤토리 통계");
-    System.out.println("6. 🔍 장비 비교");
-    System.out.println("7. 🔙 돌아가기");
+    inventoryMenu.displayInventoryMenu(player);
 
     // 상태 알림
     showInventoryAlerts(player);
@@ -132,30 +128,11 @@ public class InventoryController {
     for (GameEquipment equipment : equippableItems) {
       GameEquipment currentEquipment = getCurrentEquipment(player, equipment.getEquipmentType());
 
-      if (currentEquipment == null || isUpgrade(equipment, currentEquipment)) {
+      if (currentEquipment == null || equipment.isBetterThan(equipment)) {
         System.out.println("💡 추천: " + equipment.getName() + " 착용을 고려해보세요!");
         break; // 한 번에 하나씩만 추천
       }
     }
-  }
-
-  /**
-   * 장비가 업그레이드인지 확인합니다.
-   */
-  private boolean isUpgrade(GameEquipment newEquipment, GameEquipment currentEquipment) {
-    if (currentEquipment == null)
-      return true;
-
-    // 등급 비교
-    if (newEquipment.getRarity().ordinal() > currentEquipment.getRarity().ordinal()) {
-      return true;
-    }
-
-    // 스탯 합계 비교
-    int newTotal = newEquipment.getAttackBonus() + newEquipment.getDefenseBonus() + newEquipment.getHpBonus();
-    int currentTotal = currentEquipment.getAttackBonus() + currentEquipment.getDefenseBonus() + currentEquipment.getHpBonus();
-
-    return newTotal > currentTotal;
   }
 
   /**
@@ -223,14 +200,16 @@ public class InventoryController {
    * 체력 회복 아이템인지 확인
    */
   private boolean isHealingItem(GameConsumable item) {
-    return item.getEffectsDescription().toLowerCase().contains("hp") || item.getName().toLowerCase().contains("체력") || item.getName().toLowerCase().contains("health");
+    return item.getEffectsDescription().toLowerCase().contains("hp") || item.getName().toLowerCase().contains("체력")
+        || item.getName().toLowerCase().contains("health");
   }
 
   /**
    * 마나 회복 아이템인지 확인
    */
   private boolean isManaItem(GameConsumable item) {
-    return item.getEffectsDescription().toLowerCase().contains("mp") || item.getName().toLowerCase().contains("마나") || item.getName().toLowerCase().contains("mana");
+    return item.getEffectsDescription().toLowerCase().contains("mp") || item.getName().toLowerCase().contains("마나")
+        || item.getName().toLowerCase().contains("mana");
   }
 
   /**
@@ -238,7 +217,7 @@ public class InventoryController {
    */
   private void manageEquipment(Player player) {
     while (true) {
-      displayEquipmentMenu(player);
+      inventoryMenu.displayEquipmentMenu(player);
 
       int choice = InputValidator.getIntInput("선택: ", 1, 5);
 
@@ -259,18 +238,6 @@ public class InventoryController {
           return;
       }
     }
-  }
-
-  /**
-   * 장비 관리 메뉴를 표시합니다.
-   */
-  private void displayEquipmentMenu(Player player) {
-    System.out.println("\n=== 장비 관리 ===");
-    System.out.println("1. ⚔️ 장비 착용");
-    System.out.println("2. 📤 장비 해제");
-    System.out.println("3. 👁️ 현재 장비 보기");
-    System.out.println("4. ⚡ 최적 장비 자동 착용");
-    System.out.println("5. 🔙 돌아가기");
   }
 
   /**
@@ -318,27 +285,11 @@ public class InventoryController {
    * 장비 비교를 표시합니다.
    */
   private void displayEquipmentComparison(GameEquipment newEquipment, GameEquipment currentEquipment) {
-    System.out.printf("   📊 효과: %s%n", getEquipmentEffectDescription(newEquipment));
+    System.out.printf("   📊 효과: %s%n", newEquipment.getEffectDescription());
 
     if (currentEquipment != null) {
-      System.out.printf("   🔄 현재: %s%n", getEquipmentEffectDescription(currentEquipment));
-
-      // 변화량 표시
-      int attackChange = newEquipment.getAttackBonus() - currentEquipment.getAttackBonus();
-      int defenseChange = newEquipment.getDefenseBonus() - currentEquipment.getDefenseBonus();
-      int hpChange = newEquipment.getHpBonus() - currentEquipment.getHpBonus();
-
-      if (attackChange != GameConstants.NUMBER_ZERO || defenseChange != GameConstants.NUMBER_ZERO || hpChange != GameConstants.NUMBER_ZERO) {
-        System.out.print("   📈 변화: ");
-        List<String> changes = new java.util.ArrayList<>();
-        if (attackChange != GameConstants.NUMBER_ZERO)
-          changes.add("공격" + (attackChange > GameConstants.NUMBER_ZERO ? "+" : "") + attackChange);
-        if (defenseChange != GameConstants.NUMBER_ZERO)
-          changes.add("방어" + (defenseChange > GameConstants.NUMBER_ZERO ? "+" : "") + defenseChange);
-        if (hpChange != GameConstants.NUMBER_ZERO)
-          changes.add("HP" + (hpChange > GameConstants.NUMBER_ZERO ? "+" : "") + hpChange);
-        System.out.println(String.join(", ", changes));
-      }
+      System.out.printf("   🔄 현재: %s%n", currentEquipment.getEffectDescription());
+      System.out.printf("   📈 %s%n", newEquipment.compareWith(currentEquipment));
     } else {
       System.out.println("   ✨ 새로운 장비!");
     }
@@ -390,7 +341,7 @@ public class InventoryController {
       GameEquipment currentEquipment = getCurrentEquipment(player, type);
       GameEquipment bestEquipment = findBestEquipment(equipments, type);
 
-      if (bestEquipment != null && (currentEquipment == null || isUpgrade(bestEquipment, currentEquipment))) {
+      if (bestEquipment != null && (currentEquipment == null || currentEquipment.isBetterThan(bestEquipment))) {
         player.getInventory().equipItem(bestEquipment);
         System.out.println("✅ " + bestEquipment.getName() + " 착용!");
         anyEquipped = true;
@@ -424,12 +375,7 @@ public class InventoryController {
    * 장비를 해제합니다.
    */
   private void unequipItem(Player player) {
-    System.out.println("\n=== 장비 해제 ===");
-    System.out.println("1. ⚔️ 무기 해제");
-    System.out.println("2. 🛡️ 방어구 해제");
-    System.out.println("3. 💍 장신구 해제");
-    System.out.println("4. 🔄 모든 장비 해제");
-    System.out.println("5. 🔙 취소");
+    inventoryMenu.displayUnequipItemMenu(player);
 
     int choice = InputValidator.getIntInput("선택: ", 1, 5);
     if (choice == 5)
@@ -443,7 +389,8 @@ public class InventoryController {
       return;
     }
 
-    GameEquipment.EquipmentType[] types = {GameEquipment.EquipmentType.WEAPON, GameEquipment.EquipmentType.ARMOR, GameEquipment.EquipmentType.ACCESSORY};
+    GameEquipment.EquipmentType[] types =
+        {GameEquipment.EquipmentType.WEAPON, GameEquipment.EquipmentType.ARMOR, GameEquipment.EquipmentType.ACCESSORY};
 
     String[] typeNames = {"무기", "방어구", "장신구"};
 
@@ -525,7 +472,8 @@ public class InventoryController {
     // 총 장비 보너스 표시
     PlayerInventory.EquipmentBonus bonus = inventory.getTotalBonus();
     System.out.println("\n📊 총 장비 보너스:");
-    if (bonus.getAttackBonus() > GameConstants.NUMBER_ZERO || bonus.getDefenseBonus() > GameConstants.NUMBER_ZERO || bonus.getHpBonus() > GameConstants.NUMBER_ZERO) {
+    if (bonus.getAttackBonus() > GameConstants.NUMBER_ZERO || bonus.getDefenseBonus() > GameConstants.NUMBER_ZERO
+        || bonus.getHpBonus() > GameConstants.NUMBER_ZERO) {
       if (bonus.getAttackBonus() > GameConstants.NUMBER_ZERO)
         System.out.println("⚔️ 공격력: +" + bonus.getAttackBonus());
       if (bonus.getDefenseBonus() > GameConstants.NUMBER_ZERO)
@@ -549,7 +497,7 @@ public class InventoryController {
       System.out.println("  📦 " + equipment.getName());
       System.out.println("  ⭐ 등급: " + getRarityKorean(equipment.getRarity()));
       System.out.println("  📝 " + equipment.getDescription());
-      System.out.println("  🔥 효과: " + getEquipmentEffectDescription(equipment));
+      System.out.println("  🔥 효과: " + equipment.getEffectDescription());
       System.out.println("  💰 가치: " + equipment.getValue() + " 골드");
     } else {
       System.out.println("  📭 착용 중인 장비 없음");
@@ -700,7 +648,7 @@ public class InventoryController {
         for (GameEquipment equipment : sameTypeEquipments) {
           String comparison = "";
           if (currentEquipment != null) {
-            if (isUpgrade(equipment, currentEquipment)) {
+            if (currentEquipment.isBetterThan(equipment)) {
               comparison = " ⬆️ 업그레이드";
             } else {
               comparison = " ⬇️ 다운그레이드";
@@ -721,7 +669,8 @@ public class InventoryController {
    * 비교용 장비 포맷을 생성합니다.
    */
   private String formatEquipmentForComparison(GameEquipment equipment) {
-    return String.format("%s [%s] (공격+%d, 방어+%d, HP+%d)", equipment.getName(), getRarityKorean(equipment.getRarity()), equipment.getAttackBonus(), equipment.getDefenseBonus(), equipment.getHpBonus());
+    return String.format("%s [%s] (공격+%d, 방어+%d, HP+%d)", equipment.getName(), getRarityKorean(equipment.getRarity()), equipment.getAttackBonus(),
+        equipment.getDefenseBonus(), equipment.getHpBonus());
   }
 
   /**
@@ -850,15 +799,15 @@ public class InventoryController {
 
     if (item instanceof GameEquipment equipment) {
       System.out.println("🏷️ 타입: " + getEquipmentTypeKorean(equipment.getEquipmentType()));
-      System.out.println("🔥 효과: " + getEquipmentEffectDescription(equipment));
+      System.out.println("🔥 효과: " + equipment.getEffectDescription());
 
       // 현재 착용 중인 같은 타입 장비와 비교
       GameEquipment currentEquipment = getCurrentEquipment(player, equipment.getEquipmentType());
       if (currentEquipment != null && !currentEquipment.getName().equals(equipment.getName())) {
-        System.out.println("\n🔄 현재 착용 중인 " + getEquipmentTypeKorean(equipment.getEquipmentType()) + ":");
-        System.out.println("   " + currentEquipment.getName() + " - " + getEquipmentEffectDescription(currentEquipment));
+        System.out.println("\n🔄 현재 착용 중인 " + getEquipmentTypeKorean(currentEquipment.getEquipmentType()) + ":");
+        System.out.println("   " + currentEquipment.getName() + " - " + currentEquipment.getEffectDescription());
 
-        if (isUpgrade(equipment, currentEquipment)) {
+        if (currentEquipment.isBetterThan(equipment)) {
           System.out.println("✅ 이 장비가 더 우수합니다!");
         } else {
           System.out.println("⚠️ 현재 장비가 더 우수합니다.");
@@ -883,27 +832,6 @@ public class InventoryController {
       case ARMOR -> player.getInventory().getEquippedArmor();
       case ACCESSORY -> player.getInventory().getEquippedAccessory();
     };
-  }
-
-  /**
-   * 장비 효과 설명을 생성합니다.
-   */
-  private String getEquipmentEffectDescription(GameEquipment equipment) {
-    StringBuilder effects = new StringBuilder();
-
-    if (equipment.getAttackBonus() > GameConstants.NUMBER_ZERO) {
-      effects.append("공격력 +").append(equipment.getAttackBonus()).append(" ");
-    }
-
-    if (equipment.getDefenseBonus() > GameConstants.NUMBER_ZERO) {
-      effects.append("방어력 +").append(equipment.getDefenseBonus()).append(" ");
-    }
-
-    if (equipment.getHpBonus() > GameConstants.NUMBER_ZERO) {
-      effects.append("체력 +").append(equipment.getHpBonus()).append(" ");
-    }
-
-    return effects.length() > GameConstants.NUMBER_ZERO ? effects.toString().trim() : "특별한 효과 없음";
   }
 
   // ==================== 공개 헬퍼 메서드들 ====================
@@ -984,6 +912,7 @@ public class InventoryController {
    */
   public String getInventorySummary(Player player) {
     PlayerInventory inventory = player.getInventory();
-    return String.format("인벤토리: %d/%d (%.0f%%) | 골드: %dG", inventory.getCurrentSize(), inventory.getMaxSize(), inventory.getUsageRate() * 100, player.getGold());
+    return String.format("인벤토리: %d/%d (%.0f%%) | 골드: %dG", inventory.getCurrentSize(), inventory.getMaxSize(), inventory.getUsageRate() * 100,
+        player.getGold());
   }
 }

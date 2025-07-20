@@ -28,6 +28,8 @@ import rpg.infrastructure.persistence.GameDataRepository;
 import rpg.presentation.controller.InventoryController;
 import rpg.presentation.controller.QuestController;
 import rpg.presentation.controller.ShopController;
+import rpg.presentation.menu.GameMenu;
+import rpg.presentation.menu.MainMenu;
 import rpg.shared.constant.SystemConstants;
 import rpg.shared.debug.DebugController;
 import rpg.shared.persistence.SaveGameController;
@@ -58,6 +60,9 @@ public class GameEngine {
   private DebugController debugController;
   private SaveGameController saveGameController;
 
+  private MainMenu mainMenu;
+  private GameMenu gameMenu;
+  
   public GameEngine() {
     this.gameRunning = true;
     this.inGameLoop = false;
@@ -76,6 +81,9 @@ public class GameEngine {
   private void initializeBasicControllers() {
     try {
       // 1단계: 플레이어 독립적인 컨트롤러들
+      mainMenu = new MainMenu();
+      gameMenu = new GameMenu();
+      
       inventoryController = new InventoryController();
       saveGameController = new SaveGameController();
 
@@ -127,11 +135,11 @@ public class GameEngine {
   public void start() {
     try {
       logger.info("게임 시작 (v" + SystemConstants.GAME_VERSION + ")");
-      showWelcomeMessage();
+      mainMenu.showWelcomeMessage();
 
       // 메인 메뉴 루프
       while (gameRunning) {
-        showMainMenu();
+        mainMenu.showMainMenu();
         int choice = InputValidator.getIntInput("선택: ", 1, 3);
 
         switch (choice) {
@@ -166,6 +174,8 @@ public class GameEngine {
       player = new Player(name);
       logger.info("새 플레이어 생성: {}", name);
 
+      gameStartTime = System.currentTimeMillis();
+      
       // 2단계: 플레이어 종속 컨트롤러들 초기화
       initializePlayerDependentControllers();
 
@@ -188,77 +198,6 @@ public class GameEngine {
       InputValidator.waitForAnyKey("계속하려면 Enter를 누르세요...");
     }
   }
-
-  /**
-   * 환영 메시지를 표시합니다.
-   */
-  private void showWelcomeMessage() {
-    System.out.println("====================================");
-    System.out.println("   🎮 RPG 게임 v" + SystemConstants.GAME_VERSION + "🎮   ");
-    System.out.println("====================================");
-
-    System.out.println("새로운 기능:");
-    System.out.println("• 📦 다중 저장 슬롯 시스템 (5개)");
-    System.out.println("• 🏗️ 개선된 아키텍처 (Controller 분리)");
-    System.out.println("• 🌟 향상된 탐험 시스템(탐험지역별 몬스터추가)");
-    System.out.println("• 🛍️ 확장된 상점 시스템(구매 / 판매)");
-    System.out.println("• 📋 고도화된 퀘스트 관리");
-    System.out.println("====================================");
-  }
-
-  /**
-   * 메인 메뉴를 표시합니다.
-   */
-  private void showMainMenu() {
-    System.out.println("\n=== 🎮 메인 메뉴 ===");
-    System.out.println("1. 🆕 새로하기");
-    System.out.println("2. 📁 불러오기");
-    System.out.println("3. 🚪 종료하기");
-    System.out.println("==================");
-  }
-
-
-  /**
-   * 새 게임을 시작합니다.
-   */
-  // private void startNewGame() {
-  // try {
-  // String name = InputValidator.getStringInput("캐릭터 이름을 입력하세요: ", 1, 20);
-  // player = new Player(name);
-  //
-  // // 게임 상태 초기화
-  // gameState = new GameState();
-  // gameStartTime = System.currentTimeMillis();
-  // currentSaveSlot = 0;
-  //
-  // // 🔥 시작 아이템으로 기본 물약 지급
-  // giveStartingItems();
-  //
-  // // 컨트롤러들에 새로운 게임 상태 적용
-  // updateControllersWithNewGameState();
-  //
-  // System.out.println("🎉 새로운 모험가 " + name + "님, 환영합니다!");
-  // player.displayStats();
-  //
-  // // 🆕 일일 퀘스트 초기 생성
-  // player.getQuestManager().generateDailyQuests(player);
-  //
-  // logger.info("새 게임 초기화 완료 - 일일 퀘스트 포함");
-  //
-  // // 시작 퀘스트 안내
-  // System.out.println("\n💡 퀘스트 메뉴에서 첫 번째 퀘스트를 수락해보세요!");
-  //
-  // logger.info("새 캐릭터 생성: {}", name);
-  //
-  // // 인게임 루프 시작
-  // startGameLoop();
-  //
-  // } catch (Exception e) {
-  // logger.error("새 게임 시작 실패", e);
-  // System.out.println("새 게임 시작 중 오류가 발생했습니다.");
-  // InputValidator.waitForAnyKey("계속하려면 Enter를 누르세요...");
-  // }
-  // }
 
   /**
    * 시작 아이템 지급
@@ -304,6 +243,7 @@ public class GameEngine {
       player = result.getPlayer();
       gameState = result.getGameState();
       currentSaveSlot = result.getSlotNumber();
+      gameStartTime = System.currentTimeMillis();
 
       // 2단계: 컨트롤러 재초기화
       initializePlayerDependentControllers();
@@ -373,7 +313,7 @@ public class GameEngine {
 
     while (inGameLoop && player.isAlive()) {
       try {
-        showInGameMenu();
+        gameMenu.showInGameMenu();
         int maxChoice = SystemConstants.DEBUG_MODE ? 99 : 13;
         int choice = InputValidator.getIntInput("선택: ", 1, maxChoice);
 
@@ -450,39 +390,6 @@ public class GameEngine {
     // 인게임 루프 종료 후 메인 메뉴로 복귀
     inGameLoop = false;
   }
-
-  /**
-   * 확장된 메인 메뉴를 표시합니다.
-   */
-  private void showInGameMenu() {
-    System.out.println("\n=== 🎯 게임 메뉴 ===");
-
-    // 탐험 관련
-    System.out.println("1. 🗡️ 탐험하기");
-    System.out.println("2. 📊 상태 확인");
-
-    // 관리 메뉴
-    System.out.println("3. 🎒 인벤토리");
-    System.out.println("4. ⚡ 스킬 관리");
-    System.out.println("5. 📋 퀘스트");
-    System.out.println("6. 🏪 상점");
-
-    // 정보 메뉴
-    System.out.println("7. 🗺️ 지역 정보");
-    System.out.println("8. 📚 몬스터 도감");
-
-    // 시스템 메뉴
-    System.out.println("9. 📁 저장 관리");
-    System.out.println("10. 🚪 게임 종료");
-    System.out.println("11. ❓ 도움말");
-
-    // 디버그 모드가 활성화된 경우에만 디버그 메뉴 표시
-    if (SystemConstants.DEBUG_MODE) {
-      System.out.println("99. 🔧 디버그 메뉴");
-    }
-    System.out.println("==================");
-  }
-
 
   /**
    * 지역별 몬스터를 표시합니다.
@@ -582,40 +489,6 @@ public class GameEngine {
     }
 
     System.out.println("=".repeat(50));
-  }
-
-  // === 헬퍼 메서드들 ===
-
-  private String getDangerLevel(String location) {
-    return switch (location) {
-      case "숲속 깊은 곳" -> "🟢 낮음";
-      case "어두운 동굴", "험준한 산길" -> "🟡 보통";
-      case "마법의 숲", "신비한 호수" -> "🟠 높음";
-      case "폐허가 된 성", "고대 유적" -> "🔴 매우 높음";
-      case "용암 동굴" -> "💀 극도로 높음";
-      default -> "❓ 알 수 없음";
-    };
-  }
-
-  private String getLocationRecommendation(String location, int playerLevel, int monsterCount) {
-    return monsterCount + "종의 몬스터 (레벨 " + playerLevel + " 적합)";
-  }
-
-  private String getUnsuitableReason(String location, int playerLevel) {
-    var allLocationMonsters = MonsterDataLoader.getMonstersByLocation(location);
-
-    if (allLocationMonsters.isEmpty()) {
-      return "몬스터 정보 없음";
-    }
-
-    int minLevel = allLocationMonsters.stream().mapToInt(MonsterData::getMinLevel).min().orElse(1);
-    int maxLevel = allLocationMonsters.stream().mapToInt(MonsterData::getMaxLevel).max().orElse(99);
-
-    if (playerLevel < minLevel) {
-      return "레벨이 너무 낮음 (최소 " + minLevel + " 필요)";
-    } else {
-      return "레벨이 너무 높음 (최대 " + maxLevel + " 권장)";
-    }
   }
 
   private String getRarityIcon(String rarity) {

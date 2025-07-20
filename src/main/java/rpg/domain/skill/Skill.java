@@ -92,12 +92,12 @@ public class Skill {
   }
   private SkillResult useAttackSkill(Player caster, Monster target) {
     int damage = (int) (caster.getAttack() * damageMultiplier);
-    target.takeDamage(damage);
+    int actualDamage = target.takeDamage(damage);
 
     String message = String.format("%s이(가) %s을(를) 사용하여 %s에게 %d의 데미지를 입혔습니다!", 
-                                   caster.getName(), name, target.getName(), damage);
+                                   caster.getName(), name, target.getName(), actualDamage);
 
-    logger.debug("공격 스킬 사용: {} -> {} (데미지: {})", name, target.getName(), damage);
+    logger.debug("공격 스킬 사용: {} -> {} (데미지: {})", name, target.getName(), actualDamage);
     return new SkillResult(true, message, damage);
   }
 

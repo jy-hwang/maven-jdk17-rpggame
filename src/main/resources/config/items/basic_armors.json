@@ -10,7 +10,8 @@
     "equipmentType": "ARMOR",
     "attackBonus": 0,
     "defenseBonus": 3,
-    "hpBonus": 10
+    "hpBonus": 10,
+    "mpBonus": 0
   },
   {
     "id": "LEATHER_ARMOR",
@@ -23,7 +24,8 @@
     "equipmentType": "ARMOR",
     "attackBonus": 0,
     "defenseBonus": 8,
-    "hpBonus": 20
+    "hpBonus": 20,
+    "mpBonus": 0
   },
   {
     "id": "CHAIN_MAIL",
@@ -36,7 +38,8 @@
     "equipmentType": "ARMOR",
     "attackBonus": 0,
     "defenseBonus": 15,
-    "hpBonus": 35
+    "hpBonus": 35,
+    "mpBonus": 0
   },
   {
     "id": "PLATE_ARMOR",
@@ -49,7 +52,8 @@
     "equipmentType": "ARMOR",
     "attackBonus": 0,
     "defenseBonus": 25,
-    "hpBonus": 60
+    "hpBonus": 60,
+    "mpBonus": 0
   },
   {
     "id": "DRAGON_SCALE_ARMOR",
@@ -62,7 +66,9 @@
     "equipmentType": "ARMOR",
     "attackBonus": 0,
     "defenseBonus": 40,
-    "hpBonus": 100
+    "hpBonus": 80,
+    "mpBonus": 80
+    
   },
   {
     "id": "MAGE_ROBE",
@@ -75,7 +81,8 @@
     "equipmentType": "ARMOR",
     "attackBonus": 0,
     "defenseBonus": 5,
-    "hpBonus": 30
+    "hpBonus": 0,
+    "mpBonus": 60
   },
   {
     "id": "ARCHMAGE_ROBE",
@@ -88,6 +95,7 @@
     "equipmentType": "ARMOR",
     "attackBonus": 0,
     "defenseBonus": 12,
-    "hpBonus": 50
+    "hpBonus": 50,
+    "mpBonus": 90
   }
 ]
