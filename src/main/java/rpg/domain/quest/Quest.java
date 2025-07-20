@@ -40,10 +40,15 @@ public class Quest {
 
   @JsonCreator
   public Quest(
-      // @fotmatter:off
-      @JsonProperty("id") String id, @JsonProperty("title") String title, @JsonProperty("description") String description, @JsonProperty("type") QuestType type,
-      @JsonProperty("requiredLevel") int requiredLevel, @JsonProperty("objectives") Map<String, Integer> objectives, @JsonProperty("reward") QuestReward reward
-  // @fotmatter:on
+// @fotmatter:off
+  @JsonProperty("id") String id
+, @JsonProperty("title") String title
+, @JsonProperty("description") String description
+, @JsonProperty("type") QuestType type
+, @JsonProperty("requiredLevel") int requiredLevel
+, @JsonProperty("objectives") Map<String, Integer> objectives
+, @JsonProperty("reward") QuestReward reward
+// @fotmatter:on
   ) {
     this.id = id;
     this.title = title;
@@ -100,8 +105,14 @@ public class Quest {
       for (Map.Entry<String, Integer> entry : objectives.entrySet()) {
         String key = entry.getKey();
         if (key.equals("reach_level")) {
-          currentProgress.put(key, player.getLevel());
-          logger.debug("레벨 퀘스트 {} 진행도 초기화: 현재 레벨 {}", this.id, player.getLevel());
+          int currentLevel = player.getLevel();
+          currentProgress.put(key, currentLevel);
+          logger.info("레벨 퀘스트 {} 진행도 초기화: 현재 레벨 {} (목표: {})", this.id, currentLevel, entry.getValue());
+
+          int storedLevel = currentProgress.get(key);
+          if (storedLevel != currentLevel) {
+            logger.error("레벨 진행도 저장 실패! 설정값: {}, 저장값: {}", currentLevel, storedLevel);
+          }
         }
       }
     }
@@ -289,7 +300,12 @@ public class Quest {
 
       // 레벨 퀘스트의 경우 특별 처리
       if (type == QuestType.LEVEL && key.equals("reach_level")) {
-        current = Math.max(currentProgress.getOrDefault(key, 1), 1);
+        current = currentProgress.getOrDefault(key, 0);
+
+        if (current == 0) {
+          logger.warn("레벨 퀘스트 {} 진행도가 0입니다. currentProgress 상태: {}", this.id, currentProgress);
+        }
+
         current = Math.min(current, target);
       } else {
         current = currentProgress.getOrDefault(key, GameConstants.NUMBER_ZERO);

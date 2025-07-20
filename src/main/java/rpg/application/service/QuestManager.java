@@ -182,14 +182,15 @@ public class QuestManager {
   /**
    * 특별한 장비 생성
    */
-  private GameEquipment createSpecialEquipment(String id, String name, String description, int value, ItemRarity rarity, GameEquipment.EquipmentType type, int attackBonus, int defenseBonus,
-      int hpBonus, int mpBonus) {
+  private GameEquipment createSpecialEquipment(String id, String name, String description, int value, ItemRarity rarity,
+      GameEquipment.EquipmentType type, int attackBonus, int defenseBonus, int hpBonus, int mpBonus) {
     try {
       return new GameEquipment(id, name, description, value, rarity, type, attackBonus, defenseBonus, hpBonus, mpBonus);
     } catch (Exception e) {
       logger.error("특별 장비 생성 실패: {}", name, e);
       // 기본 장비 반환
-      return new GameEquipment(id, "기본 " + name, "기본 장비", value / 2, ItemRarity.COMMON, type, Math.max(1, attackBonus / 2), Math.max(1, defenseBonus / 2), Math.max(1, hpBonus / 2), Math.max(1, mpBonus / 2));
+      return new GameEquipment(id, "기본 " + name, "기본 장비", value / 2, ItemRarity.COMMON, type, Math.max(1, attackBonus / 2),
+          Math.max(1, defenseBonus / 2), Math.max(1, hpBonus / 2), Math.max(1, mpBonus / 2));
     }
   }
 
@@ -305,8 +306,17 @@ public class QuestManager {
 
         // 레벨 퀘스트의 경우 추가적으로 진행도 업데이트
         if (quest.getType() == Quest.QuestType.LEVEL) {
+          quest.initializeLevelProgress(character);
+
           updateLevelProgress(character);
-          logger.debug("레벨 퀘스트 수락 후 진행도 업데이트: {} (현재 레벨: {})", quest.getTitle(), character.getLevel());
+
+          // 최종 진행도 확인
+          String progressWithPlayer = quest.getProgressDescription(character);
+          String progressWithoutPlayer = quest.getProgressDescription();
+
+          logger.info("레벨 퀘스트 수락 완료: {} (플레이어 레벨: {})", quest.getTitle(), character.getLevel());
+          logger.info("진행도 (플레이어 포함): {}", progressWithPlayer);
+          logger.info("진행도 (일반): {}", progressWithoutPlayer);
         }
 
         logger.info("퀘스트 수락: {} (캐릭터: {})", quest.getTitle(), character.getName());
@@ -780,7 +790,8 @@ public class QuestManager {
     }
 
 
-    logger.debug("퀘스트 데이터 교체 완료: 사용가능 {}개, 활성 {}개, 완료 {}개, 보상수령 {}개", availableQuests.size(), activeQuests.size(), completedQuests.size(), claimedRewardIds.size());
+    logger.debug("퀘스트 데이터 교체 완료: 사용가능 {}개, 활성 {}개, 완료 {}개, 보상수령 {}개", availableQuests.size(), activeQuests.size(), completedQuests.size(),
+        claimedRewardIds.size());
 
   }
 
@@ -900,7 +911,7 @@ public class QuestManager {
   public void refreshDailyQuests(Player character) {
     logger.info("일일 퀘스트 강제 새로고침...");
     cleanupExpiredQuests();
-    //generateDailyQuests(character);
+    // generateDailyQuests(character);
     System.out.println("✅ 일일 퀘스트가 새로고침되었습니다!");
   }
 
@@ -940,7 +951,8 @@ public class QuestManager {
 
   private void removeDuplicateQuests() {
     // 각 리스트에서 중복 제거
-    availableQuests = availableQuests.stream().collect(Collectors.toMap(Quest::getId, quest -> quest, (existing, replacement) -> existing)).values().stream().collect(Collectors.toList());
+    availableQuests = availableQuests.stream().collect(Collectors.toMap(Quest::getId, quest -> quest, (existing, replacement) -> existing)).values()
+        .stream().collect(Collectors.toList());
 
     // 다른 리스트들도 동일하게 처리
   }
@@ -1012,7 +1024,8 @@ public class QuestManager {
 
     @Override
     public String toString() {
-      return String.format("QuestStatistics{available=%d, active=%d, claimable=%d, claimed=%d, completion=%.1f%%}", availableCount, activeCount, claimableCount, claimedCount, getCompletionRate());
+      return String.format("QuestStatistics{available=%d, active=%d, claimable=%d, claimed=%d, completion=%.1f%%}", availableCount, activeCount,
+          claimableCount, claimedCount, getCompletionRate());
     }
   }
 
@@ -1101,7 +1114,8 @@ public class QuestManager {
     // 특별 일일 보상
     List<GameEffect> dailyEffects = List.of(GameEffectFactory.createHealHpEffect(50), GameEffectFactory.createGainExpEffect(150));
 
-    GameConsumable dailyPotion = createSpecialPotion("DAILY_SPECIAL_POTION", "일일 특제 물약", "하루 한 번 받을 수 있는 특별한 물약", 100, ItemRarity.UNCOMMON, dailyEffects);
+    GameConsumable dailyPotion =
+        createSpecialPotion("DAILY_SPECIAL_POTION", "일일 특제 물약", "하루 한 번 받을 수 있는 특별한 물약", 100, ItemRarity.UNCOMMON, dailyEffects);
 
     QuestReward reward = new QuestReward(100, 150, dailyPotion, 1);
 
@@ -1248,7 +1262,7 @@ public class QuestManager {
   }
 
   /**
-   * QuestManager에 추가할 새로운 메서드 - 플레이어 정보를 활용한 진행도 표시
+   * 플레이어 정보를 활용한 진행도 표시 - 수정됨
    */
   public void displayActiveQuestsWithPlayer(Player player) {
     System.out.println("\n=== 진행 중인 퀘스트 ===");
@@ -1260,9 +1274,16 @@ public class QuestManager {
         Quest quest = activeQuests.get(i);
         System.out.printf("%d. %s%n", i + 1, quest.getTitle());
 
-        // 플레이어 정보를 활용한 정확한 진행도 표시
-        if (player != null && quest.getType() == Quest.QuestType.LEVEL) {
-          System.out.printf("   진행도: %s%n", quest.getProgressDescription(player));
+        // ⭐ 수정: 레벨 퀘스트는 항상 플레이어 정보 포함 메서드 사용
+        if (quest.getType() == Quest.QuestType.LEVEL) {
+          String progress = quest.getProgressDescription(player);
+          System.out.printf("   진행도: %s (실시간 레벨 반영)%n", progress);
+
+          // 디버그 정보도 표시 (개발 중)
+          if (logger.isDebugEnabled()) {
+            String basicProgress = quest.getProgressDescription();
+            System.out.printf("   [디버그] 기본 진행도: %s%n", basicProgress);
+          }
         } else {
           System.out.printf("   진행도: %s%n", quest.getProgressDescription());
         }
