@@ -71,13 +71,14 @@ public class GameState {
     System.out.println("📋 완료한 퀘스트: " + questsCompleted + "개");
     System.out.println("⏰ 총 플레이 시간: " + totalPlayTime + "분");
 
-    // 추가 통계 정보
+    // 분당 통계 정보로 변경
     if (totalPlayTime > 0) {
-      double monstersPerHour = (double) monstersKilled / (totalPlayTime / 60.0);
-      double questsPerHour = (double) questsCompleted / (totalPlayTime / 60.0);
-      System.out.printf("📈 시간당 몬스터 처치: %.1f마리%n", monstersPerHour);
-      System.out.printf("📈 시간당 퀘스트 완료: %.1f개%n", questsPerHour);
+      double monstersPerMinute = (double) monstersKilled / totalPlayTime;
+      double questsPerMinute = (double) questsCompleted / totalPlayTime;
+      System.out.printf("📈 분당 몬스터 처치: %.2f마리%n", monstersPerMinute);
+      System.out.printf("📈 분당 퀘스트 완료: %.2f개%n", questsPerMinute);
     }
+
 
     System.out.println("==================");
   }
