@@ -174,6 +174,8 @@ public class GameEngine {
       player = new Player(name);
       logger.info("새 플레이어 생성: {}", name);
 
+      gameStartTime = System.currentTimeMillis();
+      
       // 2단계: 플레이어 종속 컨트롤러들 초기화
       initializePlayerDependentControllers();
 
@@ -241,6 +243,7 @@ public class GameEngine {
       player = result.getPlayer();
       gameState = result.getGameState();
       currentSaveSlot = result.getSlotNumber();
+      gameStartTime = System.currentTimeMillis();
 
       // 2단계: 컨트롤러 재초기화
       initializePlayerDependentControllers();
