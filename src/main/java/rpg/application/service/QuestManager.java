@@ -183,13 +183,13 @@ public class QuestManager {
    * 특별한 장비 생성
    */
   private GameEquipment createSpecialEquipment(String id, String name, String description, int value, ItemRarity rarity, GameEquipment.EquipmentType type, int attackBonus, int defenseBonus,
-      int hpBonus) {
+      int hpBonus, int mpBonus) {
     try {
-      return new GameEquipment(id, name, description, value, rarity, type, attackBonus, defenseBonus, hpBonus);
+      return new GameEquipment(id, name, description, value, rarity, type, attackBonus, defenseBonus, hpBonus, mpBonus);
     } catch (Exception e) {
       logger.error("특별 장비 생성 실패: {}", name, e);
       // 기본 장비 반환
-      return new GameEquipment(id, "기본 " + name, "기본 장비", value / 2, ItemRarity.COMMON, type, Math.max(1, attackBonus / 2), Math.max(1, defenseBonus / 2), Math.max(1, hpBonus / 2));
+      return new GameEquipment(id, "기본 " + name, "기본 장비", value / 2, ItemRarity.COMMON, type, Math.max(1, attackBonus / 2), Math.max(1, defenseBonus / 2), Math.max(1, hpBonus / 2), Math.max(1, mpBonus / 2));
     }
   }
 

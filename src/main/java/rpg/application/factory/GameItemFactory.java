@@ -164,9 +164,10 @@ public class GameItemFactory {
       // 🆕 스탯 정보 추출 (stats 필드 우선 사용)
       int attack = data.getAttackBonus(); // 이미 stats 필드를 우선 확인하는 로직 포함
       int defense = data.getDefenseBonus();
-      int magic = data.getMagicBonus();
+      int hpBonus = data.getHpBonus();
+      int mpBonus = data.getMpBonus();
 
-      return new GameEquipment(data.getId(), data.getName(), data.getDescription(), data.getValue(), data.getRarity(), equipType, attack, defense, magic);
+      return new GameEquipment(data.getId(), data.getName(), data.getDescription(), data.getValue(), data.getRarity(), equipType, attack, defense, hpBonus, mpBonus);
 
     } catch (Exception e) {
       logger.error("무기 아이템 생성 실패: {}", data.getName(), e);
@@ -184,10 +185,10 @@ public class GameItemFactory {
       // 🆕 스탯 정보 추출 (stats 필드 우선 사용)
       int attack = data.getAttackBonus();
       int defense = data.getDefenseBonus();
-      //int magic = data.getMagicBonus();
       int hpBonus = data.getHpBonus();
+      int mpBonus = data.getMpBonus();
 
-      return new GameEquipment(data.getId(), data.getName(), data.getDescription(), data.getValue(), data.getRarity(), equipType, attack, defense, hpBonus);
+      return new GameEquipment(data.getId(), data.getName(), data.getDescription(), data.getValue(), data.getRarity(), equipType, attack, defense, hpBonus, mpBonus);
 
     } catch (Exception e) {
       logger.error("방어구 아이템 생성 실패: {}", data.getName(), e);
@@ -205,10 +206,10 @@ public class GameItemFactory {
       // 🆕 스탯 정보 추출 (stats 필드 우선 사용)
       int attack = data.getAttackBonus();
       int defense = data.getDefenseBonus();
-      //int magic = data.getMagicBonus();
       int hpBonus = data.getHpBonus();
+      int mpBonus = data.getMpBonus();
 
-      return new GameEquipment(data.getId(), data.getName(), data.getDescription(), data.getValue(), data.getRarity(), equipType, attack, defense, hpBonus);
+      return new GameEquipment(data.getId(), data.getName(), data.getDescription(), data.getValue(), data.getRarity(), equipType, attack, defense, hpBonus, mpBonus);
 
     } catch (Exception e) {
       logger.error("액세서리 아이템 생성 실패: {}", data.getName(), e);
@@ -433,11 +434,7 @@ public class GameItemFactory {
   private void addDefaultItem(String id, String name, String description, String type, int value, ItemRarity rarity, boolean stackable, List<GameEffectData> effects, Integer cooldown,
       Map<String, Integer> stats) {
     try {
-      GameItemData item = new GameItemData(id, name, description, type, value, rarity.name(), stackable, effects, null, null, null, null, // 기존 장비 필드들
-                                                                                                                                          // (equipmentType,
-                                                                                                                                          // attackBonus,
-                                                                                                                                          // defenseBonus,
-                                                                                                                                          // hpBonus)
+      GameItemData item = new GameItemData(id, name, description, type, value, rarity.name(), stackable, effects, null, null, null, null, null, // 기존 장비 필드들 (equipmentType, attackBonus, defenseBonus, hpBonus, mpBonus)
           cooldown, stats, null // 🆕 새로운 필드들 (cooldown, stats, properties)
       );
       itemDatabase.put(id, item);
@@ -536,11 +533,11 @@ public class GameItemFactory {
       case UNCOMMON:
         return new GameConsumable(id, name, description, value, rarity, List.of(GameEffectFactory.createHealHpEffect(60)), 0);
       case RARE:
-        return new GameEquipment(id, name, description, value, rarity, GameEquipment.EquipmentType.ACCESSORY, 5, 5, 20);
+        return new GameEquipment(id, name, description, value, rarity, GameEquipment.EquipmentType.ACCESSORY, 5, 5, 20, 20);
       case EPIC:
-        return new GameEquipment(id, name, description, value, rarity, GameEquipment.EquipmentType.ACCESSORY, 10, 10, 50);
+        return new GameEquipment(id, name, description, value, rarity, GameEquipment.EquipmentType.ACCESSORY, 10, 10, 50, 50);
       case LEGENDARY:
-        return new GameEquipment(id, name, description, value, rarity, GameEquipment.EquipmentType.ACCESSORY, 20, 20, 100);
+        return new GameEquipment(id, name, description, value, rarity, GameEquipment.EquipmentType.ACCESSORY, 20, 20, 100, 100);
       default:
         return new GameConsumable(id, name, description, value, rarity, List.of(GameEffectFactory.createHealHpEffect(25)), 0);
     }

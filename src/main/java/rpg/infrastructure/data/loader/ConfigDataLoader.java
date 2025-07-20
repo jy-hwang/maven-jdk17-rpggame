@@ -258,17 +258,17 @@ public class ConfigDataLoader {
       Map<String, GameItemData> defaultWeapons = Map.of(
           "WOODEN_SWORD", new GameItemData(
               "WOODEN_SWORD", "나무 검", "초보자용 나무 검입니다", "EQUIPMENT", 30, "COMMON", 
-              false, null, "WEAPON", 5, 0, 0, 
+              false, null, "WEAPON", 5, 0, 0, 0,
               null, woodenSwordStats, null
           ),
           "IRON_SWORD", new GameItemData(
               "IRON_SWORD", "철 검", "날카로운 철로 만든 검입니다", "EQUIPMENT", 100, "UNCOMMON", 
-              false, null, "WEAPON", 12, 0, 0, 
+              false, null, "WEAPON", 12, 0, 0, 0,
               null, ironSwordStats, null
           ),
           "STEEL_SWORD", new GameItemData(
               "STEEL_SWORD", "강철 검", "단단한 강철로 제련한 고급 검입니다", "EQUIPMENT", 250, "RARE", 
-              false, null, "WEAPON", 20, 0, 0, 
+              false, null, "WEAPON", 20, 0, 0, 0,
               null, steelSwordStats, null
           )
       );
@@ -298,12 +298,12 @@ public class ConfigDataLoader {
       Map<String, GameItemData> defaultArmors = Map.of(
           "LEATHER_ARMOR", new GameItemData(
               "LEATHER_ARMOR", "가죽 갑옷", "질긴 가죽으로 만든 갑옷입니다", "EQUIPMENT", 60, "COMMON", 
-              false, null, "ARMOR", 0, 8, 20, 
+              false, null, "ARMOR", 0, 8, 20, 0,
               null, leatherArmorStats, null
           ),
           "CHAIN_MAIL", new GameItemData(
               "CHAIN_MAIL", "사슬 갑옷", "쇠사슬로 엮어 만든 갑옷입니다", "EQUIPMENT", 150, "UNCOMMON", 
-              false, null, "ARMOR", 0, 15, 25, 
+              false, null, "ARMOR", 0, 15, 25, 0,
               null, chainMailStats, null
           )
       );
@@ -332,7 +332,7 @@ public class ConfigDataLoader {
       Map<String, GameItemData> defaultAccessories = Map.of(
           "POWER_RING", new GameItemData(
               "POWER_RING", "힘의 반지", "착용자의 공격력을 높여주는 마법의 반지입니다", "EQUIPMENT", 200, "UNCOMMON", 
-              false, null, "ACCESSORY", 5, 0, 0, 
+              false, null, "ACCESSORY", 5, 0, 0, 0,
               null, powerRingStats, null
           )
       );
@@ -363,12 +363,12 @@ public class ConfigDataLoader {
       Map<String, GameItemData> defaultPotions = Map.of(
           "SMALL_HEALTH_POTION", new GameItemData(
               "HEALTH_POTION", "체력 물약", "HP를 30 회복합니다", "CONSUMABLE", 25, "COMMON", 
-              true, hpEffect, null, null, null, null, 
+              true, hpEffect, null, null, null, null, null,
               0, null, null  // 🆕 cooldown 추가
           ),
           "SMALL_MANA_POTION", new GameItemData(
               "MANA_POTION", "마나 물약", "MP를 20 회복합니다", "CONSUMABLE", 30, "COMMON", 
-              true, mpEffect, null, null, null, null, 
+              true, mpEffect, null, null, null, null, null,
               0, null, null  // 🆕 cooldown 추가
           )
       );

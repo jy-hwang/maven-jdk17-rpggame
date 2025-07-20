@@ -10,7 +10,8 @@
     "equipmentType": "ACCESSORY",
     "attackBonus": 5,
     "defenseBonus": 0,
-    "hpBonus": 0
+    "hpBonus": 0,
+    "mpBonus": 0
   },
   {
     "id": "DEFENSE_RING",
@@ -23,20 +24,22 @@
     "equipmentType": "ACCESSORY",
     "attackBonus": 0,
     "defenseBonus": 5,
-    "hpBonus": 0
+    "hpBonus": 0,
+    "mpBonus": 0
   },
   {
     "id": "LUCKY_CHARM",
     "name": "행운의 부적",
     "description": "착용자에게 행운을 가져다주는 신비한 부적입니다",
     "type": "ACCESSORY",
-    "value": 200,
+    "value": 300,
     "rarity": "UNCOMMON",
     "stackable": false,
     "equipmentType": "ACCESSORY",
     "attackBonus": 2,
     "defenseBonus": 2,
-    "hpBonus": 10
+    "hpBonus": 10,
+    "mpBonus": 10
   },
   {
     "id": "HEALTH_AMULET",
@@ -49,20 +52,35 @@
     "equipmentType": "ACCESSORY",
     "attackBonus": 0,
     "defenseBonus": 0,
-    "hpBonus": 20
+    "hpBonus": 20,
+    "mpBonus": 0
+  },  {
+    "id": "MANA_AMULET",
+    "name": "정신력의 목걸이",
+    "description": "착용자의 최대 마나를 증가시키는 목걸이입니다",
+    "type": "ACCESSORY",
+    "value": 300,
+    "rarity": "COMMON",
+    "stackable": false,
+    "equipmentType": "ACCESSORY",
+    "attackBonus": 0,
+    "defenseBonus": 0,
+    "hpBonus": 0,
+    "mpBonus": 20
   },
   {
     "id": "BALANCED_AMULET",
     "name": "균형의 목걸이",
     "description": "모든 능력치를 골고루 향상시키는 목걸이입니다",
     "type": "ACCESSORY",
-    "value": 450,
+    "value": 500,
     "rarity": "UNCOMMON",
     "stackable": false,
     "equipmentType": "ACCESSORY",
     "attackBonus": 5,
     "defenseBonus": 5,
-    "hpBonus": 20
+    "hpBonus": 20,
+    "mpBonus": 20
   },
   {
     "id": "BERSERKER_RING",
@@ -75,7 +93,8 @@
     "equipmentType": "ACCESSORY",
     "attackBonus": 12,
     "defenseBonus": -3,
-    "hpBonus": 0
+    "hpBonus": 0,
+    "mpBonus": 0
   },
   {
     "id": "GUARDIAN_AMULET",
@@ -88,7 +107,8 @@
     "equipmentType": "ACCESSORY",
     "attackBonus": 0,
     "defenseBonus": 8,
-    "hpBonus": 60
+    "hpBonus": 60,
+    "mpBonus": 0
   },
   {
     "id": "DRAGON_RING",
@@ -101,6 +121,7 @@
     "equipmentType": "ACCESSORY",
     "attackBonus": 30,
     "defenseBonus": 30,
-    "hpBonus": 100
+    "hpBonus": 100,
+    "mpBonus": 100
   }
 ]
