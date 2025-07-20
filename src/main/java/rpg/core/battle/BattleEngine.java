@@ -323,8 +323,8 @@ private void showBattleStatus(Player player, Monster monster) {
       player.setGold(player.getGold() + monster.getGoldReward());
 
       // 보상 표시 (색상 적용)
-      System.out.println(monster.getExpReward() + " 획득!");
-      System.out.println(monster.getGoldReward() + " 획득!");
+      System.out.println("경험치 : " + monster.getExpReward() + " 획득!");
+      System.out.println("골드 : " + monster.getGoldReward() + " 획득!");
 
       if (levelUp) {
         System.out.println("🎉 축하합니다! 레벨이 올랐습니다! 🎉");
