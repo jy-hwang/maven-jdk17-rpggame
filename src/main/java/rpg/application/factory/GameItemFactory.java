@@ -184,9 +184,10 @@ public class GameItemFactory {
       // 🆕 스탯 정보 추출 (stats 필드 우선 사용)
       int attack = data.getAttackBonus();
       int defense = data.getDefenseBonus();
-      int magic = data.getMagicBonus();
+      //int magic = data.getMagicBonus();
+      int hpBonus = data.getHpBonus();
 
-      return new GameEquipment(data.getId(), data.getName(), data.getDescription(), data.getValue(), data.getRarity(), equipType, attack, defense, magic);
+      return new GameEquipment(data.getId(), data.getName(), data.getDescription(), data.getValue(), data.getRarity(), equipType, attack, defense, hpBonus);
 
     } catch (Exception e) {
       logger.error("방어구 아이템 생성 실패: {}", data.getName(), e);
@@ -204,9 +205,10 @@ public class GameItemFactory {
       // 🆕 스탯 정보 추출 (stats 필드 우선 사용)
       int attack = data.getAttackBonus();
       int defense = data.getDefenseBonus();
-      int magic = data.getMagicBonus();
+      //int magic = data.getMagicBonus();
+      int hpBonus = data.getHpBonus();
 
-      return new GameEquipment(data.getId(), data.getName(), data.getDescription(), data.getValue(), data.getRarity(), equipType, attack, defense, magic);
+      return new GameEquipment(data.getId(), data.getName(), data.getDescription(), data.getValue(), data.getRarity(), equipType, attack, defense, hpBonus);
 
     } catch (Exception e) {
       logger.error("액세서리 아이템 생성 실패: {}", data.getName(), e);
