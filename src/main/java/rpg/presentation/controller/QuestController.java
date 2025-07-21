@@ -177,9 +177,9 @@ public class QuestController {
     System.out.println("🎯 목표: " + quest.getObjectiveDescription());
     if (quest.getType() == Quest.QuestType.LEVEL && currentPlayer != null) {
       System.out.println("📊 진행도: " + quest.getProgressDescription(currentPlayer));
-  } else {
+    } else {
       System.out.println("📊 진행도: " + quest.getProgressDescription());
-  }
+    }
     System.out.println("🏆 상태: " + getQuestStatusKorean(quest.getStatus()));
     System.out.println("⭐ 필요 레벨: " + quest.getRequiredLevel());
     System.out.println("🏷️ 타입: " + getQuestTypeKorean(quest.getType()));
@@ -393,26 +393,22 @@ public class QuestController {
   public boolean hasClaimableRewards() {
     return !questManager.getClaimableQuests().isEmpty();
   }
-  
+
   /**
    * 🔧 완료 가능한 퀘스트가 있는지 확인 (기존 hasClaimableRewards와 다름)
    * - hasClaimableRewards(): 보상 수령 대기 중인 퀘스트 (COMPLETED 상태)
    * - hasCompletableQuests(): 완료 조건 달성했지만 아직 ACTIVE 상태인 퀘스트
    */
   public boolean hasCompletableQuests() {
-      if (currentPlayer == null || currentPlayer.getQuestManager() == null) {
-          return false;
-      }
-      
-      List<Quest> activeQuests = currentPlayer.getQuestManager().getActiveQuests();
-      
-      return activeQuests.stream().anyMatch(quest -> 
-          quest != null && 
-          quest.getStatus() == Quest.QuestStatus.ACTIVE && 
-          quest.isCompleted()
-      );
+    if (currentPlayer == null || currentPlayer.getQuestManager() == null) {
+      return false;
+    }
+
+    List<Quest> activeQuests = currentPlayer.getQuestManager().getActiveQuests();
+
+    return activeQuests.stream().anyMatch(quest -> quest != null && quest.getStatus() == Quest.QuestStatus.ACTIVE && quest.isCompleted());
   }
-  
+
   /**
    * 퀘스트 매니저를 반환합니다. (다른 컨트롤러에서 필요한 경우)
    * 
@@ -438,49 +434,49 @@ public class QuestController {
 
     System.out.println("★".repeat(GameConstants.NUMBER_TWENTY));
   }
+
   /**
    * 🔧 퀘스트 완료 상태를 확인하고 자동으로 COMPLETED 상태로 변경
    * (기존 showQuestCompletionNotification과 연계하여 사용)
    */
   public void checkQuestCompletion() {
-      if (currentPlayer == null || currentPlayer.getQuestManager() == null) {
-          logger.warn("플레이어 또는 QuestManager가 null입니다.");
-          return;
+    if (currentPlayer == null || currentPlayer.getQuestManager() == null) {
+      logger.warn("플레이어 또는 QuestManager가 null입니다.");
+      return;
+    }
+
+    QuestManager playerQuestManager = currentPlayer.getQuestManager();
+    List<Quest> activeQuests = new ArrayList<>(playerQuestManager.getActiveQuests());
+    boolean anyQuestCompleted = false;
+
+    for (Quest quest : activeQuests) {
+      if (quest != null && quest.getStatus() == Quest.QuestStatus.ACTIVE && quest.isCompleted()) {
+
+        // 퀘스트를 COMPLETED 상태로 변경
+        quest.setStatus(Quest.QuestStatus.COMPLETED);
+        playerQuestManager.completeQuest(quest);
+
+        // 기존 메서드 활용
+        showQuestCompletionNotification(quest);
+
+        anyQuestCompleted = true;
+        logger.info("퀘스트 자동 완료: {} ({})", quest.getTitle(), quest.getId());
+      }
+    }
+
+    if (anyQuestCompleted) {
+      // 게임 통계 업데이트
+      if (gameState != null) {
+        gameState.incrementQuestsCompleted();
       }
 
-      QuestManager playerQuestManager = currentPlayer.getQuestManager();
-      List<Quest> activeQuests = new ArrayList<>(playerQuestManager.getActiveQuests());
-      boolean anyQuestCompleted = false;
-
-      for (Quest quest : activeQuests) {
-          if (quest != null && 
-              quest.getStatus() == Quest.QuestStatus.ACTIVE && 
-              quest.isCompleted()) {
-              
-              // 퀘스트를 COMPLETED 상태로 변경
-              quest.setStatus(Quest.QuestStatus.COMPLETED);
-              playerQuestManager.completeQuest(quest);
-              
-              // 기존 메서드 활용
-              showQuestCompletionNotification(quest);
-              
-              anyQuestCompleted = true;
-              logger.info("퀘스트 자동 완료: {} ({})", quest.getTitle(), quest.getId());
-          }
+      // 기존 메서드 활용
+      if (hasClaimableRewards()) {
+        System.out.println("💡 퀘스트 메뉴에서 완료된 퀘스트의 보상을 수령하세요!");
       }
-
-      if (anyQuestCompleted) {
-          // 게임 통계 업데이트
-          if (gameState != null) {
-              gameState.incrementQuestsCompleted();
-          }
-          
-          // 기존 메서드 활용
-          if (hasClaimableRewards()) {
-              System.out.println("💡 퀘스트 메뉴에서 완료된 퀘스트의 보상을 수령하세요!");
-          }
-      }
+    }
   }
+
   /**
    * 퀘스트 힌트를 표시합니다.
    */
@@ -689,9 +685,33 @@ public class QuestController {
   }
 
   /**
+   * 보물 상자 발견 시 호출되는 메서드
+   */
+  public void onTreasureChestFound(String locationName) {
+    // "find_TREASURE_CHEST" 퀘스트 목표 업데이트
+    questManager.updateCustomProgress("find_TREASURE_CHEST", 1);
+
+    // 보물 관련 일반 진행도도 함께 업데이트
+    updateTreasureProgress(1);
+
+    // 특정 지역에서 보물 상자 발견 관련 퀘스트 체크
+    if (locationName != null) {
+      updateCustomProgress("find_TREASURE_CHEST_in", locationName, 1);
+    }
+
+    logger.info("보물 상자 발견 퀘스트 진행도 업데이트: {}", locationName != null ? locationName : "일반");
+  }
+
+  /**
    * 보물 발견 시 호출
    */
   public void onTreasureFound(String treasureName, String locationName) {
+    // 보물 상자인 경우 특별 처리
+    if ("TREASURE_CHEST".equals(treasureName)) {
+        onTreasureChestFound(locationName);
+        return;
+    }
+    
     updateTreasureProgress(1);
 
     // 특정 보물이나 지역 관련 퀘스트 체크

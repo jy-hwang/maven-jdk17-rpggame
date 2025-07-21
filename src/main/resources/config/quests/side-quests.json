@@ -39,7 +39,7 @@
     "requiredLevel": 4,
     "category": "SIDE",
     "objectives": {
-      "find_treasure_chest": 1
+      "find_TREASURE_CHEST": 1
     },
     "reward": {
       "experience": 300,

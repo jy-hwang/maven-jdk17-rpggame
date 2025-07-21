@@ -1,8 +1,35 @@
 [
   {
+    "id": "TREASURE_CHEST",
+    "name": "보물 상자",
+    "description": "신비한 보물들이 들어있는 상자입니다",
+    "type": "CONSUMABLE",
+    "value": 200,
+    "rarity": "RARE",
+    "stackable": true,
+    "effects": [
+      {
+        "type": "OPEN_CHEST",
+        "value": 1
+      }
+    ],
+    "cooldown": 0,
+    "category": "treasure",
+    "properties": {
+      "source": "exploration",
+      "dropChance": 0.15,
+      "container": true,
+      "contains": [
+        "PREMIUM_HEALTH_POTION",
+        "MYSTICAL_POTION",
+        "CRYSTAL_VIAL"
+      ]
+    }
+  },
+  {
     "id": "PREMIUM_HEALTH_POTION",
     "name": "고급 체력 물약",
-    "description": "HP를 100 회복합니다",
+    "description": "HP와 MP를 50 회복합니다",
     "type": "CONSUMABLE",
     "value": 50,
     "rarity": "UNCOMMON",
@@ -10,14 +37,18 @@
     "effects": [
       {
         "type": "HEAL_HP",
-        "value": 100
+        "value": 50
+      },
+      {
+        "type": "HEAL_MP",
+        "value": 50
       }
     ],
     "cooldown": 0,
     "category": "treasure",
     "properties": {
-      "source": "treasure_chest",
-      "dropChance": 0.3
+      "source": "TREASURE_CHEST",
+      "dropChance": 0.7
     }
   },
   {
@@ -41,8 +72,8 @@
     "cooldown": 1,
     "category": "treasure",
     "properties": {
-      "source": "special_merchant",
-      "magical": true
+      "source": "TREASURE_CHEST",
+      "dropChance": 0.5
     }
   },
   {
@@ -51,7 +82,7 @@
     "description": "모든 능력을 일시적으로 회복합니다",
     "type": "CONSUMABLE",
     "value": 120,
-    "rarity": "EPIC",
+    "rarity": "RARE",
     "stackable": true,
     "effects": [
       {
@@ -60,18 +91,18 @@
       },
       {
         "type": "HEAL_MP",
-        "value": 80
+        "value": 150
       },
       {
         "type": "GAIN_EXP",
-        "value": 25
+        "value": 200
       }
     ],
     "cooldown": 3,
     "category": "treasure",
     "properties": {
-      "source": "crystal_cave",
-      "rare_find": true
+      "source": "TREASURE_CHEST",
+      "dropChance": 0.5
     }
   }
 ]

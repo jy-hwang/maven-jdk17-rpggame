@@ -128,25 +128,65 @@ public class ExploreEngine {
     return eventHandlers.get(eventType).apply(player, location);
   }
 
-  // === 개별 이벤트 핸들러들 (기존과 동일하지만 메서드 시그니처 통일) ===
-
   private ExploreResultData handleTreasureEvent(Player player, LocationData location) {
     System.out.println("✨ " + location.getNameKo() + "에서 보물을 발견했습니다!");
 
-    ItemRarity rarity = calculateTreasureRarity(location);
-    GameItem treasure = GameItemFactory.getInstance().createRandomItemByRarity(rarity);
+    // 보물 상자 발견 확률 (지역 난이도에 따라 조정)
+    double treasureChestChance = calculateTreasureChestChance(location);
+    boolean foundTreasureChest = random.nextDouble() < treasureChestChance;
 
-    if (treasure != null && inventoryController.addItem(player, treasure, 1)) {
-      questController.updateCollectionProgress(player, treasure.getId(), 1);
-      System.out.println("🎁 " + treasure.getName() + "을(를) 획득했습니다!");
-
-      String message = "보물 발견! " + treasure.getName() + " 획득!";
-      logger.info("보물 이벤트: {} -> {} ({})", player.getName(), treasure.getName(), treasure.getId());
-      return new ExploreResultData(ExploreResult.TREASURE, message);
+    if (foundTreasureChest) {
+        // 보물 상자 발견
+        System.out.println("📦 보물 상자를 발견했습니다!");
+        
+        // 보물 상자 아이템 생성 및 추가
+        GameItem treasureChest = GameItemFactory.getInstance().createTreasureChestItem();
+        
+        if (treasureChest != null && inventoryController.addItem(player, treasureChest, 1)) {
+            // 보물 상자 관련 퀘스트 진행도 업데이트
+            questController.onTreasureChestFound(location.getNameKo());
+            
+            System.out.println("🎁 " + treasureChest.getName() + "을(를) 획득했습니다!");
+            
+            String message = "보물 상자 발견! " + treasureChest.getName() + " 획득!";
+            logger.info("보물 상자 이벤트: {} -> {} ({})", player.getName(), treasureChest.getName(), treasureChest.getId());
+            return new ExploreResultData(ExploreResult.TREASURE, message);
+            
+        } else {
+            return new ExploreResultData(ExploreResult.TREASURE, "보물 상자를 발견했지만 인벤토리가 가득 참!");
+        }
     } else {
-      return new ExploreResultData(ExploreResult.TREASURE, "보물을 발견했지만 인벤토리가 가득 참!");
+        // 일반 보물 아이템 발견
+        ItemRarity rarity = calculateTreasureRarity(location);
+        GameItem treasure = GameItemFactory.getInstance().createRandomItemByRarity(rarity);
+
+        if (treasure != null && inventoryController.addItem(player, treasure, 1)) {
+            questController.updateCollectionProgress(player, treasure.getId(), 1);
+            System.out.println("🎁 " + treasure.getName() + "을(를) 획득했습니다!");
+
+            String message = "보물 발견! " + treasure.getName() + " 획득!";
+            logger.info("보물 이벤트: {} -> {} ({})", player.getName(), treasure.getName(), treasure.getId());
+            return new ExploreResultData(ExploreResult.TREASURE, message);
+        } else {
+            return new ExploreResultData(ExploreResult.TREASURE, "보물을 발견했지만 인벤토리가 가득 참!");
+        }
     }
-  }
+}
+
+/**
+ * 지역 난이도에 따른 보물 상자 발견 확률 계산
+ */
+private double calculateTreasureChestChance(LocationData location) {
+    return switch (location.getDangerLevel()) {
+        case EASY -> 0.10;      // 10% 확률
+        case NORMAL -> 0.15;    // 15% 확률  
+        case HARD -> 0.20;      // 20% 확률
+        case VERY_HARD -> 0.25; // 25% 확률
+        case EXTREME -> 0.30;   // 30% 확률
+        case NIGHTMARE -> 0.35; // 35% 확률
+      default -> throw new IllegalArgumentException("Unexpected value: " + location.getDangerLevel());
+    };
+}
 
   private ExploreResultData handleKnowledgeEvent(Player player, LocationData location) {
     System.out.println("📚 " + location.getNameKo() + "에서 고대의 지식을 얻었습니다!");

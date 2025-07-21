@@ -15,7 +15,7 @@
     },
     "category": "treasure",
     "properties": {
-      "source": "treasure_chest",
+      "source": "TREASURE_CHEST",
       "material": "silver",
       "blessed": true
     }
