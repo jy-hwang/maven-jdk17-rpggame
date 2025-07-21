@@ -421,8 +421,8 @@ public class SaveGameController {
 
       // 스탯 정보
       System.out.println("\n📊 스탯 정보:");
-      System.out.printf("   ❤️ 체력: %d/%d\n", player.getHp(), player.getMaxHp());
-      System.out.printf("   💙 마나: %d/%d\n", player.getMana(), player.getMaxMana());
+      System.out.printf("   ❤️ HP: %d/%d\n", player.getHp(), player.getMaxHp());
+      System.out.printf("   💙 MP: %d/%d\n", player.getMp(), player.getMaxMp());
       System.out.printf("   ⚔️ 공격력: %d\n", player.getAttack());
       System.out.printf("   🛡️ 방어력: %d\n", player.getTotalDefense());
 

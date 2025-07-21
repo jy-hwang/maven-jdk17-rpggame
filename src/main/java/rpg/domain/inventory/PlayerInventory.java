@@ -276,26 +276,30 @@ public class PlayerInventory {
     int attackBonus = GameConstants.NUMBER_ZERO;
     int defenseBonus = GameConstants.NUMBER_ZERO;
     int hpBonus = GameConstants.NUMBER_ZERO;
+    int mpBonus = GameConstants.NUMBER_ZERO;
 
     if (equippedWeapon != null) {
       attackBonus += equippedWeapon.getAttackBonus();
       defenseBonus += equippedWeapon.getDefenseBonus();
       hpBonus += equippedWeapon.getHpBonus();
+      mpBonus += equippedWeapon.getMpBonus();
     }
 
     if (equippedArmor != null) {
       attackBonus += equippedArmor.getAttackBonus();
       defenseBonus += equippedArmor.getDefenseBonus();
       hpBonus += equippedArmor.getHpBonus();
+      mpBonus += equippedArmor.getMpBonus();
     }
 
     if (equippedAccessory != null) {
       attackBonus += equippedAccessory.getAttackBonus();
       defenseBonus += equippedAccessory.getDefenseBonus();
       hpBonus += equippedAccessory.getHpBonus();
+      mpBonus += equippedAccessory.getMpBonus();
     }
 
-    return new EquipmentBonus(attackBonus, defenseBonus, hpBonus);
+    return new EquipmentBonus(attackBonus, defenseBonus, hpBonus, mpBonus);
   }
 
   /**
@@ -419,6 +423,7 @@ public class PlayerInventory {
     private final int attackBonus;
     private final int defenseBonus;
     private final int hpBonus;
+    private final int mpBonus;
 
     // Jackson 역직렬화용 생성자 추가
     @JsonCreator
@@ -427,11 +432,13 @@ public class PlayerInventory {
   @JsonProperty("attackBonus") int attackBonus
 , @JsonProperty("defenseBonus") int defenseBonus
 , @JsonProperty("hpBonus") int hpBonus
+, @JsonProperty("mpBonus") int mpBonus
 //@formatter:on
     ) {
       this.attackBonus = attackBonus;
       this.defenseBonus = defenseBonus;
       this.hpBonus = hpBonus;
+      this.mpBonus = mpBonus;
     }
 
     public int getAttackBonus() {
@@ -444,6 +451,10 @@ public class PlayerInventory {
 
     public int getHpBonus() {
       return hpBonus;
+    }
+    
+    public int getMpBonus() {
+      return mpBonus;
     }
   }
 

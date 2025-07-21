@@ -9,8 +9,8 @@ public class PlayerDto {
   private int level;
   private int hp;
   private int maxHp;
-  private int mana;
-  private int maxMana;
+  private int mp;
+  private int maxMp;
   private double restoreHp;
   private double restoreMana;
   private int exp;
@@ -31,8 +31,8 @@ public class PlayerDto {
 , @JsonProperty("level") int level
 , @JsonProperty("hp") int hp
 , @JsonProperty("maxHp") int maxHp
-, @JsonProperty("mana") int mana
-, @JsonProperty("maxMana") int maxMana
+, @JsonProperty("mp") int mp
+, @JsonProperty("maxMp") int maxMp
 , @JsonProperty("restoreHp") double restoreHp
 , @JsonProperty("restoreMana") double restoreMana
 , @JsonProperty("exp") int exp
@@ -49,8 +49,8 @@ public class PlayerDto {
       this.level = level;
       this.hp = hp;
       this.maxHp = maxHp;
-      this.mana = mana;
-      this.maxMana = maxMana;
+      this.mp = mp;
+      this.maxMp = maxMp;
       this.restoreHp = restoreHp;
       this.restoreMana = restoreMana;
       this.exp = exp;
@@ -95,20 +95,20 @@ public class PlayerDto {
     this.maxHp = maxHp;
   }
 
-  public int getMana() {
-    return mana;
+  public int getMp() {
+    return mp;
   }
 
-  public void setMana(int mana) {
-    this.mana = mana;
+  public void setMp(int mp) {
+    this.mp = mp;
   }
 
-  public int getMaxMana() {
-    return maxMana;
+  public int getMaxMp() {
+    return maxMp;
   }
 
-  public void setMaxMana(int maxMana) {
-    this.maxMana = maxMana;
+  public void setMaxMp(int maxMp) {
+    this.maxMp = maxMp;
   }
 
   public double getRestoreHp() {

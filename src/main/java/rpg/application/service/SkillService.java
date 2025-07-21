@@ -176,7 +176,7 @@ public class SkillService {
 
     // 마나 확인
     int manaCost = (Integer) skillInfo.get("manaCost");
-    if (character.getMana() < manaCost) {
+    if (character.getMp() < manaCost) {
       return false;
     }
 
@@ -269,7 +269,7 @@ public class SkillService {
         status = " (레벨 부족)";
       } else if (skillCooldowns.getOrDefault(skillId, 0) > 0) {
         status = " (쿨다운: " + skillCooldowns.get(skillId) + "턴)";
-      } else if (character.getMana() < manaCost) {
+      } else if (character.getMp() < manaCost) {
         status = " (마나 부족)";
       } else {
         status = " (사용 가능)";

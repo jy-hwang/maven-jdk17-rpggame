@@ -82,7 +82,7 @@
     "attackBonus": 0,
     "defenseBonus": 5,
     "hpBonus": 0,
-    "mpBonus": 60
+    "mpBonus": 30
   },
   {
     "id": "ARCHMAGE_ROBE",
@@ -95,7 +95,7 @@
     "equipmentType": "ARMOR",
     "attackBonus": 0,
     "defenseBonus": 12,
-    "hpBonus": 50,
-    "mpBonus": 90
+    "hpBonus": 10,
+    "mpBonus": 60
   }
 ]

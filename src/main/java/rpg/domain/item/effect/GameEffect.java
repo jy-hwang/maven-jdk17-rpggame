@@ -195,9 +195,9 @@ public interface GameEffect {
 
     return switch (getType()) {
       case HEAL_HP -> target.getHp() < target.getTotalMaxHp();
-      case HEAL_MP -> target.getMana() < target.getMaxMana();
+      case HEAL_MP -> target.getMp() < target.getMaxMp();
       case HEAL_HP_PERCENT -> target.getHp() < target.getTotalMaxHp();
-      case HEAL_MP_PERCENT -> target.getMana() < target.getMaxMana();
+      case HEAL_MP_PERCENT -> target.getMp() < target.getMaxMp();
       case GAIN_EXP -> true;
       case REVIVE -> !target.isAlive();
       default -> true; // 미구현 효과들은 일단 true

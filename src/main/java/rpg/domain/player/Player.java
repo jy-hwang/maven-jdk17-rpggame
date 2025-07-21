@@ -20,8 +20,8 @@ public class Player {
   private int level;
   private int hp;
   private int maxHp;
-  private int mana;
-  private int maxMana;
+  private int mp;
+  private int maxMp;
   private int exp;
   private int baseAttack;
   private int baseDefense;
@@ -46,8 +46,8 @@ public class Player {
     this.level = GameConstants.INITIAL_LEVEL;
     this.maxHp = GameConstants.INITIAL_MAX_HP;
     this.hp = maxHp;
-    this.maxMana = GameConstants.INITIAL_MAX_MANA;
-    this.mana = maxMana;
+    this.maxMp = GameConstants.INITIAL_MAX_MP;
+    this.mp = maxMp;
     this.exp = GameConstants.INITIAL_EXP;
     this.baseAttack = GameConstants.INITIAL_ATTACK;
     this.baseDefense = GameConstants.INITIAL_DEFENSE;
@@ -72,8 +72,8 @@ public class Player {
 , @JsonProperty("level") int level
 , @JsonProperty("hp") int hp
 , @JsonProperty("maxHp") int maxHp
-, @JsonProperty("mana") int mana
-, @JsonProperty("maxMana") int maxMana
+, @JsonProperty("mp") int mp
+, @JsonProperty("maxMp") int maxMp
 , @JsonProperty("restoreHp") double restoreHp
 , @JsonProperty("restoreMana") double restoreMana
 , @JsonProperty("exp") int exp
@@ -97,8 +97,8 @@ public class Player {
     this.level = level;
     this.hp = Math.max(GameConstants.NUMBER_ZERO, hp);
     this.maxHp = Math.max(GameConstants.NUMBER_ONE, maxHp);
-    this.mana = Math.max(GameConstants.NUMBER_ZERO, mana);
-    this.maxMana = Math.max(GameConstants.NUMBER_ZERO, maxMana);
+    this.mp = Math.max(GameConstants.NUMBER_ZERO, mp);
+    this.maxMp = Math.max(GameConstants.NUMBER_ZERO, maxMp);
     this.restoreHp = Math.max(GameConstants.NUMBER_ONE, restoreHp);
     this.restoreMana = Math.max(GameConstants.NUMBER_ONE, restoreMana);
     this.exp = Math.max(GameConstants.NUMBER_ZERO, exp);
@@ -188,17 +188,17 @@ public class Player {
 
       // 스탯 증가
       maxHp += GameConstants.LEVEL_UP_HP_BONUS;
-      maxMana += GameConstants.LEVEL_UP_MANA_BONUS;
+      maxMp += GameConstants.LEVEL_UP_MANA_BONUS;
       baseAttack += GameConstants.LEVEL_UP_ATTACK_BONUS;
       baseDefense += GameConstants.LEVEL_UP_DEFENSE_BONUS;
 
       // 자체 회복량 증가
       restoreHp += GameConstants.LEVEL_UP_RESTORE_HP;
-      restoreMana += GameConstants.LEVEL_UP_RESTORE_MANA;
+      restoreMana += GameConstants.LEVEL_UP_RESTORE_MP;
 
       // 체력과 마나 완전 회복
       hp = getTotalMaxHp();
-      mana = maxMana;
+      mp = getTotalMaxMp();
 
       System.out.println("🎉 레벨업! 새로운 레벨: " + level);
       System.out.println("💚 체력과 마나가 완전 회복되었습니다!");
@@ -217,7 +217,7 @@ public class Player {
         System.out.println("🎉 레벨업으로 새로운 일일 퀘스트가 해금되었을 수 있습니다!");
       }
 
-      logger.info("{} 레벨업 완료 - 레벨: {}, 최대HP: {}, 최대마나: {}, 공격력: {}, 방어력: {}", name, level, maxHp, maxMana, baseAttack, baseDefense);
+      logger.info("{} 레벨업 완료 - 레벨: {}, 최대HP: {}, 최대MP: {}, 공격력: {}, 방어력: {}", name, level, maxHp, maxMp, baseAttack, baseDefense);
 
     } catch (Exception e) {
       logger.error("레벨업 처리 중 오류 발생", e);
@@ -242,16 +242,16 @@ public class Player {
   /**
    * 마나를 회복합니다.
    */
-  public void restoreMana(int amount) {
+  public void restoreMp(int amount) {
     if (amount < GameConstants.NUMBER_ZERO) {
       logger.warn("음수 마나 회복 시도: {}", amount);
       throw new IllegalArgumentException("마나 회복량은 " + GameConstants.NUMBER_ZERO + " 이상이어야 합니다.");
     }
 
-    int oldMana = this.mana;
-    this.mana = Math.min(mana + amount, maxMana);
+    int oldMp = this.mp;
+    this.mp = Math.min(oldMp + amount, maxMp);
 
-    logger.debug("{} 마나 회복: {} -> {} (+{})", name, oldMana, this.mana, amount);
+    logger.debug("{} 마나 회복: {} -> {} (+{}), 최대MP: {}", name, oldMp, this.mp, amount, getTotalMaxMp());
   }
 
   /**
@@ -259,25 +259,26 @@ public class Player {
    */
   public void fullHeal() {
     int oldHp = this.hp;
+    int oldMp = this.mp;
     this.hp = getTotalMaxHp(); // 장비 보너스 포함한 최대 체력으로 회복
-    this.mana = maxMana;
+    this.mp = getTotalMaxMp();
 
-    logger.info("{} 완전 회복: HP {} -> {}, MP {} -> {}", name, oldHp, this.hp, mana, maxMana);
+    logger.info("{} 완전 회복: HP {} -> {}, MP {} -> {}", name, oldHp, this.hp, oldMp, maxMp);
     System.out.println("💚 체력과 마나가 완전 회복되었습니다!");
   }
 
   /**
    * 마나를 소모합니다.
    */
-  public boolean useMana(int amount) {
+  public boolean useMp(int amount) {
     if (amount < GameConstants.NUMBER_ZERO) {
-      logger.warn("음수 마나 소모 시도: {}", amount);
+      logger.warn("음수 MP 소모 시도: {}", amount);
       return false;
     }
 
-    if (mana >= amount) {
-      mana -= amount;
-      logger.debug("{} 마나 소모: {} (-{})", name, mana, amount);
+    if (mp >= amount) {
+      mp -= amount;
+      logger.debug("{} MP 소모: {} (-{})", name, mp, amount);
       return true;
     }
 
@@ -333,11 +334,19 @@ public class Player {
   }
 
   /**
-   * 총 최대 체력을 반환합니다 (기본 최대 체력 + 장비 보너스).
+   * 총 최대 HP을 반환합니다 (기본 최대 HP + 장비 보너스).
    */
   public int getTotalMaxHp() {
     PlayerInventory.EquipmentBonus bonus = inventory.getTotalBonus();
     return maxHp + bonus.getHpBonus();
+  }
+  
+  /**
+   * 총 최대 MP을 반환합니다 (기본 최대 MP + 장비 보너스).
+   */
+  public int getTotalMaxMp() {
+    PlayerInventory.EquipmentBonus bonus = inventory.getTotalBonus();
+    return maxMp + bonus.getMpBonus();
   }
 
   /**
@@ -350,13 +359,16 @@ public class Player {
       System.out.println("========== 캐릭터 정보 ==========");
       System.out.println("이름: " + name);
       System.out.println("레벨: " + level);
-      System.out.printf("체력: %d/%d", hp, getTotalMaxHp());
+      System.out.printf("HP: %d/%d", hp, getTotalMaxHp());
       if (bonus.getHpBonus() > GameConstants.NUMBER_ZERO) {
         System.out.printf(" (%d+%d)", maxHp, bonus.getHpBonus());
       }
       System.out.println();
 
-      System.out.printf("마나: %d/%d%n", mana, maxMana);
+      System.out.printf("MP: %d/%d%n", mp, maxMp);
+      if (bonus.getMpBonus() > GameConstants.NUMBER_ZERO) {
+        System.out.printf(" (%d+%d)", maxMp, bonus.getMpBonus());
+      }
       System.out.printf("체력회복량: %.1f, 마나회복량: %.1f%n", restoreHp, restoreMana);
       System.out.printf("경험치: %d/%d%n", exp, getExpRequiredForNextLevel());
 
@@ -413,12 +425,12 @@ public class Player {
     return maxHp;
   }
 
-  public int getMana() {
-    return mana;
+  public int getMp() {
+    return mp;
   }
 
-  public int getMaxMana() {
-    return maxMana;
+  public int getMaxMp() {
+    return maxMp;
   }
 
   public double getRestoreHp() {
@@ -509,10 +521,10 @@ public class Player {
     int hpRegenAmount = (int) Math.max(GameConstants.NUMBER_ONE, Math.round(maxHp * this.restoreHp / 100.0));
     heal(hpRegenAmount);
 
-    int manaRegenAmount = (int) Math.max(GameConstants.NUMBER_ONE, Math.round(maxMana * this.restoreMana / 100.0));
-    restoreMana(manaRegenAmount);
+    int mpRegenAmount = (int) Math.max(GameConstants.NUMBER_ONE, Math.round(maxMp * this.restoreMana / 100.0));
+    restoreMp(mpRegenAmount);
 
-    logger.debug("{} 전투 후 체력 회복량 : {}, 마나 회복량 : {}", name, hpRegenAmount, manaRegenAmount);
+    logger.debug("{} 전투 후 체력 회복량 : {}, 마나 회복량 : {}", name, hpRegenAmount, mpRegenAmount);
   }
 
   /**
@@ -567,5 +579,13 @@ public class Player {
     logger.debug("{} 로드 후 초기화 완료", name);
   }
 
-
+  @Override
+  public String toString() {
+    return "Player [name=" + name + ", level=" + level + ", hp=" + hp + ", maxHp=" + maxHp + ", mp=" + mp + ", maxMp=" + maxMp + ", exp=" + exp
+        + ", baseAttack=" + baseAttack + ", baseDefense=" + baseDefense + ", gold=" + gold + ", restoreHp=" + restoreHp + ", restoreMana="
+        + restoreMana + ", inventory=" + inventory + ", skillManager=" + skillManager + ", playerStatusCondition=" + playerStatusCondition
+        + ", questManager=" + questManager + "]";
+  }
+  
+  
 }

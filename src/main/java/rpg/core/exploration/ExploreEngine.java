@@ -207,7 +207,7 @@ private double calculateTreasureChestChance(LocationData location) {
     int healAmount = recovery[0], manaAmount = recovery[1];
 
     player.heal(healAmount);
-    player.restoreMana(manaAmount);
+    player.restoreMp(manaAmount);
 
     System.out.println("💤 체력과 마나가 회복되었습니다! (HP +" + healAmount + ", MP +" + manaAmount + ")");
     logger.info("휴식 이벤트: {} -> HP+{}, MP+{} ({})", player.getName(), healAmount, manaAmount, location.getId());
@@ -230,8 +230,8 @@ private double calculateTreasureChestChance(LocationData location) {
   private ExploreResultData handleMagicCrystalEvent(Player player, LocationData location) {
     System.out.println("💎 " + location.getNameKo() + "에서 빛나는 마법 크리스탈을 발견했습니다!");
 
-    int manaAmount = player.getMaxMana() - player.getMana();
-    player.restoreMana(manaAmount);
+    int manaAmount = player.getMaxMp() - player.getMp();
+    player.restoreMp(manaAmount);
 
     System.out.println("✨ 마나가 완전히 회복되었습니다!");
     logger.info("마법 크리스탈 이벤트: {} -> MP 완전 회복 ({})", player.getName(), location.getId());
@@ -276,24 +276,26 @@ private double calculateTreasureChestChance(LocationData location) {
 
     String message = switch (blessing) {
       case "strength" -> {
-        System.out.println("⚔️ 힘의 축복을 받았습니다! 공격력이 일시적으로 증가합니다!");
+        System.out.println("⚔️ 힘의 축복을 받았습니다! 공격력이 일시적으로 증가합니다!(미구현)");
         yield "힘의 축복! 공격력 증가!";
       }
       case "vitality" -> {
         int healAmount = player.getMaxHp() / 2;
         player.heal(healAmount);
-        System.out.println("❤️ 생명력의 축복을 받았습니다! 체력이 회복됩니다!");
-        yield "생명력의 축복! 체력 회복!";
+        System.out.println("❤️ 생명력의 축복을 받았습니다! HP가 회복됩니다!");
+        yield "생명력의 축복! HP 회복!";
       }
       case "wisdom" -> {
-        int expGain = player.getLevel() * 10;
-        player.gainExp(expGain);
-        System.out.println("🧠 지혜의 축복을 받았습니다! 경험치를 획득합니다!");
-        yield "지혜의 축복! 경험치 +" + expGain;
+        int mpAmount = player.getMaxMp() / 2;
+        player.restoreMp(mpAmount);
+        System.out.println("🧠 지혜의 축복을 받았습니다! MP가 회복됩니다!");
+        yield "지혜의 축복! MP 회복 +" + mpAmount;
       }
       case "fortune" -> {
-        System.out.println("🍀 행운의 축복을 받았습니다! 운이 일시적으로 증가합니다!");
-        yield "행운의 축복! 운 증가!";
+        int expGain = player.getLevel() * 100;
+        player.gainExp(expGain);
+        System.out.println("🍀 행운의 축복을 받았습니다! 경험치를 획득합니다!");
+        yield "행운의 축복! 경험치 획득!";
       }
       default -> "알 수 없는 축복";
     };

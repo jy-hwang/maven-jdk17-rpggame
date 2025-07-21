@@ -270,9 +270,9 @@ public class GameConsumable extends GameItem {
           }
         }
         case "MP" -> {
-          int oldMp = target.getMana();
-          target.restoreMana(value);
-          int restoredAmount = target.getMana() - oldMp;
+          int oldMp = target.getMp();
+          target.restoreMp(value);
+          int restoredAmount = target.getMp() - oldMp;
           if (restoredAmount > 0) {
             System.out.println("💙 " + restoredAmount + " MP 회복!");
             return true;

@@ -4,7 +4,7 @@ public class GameConstants {
   // === 케릭터 관련 상수 ===
   public static final int INITIAL_LEVEL = 1;
   public static final int INITIAL_MAX_HP = 100;
-  public static final int INITIAL_MAX_MANA = 50;
+  public static final int INITIAL_MAX_MP = 50;
   public static final int INITIAL_EXP = 0;
   public static final int INITIAL_ATTACK = 10;
   public static final int INITIAL_DEFENSE = 5;
@@ -17,7 +17,7 @@ public class GameConstants {
   public static final int LEVEL_UP_ATTACK_BONUS = 5;
   public static final int LEVEL_UP_DEFENSE_BONUS = 3;
   public static final double LEVEL_UP_RESTORE_HP = 0.3;
-  public static final double LEVEL_UP_RESTORE_MANA = 0.2;
+  public static final double LEVEL_UP_RESTORE_MP = 0.2;
 
   // === 인벤토리 관련 ===
   public static final int DEFAULT_INVENTORY = 20;

@@ -17,8 +17,8 @@ public class PlayerMapper {
     dto.setLevel(character.getLevel());
     dto.setHp(character.getHp());
     dto.setMaxHp(character.getMaxHp());
-    dto.setMana(character.getMana());
-    dto.setMaxMana(character.getMaxMana());
+    dto.setMp(character.getMp());
+    dto.setMaxMp(character.getMaxMp());
     dto.setRestoreHp(character.getRestoreHp());
     dto.setRestoreMana(character.getRestoreMana());
     dto.setExp(character.getExp());
@@ -36,7 +36,7 @@ public class PlayerMapper {
 
   public static Player fromDto(PlayerDto dto) {
     // GameCharacter의 @JsonCreator 생성자 사용 (getter 사용)
-    Player character = new Player(dto.getName(), dto.getLevel(), dto.getHp(), dto.getMaxHp(), dto.getMana(), dto.getMaxMana(), dto.getRestoreHp(), dto.getRestoreMana(), dto.getExp(),
+    Player character = new Player(dto.getName(), dto.getLevel(), dto.getHp(), dto.getMaxHp(), dto.getMp(), dto.getMaxMp(), dto.getRestoreHp(), dto.getRestoreMana(), dto.getExp(),
         dto.getBaseAttack(), dto.getBaseDefense(), dto.getGold(), PlayerInventoryMapper.fromDto(dto.getInventory()), SkillManagerMapper.fromDto(dto.getSkillManager()),
         PlayerStatusCondition.valueOf(dto.getPlayerStatusCondition()), QuestManagerMapper.fromDto(dto.getQuestManager()));
 

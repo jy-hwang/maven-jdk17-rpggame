@@ -42,8 +42,8 @@ public class SimpleSaveData {
   private final int experience;
   private final int hp;
   private final int maxHp;
-  private final int mana;
-  private final int maxMana;
+  private final int mp;
+  private final int maxMp;
   private final int attack;
   private final int defense;
   private final int gold;
@@ -82,8 +82,8 @@ public class SimpleSaveData {
 , @JsonProperty("experience") int experience
 , @JsonProperty("hp") int hp
 , @JsonProperty("maxHp") int maxHp
-, @JsonProperty("mana") int mana
-, @JsonProperty("maxMana") int maxMana
+, @JsonProperty("mp") int mp
+, @JsonProperty("maxMp") int maxMp
 , @JsonProperty("attack") int attack
 , @JsonProperty("defense") int defense
 , @JsonProperty("gold") int gold
@@ -112,8 +112,8 @@ public class SimpleSaveData {
     this.experience = experience;
     this.hp = hp;
     this.maxHp = maxHp;
-    this.mana = mana;
-    this.maxMana = maxMana;
+    this.mp = mp;
+    this.maxMp = maxMp;
     this.attack = attack;
     this.defense = defense;
     this.gold = gold;
@@ -143,11 +143,14 @@ public class SimpleSaveData {
     try {
       logger.debug("Player를 SimpleSaveData로 변환 시작: {}", player.getName());
 
-      return new SimpleSaveData(String.valueOf(SystemConstants.GAME_VERSION), LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), slotNumber, player.getName(),
-          player.getLevel(), player.getExp(), player.getHp(), player.getMaxHp(), player.getMana(), player.getMaxMana(), player.getBaseAttack(), player.getBaseDefense(), player.getGold(),
-          player.getRestoreHp(), player.getRestoreMana(), player.getPlayerStatusCondition().name(), extractItemEntries(player.getInventory()), extractEquipmentSlots(player.getInventory()),
-          player.getInventory().getMaxSize(), extractQuestProgress(player.getQuestManager()), extractCompletedQuestIds(player.getQuestManager()), extractClaimedRewardIds(player.getQuestManager()),
-          extractLearnedSkillIds(player.getSkillManager()), extractSkillCooldowns(player.getSkillManager()), gameState.getTotalPlayTime(), gameState.getMonstersKilled(),
+      return new SimpleSaveData(String.valueOf(SystemConstants.GAME_VERSION),
+          LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), slotNumber, player.getName(), player.getLevel(),
+          player.getExp(), player.getHp(), player.getMaxHp(), player.getMp(), player.getMaxMp(), player.getBaseAttack(), player.getBaseDefense(),
+          player.getGold(), player.getRestoreHp(), player.getRestoreMana(), player.getPlayerStatusCondition().name(),
+          extractItemEntries(player.getInventory()), extractEquipmentSlots(player.getInventory()), player.getInventory().getMaxSize(),
+          extractQuestProgress(player.getQuestManager()), extractCompletedQuestIds(player.getQuestManager()),
+          extractClaimedRewardIds(player.getQuestManager()), extractLearnedSkillIds(player.getSkillManager()),
+          extractSkillCooldowns(player.getSkillManager()), gameState.getTotalPlayTime(), gameState.getMonstersKilled(),
           gameState.getQuestsCompleted(), gameState.getCurrentLocation());
 
     } catch (Exception e) {
@@ -173,9 +176,8 @@ public class SimpleSaveData {
       QuestManager questManager = restoreQuestManagerWithFactory();
 
       // === 4. Player 생성 ===
-      Player player = new Player(playerName, level, hp, maxHp, mana, maxMana, restoreHp, restoreMp, experience, attack, defense, gold, inventory, skillManager,
-          PlayerStatusCondition.valueOf(statusCondition), questManager);
-
+      Player player = new Player(playerName, level, hp, maxHp, mp, maxMp, restoreHp, restoreMp, experience, attack, defense, gold, inventory,
+          skillManager, PlayerStatusCondition.valueOf(statusCondition), questManager);
       // 상태 조건 설정
       try {
         PlayerStatusCondition condition = PlayerStatusCondition.valueOf(statusCondition);
@@ -296,7 +298,8 @@ public class SimpleSaveData {
   /**
    * 개별 장비 아이템 복원
    */
-  private void restoreEquippedItem(PlayerInventory inventory, GameItemFactory itemFactory, String itemId, String equipmentType, EquipmentSetter setter) {
+  private void restoreEquippedItem(PlayerInventory inventory, GameItemFactory itemFactory, String itemId, String equipmentType,
+      EquipmentSetter setter) {
     try {
       GameItem item = itemFactory.createItem(itemId);
 
@@ -579,12 +582,12 @@ public class SimpleSaveData {
     return maxHp;
   }
 
-  public int getMana() {
-    return mana;
+  public int getMp() {
+    return mp;
   }
 
-  public int getMaxMana() {
-    return maxMana;
+  public int getMaxMp() {
+    return maxMp;
   }
 
   public int getAttack() {

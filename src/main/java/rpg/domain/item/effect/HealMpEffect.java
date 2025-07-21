@@ -27,21 +27,21 @@ public class HealMpEffect implements GameEffect {
       return false;
     }
 
-    int oldMp = target.getMana();
+    int oldMp = target.getMp();
     int restoreAmount;
 
     if (isPercentage) {
-      restoreAmount = (int) (target.getMaxMana() * value / 100.0);
+      restoreAmount = (int) (target.getMaxMp() * value / 100.0);
     } else {
       restoreAmount = value;
     }
 
-    target.restoreMana(restoreAmount);
-    int actualRestored = target.getMana() - oldMp;
+    target.restoreMp(restoreAmount);
+    int actualRestored = target.getMp() - oldMp;
 
     if (actualRestored > GameConstants.NUMBER_ZERO) {
       System.out.println(getApplyMessage(target, true));
-      logger.info("{} MP 회복 적용: {} -> {} (+{})", target.getName(), oldMp, target.getMana(), actualRestored);
+      logger.info("{} MP 회복 적용: {} -> {} (+{})", target.getName(), oldMp, target.getMp(), actualRestored);
       return true;
     } else {
       System.out.println(getApplyMessage(target, false));

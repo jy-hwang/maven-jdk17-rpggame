@@ -31,6 +31,7 @@ import rpg.presentation.controller.QuestController;
 import rpg.presentation.controller.ShopController;
 import rpg.presentation.menu.GameMenu;
 import rpg.presentation.menu.MainMenu;
+import rpg.shared.constant.GameConstants;
 import rpg.shared.constant.SystemConstants;
 import rpg.shared.debug.DebugController;
 import rpg.shared.persistence.SaveGameController;
@@ -868,15 +869,15 @@ public class GameEngine {
    * 플레이어 상태 간단 표시
    */
   private void showPlayerStatusBrief() {
-    System.out.printf("📊 상태: Lv.%d | HP: %d/%d | MP: %d/%d | EXP: %d%n", player.getLevel(), player.getHp(), player.getMaxHp(), player.getMana(),
-        player.getMaxMana(), player.getExp());
+    System.out.printf("📊 상태: Lv.%d | HP: %d/%d | MP: %d/%d | EXP: %d%n", player.getLevel(), player.getHp(), player.getMaxHp(), player.getMp(),
+        player.getMaxMp(), player.getExp());
   }
 
   /**
    * 회복 상태 표시
    */
   private void showRecoveryStatus() {
-    System.out.printf("💝 회복 완료 - HP: %d/%d, MP: %d/%d%n", player.getHp(), player.getMaxHp(), player.getMana(), player.getMaxMana());
+    System.out.printf("💝 회복 완료 - HP: %d/%d, MP: %d/%d%n", player.getHp(), player.getMaxHp(), player.getMp(), player.getMaxMp());
   }
 
   /**
@@ -909,7 +910,7 @@ public class GameEngine {
    */
   private void checkHealthWarning() {
     double hpRate = (double) player.getHp() / player.getMaxHp();
-    double mpRate = (double) player.getMana() / player.getMaxMana();
+    double mpRate = (double) player.getMp() / player.getMaxMp();
 
     if (hpRate < 0.3) {
       System.out.println("⚠️ 체력이 부족합니다! 휴식을 권장합니다.");
@@ -923,9 +924,9 @@ public class GameEngine {
    * 행운의 보너스 체크
    */
   private void checkLuckyBonus() {
-    if (random.nextInt(100) < 5) { // 5% 확률
-      int bonusGold = player.getLevel() * 10;
-      player.setGold(bonusGold);
+    if (random.nextInt(GameConstants.NUMBER_HUNDRED) < GameConstants.NUMBER_TEN) { // 10% 확률
+      int bonusGold = player.getLevel() * GameConstants.NUMBER_TEN;
+      player.addGold(bonusGold);
       System.out.println("🍀 행운의 보너스! 골드 +" + bonusGold);
     }
   }

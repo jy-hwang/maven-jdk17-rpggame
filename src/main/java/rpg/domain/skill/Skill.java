@@ -71,11 +71,11 @@ public class Skill {
    * @return 스킬 사용 결과
    */
   public SkillResult useSkill(Player caster, Monster target) {
-    if (caster.getMana() < manaCost) {
+    if (caster.getMp() < manaCost) {
       return new SkillResult(false, "마나가 부족합니다!", 0);
     }
 
-    caster.useMana(manaCost);
+    caster.useMp(manaCost);
 
     switch (type) {
       case ATTACK:

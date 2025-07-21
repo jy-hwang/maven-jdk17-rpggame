@@ -57,7 +57,8 @@ public class SaveLoadController {
       var targetSlot = slots.stream().filter(slot -> slot.getSlotNumber() == slotNumber).findFirst().orElse(null);
 
       if (targetSlot != null && targetSlot.isOccupied()) {
-        boolean overwrite = InputValidator.getConfirmation("슬롯 " + slotNumber + "에 이미 '" + targetSlot.getCharacterName() + "' 캐릭터가 저장되어 있습니다. 덮어쓰시겠습니까?");
+        boolean overwrite =
+            InputValidator.getConfirmation("슬롯 " + slotNumber + "에 이미 '" + targetSlot.getCharacterName() + "' 캐릭터가 저장되어 있습니다. 덮어쓰시겠습니까?");
 
         if (!overwrite) {
           System.out.println("저장이 취소되었습니다.");
@@ -96,7 +97,6 @@ public class SaveLoadController {
         return new LoadResult(false, null, null, 0);
       } else {
         currentSaveSlot = slotNumber; // 현재 슬롯 업데이트
-
         System.out.println("🎮 슬롯 " + slotNumber + "에서 게임을 불러왔습니다!");
         System.out.println("어서오세요, " + saveData.getCharacter().getName() + "님!");
 

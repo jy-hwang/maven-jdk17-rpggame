@@ -187,7 +187,7 @@ public class InventoryController {
     }
 
     // 마나가 가득 찬 상태에서 마나 물약 사용 시 확인
-    if (isManaItem(item) && player.getMana() >= player.getMaxMana()) {
+    if (isManaItem(item) && player.getMp() >= player.getMaxMp()) {
       if (!InputValidator.getConfirmation("마나가 이미 가득합니다. 정말 사용하시겠습니까?")) {
         return false;
       }
@@ -306,6 +306,7 @@ public class InventoryController {
       int attackChange = newEquipment.getAttackBonus() - oldEquipment.getAttackBonus();
       int defenseChange = newEquipment.getDefenseBonus() - oldEquipment.getDefenseBonus();
       int hpChange = newEquipment.getHpBonus() - oldEquipment.getHpBonus();
+      int mpChange = newEquipment.getMpBonus() - oldEquipment.getMpBonus();
 
       if (attackChange > GameConstants.NUMBER_ZERO)
         System.out.println("⚔️ 공격력이 " + attackChange + " 증가했습니다!");
@@ -321,10 +322,16 @@ public class InventoryController {
         System.out.println("❤️ 최대 체력이 " + hpChange + " 증가했습니다!");
       else if (hpChange < GameConstants.NUMBER_ZERO)
         System.out.println("❤️ 최대 체력이 " + (-hpChange) + " 감소했습니다.");
+
+      if (mpChange > GameConstants.NUMBER_ZERO)
+        System.out.println("💙 최대 마나가 " + mpChange + " 증가했습니다!");
+      else if (mpChange < GameConstants.NUMBER_ZERO)
+        System.out.println("💙 최대 마나가 " + (-mpChange) + " 감소했습니다.");
     } else {
       System.out.println("⚔️ 공격력 +" + newEquipment.getAttackBonus());
       System.out.println("🛡️ 방어력 +" + newEquipment.getDefenseBonus());
       System.out.println("❤️ 최대 체력 +" + newEquipment.getHpBonus());
+      System.out.println("❤️ 최대 마나 +" + newEquipment.getMpBonus());
     }
   }
 
@@ -473,13 +480,15 @@ public class InventoryController {
     PlayerInventory.EquipmentBonus bonus = inventory.getTotalBonus();
     System.out.println("\n📊 총 장비 보너스:");
     if (bonus.getAttackBonus() > GameConstants.NUMBER_ZERO || bonus.getDefenseBonus() > GameConstants.NUMBER_ZERO
-        || bonus.getHpBonus() > GameConstants.NUMBER_ZERO) {
+        || bonus.getHpBonus() > GameConstants.NUMBER_ZERO || bonus.getMpBonus() > GameConstants.NUMBER_ZERO) {
       if (bonus.getAttackBonus() > GameConstants.NUMBER_ZERO)
         System.out.println("⚔️ 공격력: +" + bonus.getAttackBonus());
       if (bonus.getDefenseBonus() > GameConstants.NUMBER_ZERO)
         System.out.println("🛡️ 방어력: +" + bonus.getDefenseBonus());
       if (bonus.getHpBonus() > GameConstants.NUMBER_ZERO)
-        System.out.println("❤️ 체력: +" + bonus.getHpBonus());
+        System.out.println("❤️ HP: +" + bonus.getHpBonus());
+      if (bonus.getMpBonus() > GameConstants.NUMBER_ZERO)
+        System.out.println("❤️ MP: +" + bonus.getMpBonus());
     } else {
       System.out.println("없음");
     }

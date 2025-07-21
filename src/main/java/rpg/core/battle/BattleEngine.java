@@ -126,8 +126,8 @@ private void showBattleStatus(Player player, Monster monster) {
         player.getName(),
         player.getHp(),
         player.getTotalMaxHp(),
-        player.getMana(),
-        player.getMaxMana());
+        player.getMp(),
+        player.getMaxMp());
     System.out.println();
     // 몬스터 상태
     System.out.printf("👹 %s%n❤️ HP (%d/%d)%n",
