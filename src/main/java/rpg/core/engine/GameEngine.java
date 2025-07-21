@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.IntSummaryStatistics;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,9 +17,9 @@ import rpg.application.validator.InputValidator;
 import rpg.core.battle.BattleEngine;
 import rpg.core.exploration.ExploreEngine;
 import rpg.core.exploration.ExploreResult;
+import rpg.core.exploration.ExploreResultData;
 import rpg.domain.item.GameConsumable;
 import rpg.domain.item.GameItem;
-import rpg.domain.location.DangerLevel;
 import rpg.domain.location.LocationData;
 import rpg.domain.monster.MonsterData;
 import rpg.domain.player.Player;
@@ -41,7 +42,9 @@ import rpg.shared.util.ConsoleColors;
  */
 public class GameEngine {
   private static final Logger logger = LoggerFactory.getLogger(GameEngine.class);
-
+  
+  private final Random random;
+  
   // 게임 상태
   private Player player;
   private GameState gameState;
@@ -62,13 +65,14 @@ public class GameEngine {
 
   private MainMenu mainMenu;
   private GameMenu gameMenu;
-  
+
   public GameEngine() {
     this.gameRunning = true;
     this.inGameLoop = false;
     this.gameState = new GameState();
     this.gameStartTime = System.currentTimeMillis();
     this.currentSaveSlot = 0;
+    this.random = new Random();
 
     // 단계별 초기화
     initializeBasicControllers();
@@ -83,7 +87,7 @@ public class GameEngine {
       // 1단계: 플레이어 독립적인 컨트롤러들
       mainMenu = new MainMenu();
       gameMenu = new GameMenu();
-      
+
       inventoryController = new InventoryController();
       saveGameController = new SaveGameController();
 
@@ -175,7 +179,7 @@ public class GameEngine {
       logger.info("새 플레이어 생성: {}", name);
 
       gameStartTime = System.currentTimeMillis();
-      
+
       // 2단계: 플레이어 종속 컨트롤러들 초기화
       initializePlayerDependentControllers();
 
@@ -423,73 +427,6 @@ public class GameEngine {
     });
   }
 
-  /**
-   * 몬스터를 검색합니다.
-   */
-  private void searchMonster() {
-    String keyword = InputValidator.getStringInput("몬스터 이름을 입력하세요: ", 1, 20);
-
-    var allMonsters = MonsterDataLoader.loadAllMonsters();
-
-    var searchResults =
-        allMonsters.values().stream().filter(monster -> monster.getName().toLowerCase().contains(keyword.toLowerCase())).collect(Collectors.toList());
-
-    if (searchResults.isEmpty()) {
-      System.out.println("'" + keyword + "'와 일치하는 몬스터를 찾을 수 없습니다.");
-      return;
-    }
-
-    System.out.println("\n🔍 검색 결과: " + searchResults.size() + "종");
-
-    for (MonsterData monster : searchResults) {
-      showDetailedMonsterInfo(monster);
-    }
-  }
-
-  /**
-   * 몬스터의 상세 정보를 표시합니다.
-   */
-  private void showDetailedMonsterInfo(MonsterData monster) {
-    String rarity = getRarityIcon(monster.getRarity());
-    int level = estimateMonsterLevel(monster);
-
-    System.out.println("\n" + "=".repeat(50));
-    System.out.printf("%s %s (레벨 %d)%n", rarity, monster.getName(), level);
-    System.out.println("📝 " + monster.getDescription());
-    System.out.println("🏷️ 등급: " + monster.getRarity());
-
-    // 능력치
-    var stats = monster.getStats();
-    System.out.printf("⚔️ 능력치: HP %d, 공격 %d, 방어 %d, 속도 %d%n", stats.getHp(), stats.getAttack(), stats.getDefense(), stats.getSpeed());
-
-    // 보상
-    var rewards = monster.getRewards();
-    System.out.printf("💎 보상: 경험치 %d, 골드 %d%n", rewards.getExp(), rewards.getGold());
-
-    // 출현 지역
-    if (!monster.getLocations().isEmpty()) {
-      System.out.println("🗺️ 출현 지역: " + String.join(", ", monster.getLocations()));
-    }
-
-    // 출현 레벨 범위
-    System.out.printf("📊 출현 레벨: %d ~ %d (확률 %.0f%%)%n", monster.getMinLevel(), monster.getMaxLevel(), monster.getSpawnRate() * 100);
-
-    // 특수 능력
-    if (!monster.getAbilities().isEmpty()) {
-      System.out.println("💫 특수능력: " + String.join(", ", monster.getAbilities()));
-    }
-
-    // 드롭 아이템
-    if (!rewards.getDropItems().isEmpty()) {
-      System.out.println("🎁 드롭 아이템:");
-      for (var dropItem : rewards.getDropItems()) {
-        System.out.printf("   • %s (확률 %.1f%%, 수량 %d~%d)%n", dropItem.getItemId(), dropItem.getDropRate() * 100, dropItem.getMinQuantity(),
-            dropItem.getMaxQuantity());
-      }
-    }
-
-    System.out.println("=".repeat(50));
-  }
 
   private String getRarityIcon(String rarity) {
     return switch (rarity.toUpperCase()) {
@@ -506,53 +443,6 @@ public class GameEngine {
     return Math.max(1, (monsterData.getStats().getHp() + monsterData.getStats().getAttack() * 2) / 15);
   }
 
-  private void showLocationDescription(String location) {
-    String description = switch (location) {
-      case "숲속 깊은 곳" -> "🌲 울창한 숲에서 작은 소리들이 들려옵니다. 초보자에게 적합한 곳입니다.";
-      case "어두운 동굴" -> "🕳️ 어둠이 깊게 드리워진 동굴입니다. 위험하지만 보물이 있을 수 있습니다.";
-      case "험준한 산길" -> "⛰️ 험준한 산길이 이어집니다. 강한 몬스터들이 서식하고 있습니다.";
-      case "신비한 호수" -> "🏞️ 신비로운 기운이 감도는 호수입니다. 물속에서 무언가가 움직입니다.";
-      case "폐허가 된 성" -> "🏰 오래된 성의 폐허입니다. 망령들의 기운이 느껴집니다.";
-      case "마법의 숲" -> "🌟 마법의 기운이 흐르는 숲입니다. 신비한 존재들이 살고 있습니다.";
-      case "용암 동굴" -> "🌋 뜨거운 용암이 흐르는 위험한 동굴입니다. 최고 수준의 위험 지역입니다.";
-      case "고대 유적" -> "🏛️ 고대 문명의 유적입니다. 시간을 초월한 강력한 존재들이 지키고 있습니다.";
-      default -> "🗺️ 알 수 없는 지역입니다.";
-    };
-    System.out.println(description);
-  }
-
-  private void showLocationStatistics(String location) {
-    var monsters = MonsterDataLoader.getMonstersByLocation(location);
-
-    if (monsters.isEmpty())
-      return;
-
-    System.out.println("\n📊 지역 통계:");
-    System.out.println("   총 몬스터 종류: " + monsters.size() + "종");
-
-    int minLevel = monsters.stream().mapToInt(MonsterData::getMinLevel).min().orElse(1);
-    int maxLevel = monsters.stream().mapToInt(MonsterData::getMaxLevel).max().orElse(99);
-    System.out.println("   레벨 범위: " + minLevel + " ~ " + maxLevel);
-
-    double avgSpawnRate = monsters.stream().mapToDouble(MonsterData::getSpawnRate).average().orElse(0.0);
-    System.out.printf("   평균 출현율: %.1f%%%n", avgSpawnRate * 100);
-  }
-
-
-
-  /**
-   * 게임 알림을 표시합니다.
-   */
-  private void showNotifications() {
-    if (questController.hasClaimableRewards()) {
-      System.out.println("🎁 수령 가능한 퀘스트 보상이 있습니다!");
-    }
-
-    double inventoryUsage = inventoryController.getInventoryUsageRate(player);
-    if (inventoryUsage > 0.8) {
-      System.out.println("💼 인벤토리가 거의 가득 찼습니다! (" + String.format("%.0f%%", inventoryUsage * 100) + ")");
-    }
-  }
 
   /**
    * 메인 메뉴로 돌아갑니다.
@@ -623,69 +513,455 @@ public class GameEngine {
    * 특정 지역으로 탐험을 진행합니다. (LocationData 기반)
    */
   private void exploreSpecificLocation(LocationData location) {
-    System.out.println("\n🚀 " + location.getNameKo() + "(으)로 향합니다!");
+    displayLocationEntry(location);
 
-    // 현재 위치 설정 (한글명으로 설정, 호환성 유지)
-    gameState.setCurrentLocation(location.getNameKo());
+    // 지역 정보 표시
+    showLocationInfo(location);
 
-    // 지역 설명 표시
-    showLocationDescription(location);
+    // 탐험 실행
+    ExploreResultData resultData = exploreController.exploreLocation(player, location.getId());
 
-    // 해당 지역에서의 탐험 진행 (LocationID 사용)
-    ExploreResult result = exploreController.exploreLocation(player, location.getId());
+    // 결과 처리 및 표시
+    processExplorationResult(resultData);
 
-    // 탐험 결과 처리
-    handleExplorationResult(result);
+    // 후처리
+    handlePostExplorationActions(resultData);
 
     // 탐험 후 잠시 대기
     InputValidator.waitForAnyKey("\n계속하려면 Enter를 누르세요...");
   }
 
   /**
-   * 탐험 결과 처리
+   * 🌟 지역 진입 시 연출 개선
    */
-  private void handleExplorationResult(ExploreResult result) {
-    switch (result.getType()) {
-      case BATTLE_DEFEAT -> {
-        if (!player.isAlive()) {
-          System.out.println("💀 전투에서 패배했습니다...");
-          gameRunning = false;
-        }
-      }
-      case TREASURE -> {
-        // 보물 관련 퀘스트 진행도 업데이트
-        questController.updateProgress("treasure", 1);
-        logger.debug("보물 발견 이벤트 완료");
-      }
-      case KNOWLEDGE -> {
-        // 지식 획득 관련 퀘스트 진행도 업데이트
-        questController.updateLevelProgress(player);
-      }
-      case MERCHANT -> {
-        // 상인 조우 관련 퀘스트 진행도 업데이트
-        questController.updateProgress("merchant", 1);
-      }
-      case REST -> {
-        // 휴식 관련 효과는 이미 ExploreEngine에서 처리됨
-        logger.debug("휴식 이벤트 완료");
-      }
-      default -> {
-        // 기타 결과 처리
-      }
+  private void displayLocationEntry(LocationData location) {
+    System.out.println("\n" + "=".repeat(50));
+    System.out.println("🚀 " + location.getNameKo() + "(으)로 향합니다!");
+    System.out.println("=".repeat(50));
+
+    // 현재 위치 설정
+    gameState.setCurrentLocation(location.getNameKo());
+
+    // 지역별 분위기 연출
+    displayLocationAtmosphere(location);
+  }
+
+  /**
+   * 🎭 지역별 분위기 연출
+   */
+  private void displayLocationAtmosphere(LocationData location) {
+    String atmosphere = switch (location.getId()) {
+      case "forest" -> "🌲 바람에 나뭇잎이 바스락거리며 신비로운 기운이 감돕니다...";
+      case "cave" -> "🕳️ 동굴 깊숙한 곳에서 차가운 바람이 불어옵니다...";
+      case "mountain" -> "⛰️ 높은 산 정상에서 구름이 발밑으로 흘러갑니다...";
+      case "lake" -> "🏞️ 맑은 호수면에 달빛이 반짝이며 잔물결이 일고 있습니다...";
+      case "ruins" -> "🏛️ 오래된 유적에서 고대의 신비로운 힘이 느껴집니다...";
+      case "volcano" -> "🌋 뜨거운 용암의 열기가 피부를 태우듯 뜨겁습니다...";
+      default -> "🗺️ 새로운 모험이 기다리고 있습니다...";
+    };
+
+    System.out.println(atmosphere);
+    System.out.println();
+
+    // 잠시 대기 (몰입감 증대)
+    try {
+      Thread.sleep(500);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
     }
   }
 
   /**
-   * 지역 설명을 표시합니다. (LocationData 기반)
+   * 📊 지역 정보 표시 개선
    */
-  private void showLocationDescription(LocationData location) {
-    System.out.println(location.getDescription());
+  private void showLocationInfo(LocationData location) {
+    System.out.println("📍 지역 정보:");
+    System.out.printf("   %s %s (위험도: %s)%n", location.getIcon(), location.getNameKo(), location.getDangerLevel());
+    System.out.printf("   권장 레벨: %d-%d (현재: %d)%n", location.getMinLevel(), location.getMaxLevel(), player.getLevel());
+    System.out.printf("   이벤트 확률: %d%% ", // | 입장료: %d골드%n",
+        location.getEventChance());// , location.getEntryCost());
 
-    // 지역 특성 표시
-    Map<String, Object> properties = location.properties();
-    if (properties != null && !properties.isEmpty()) {
-      showLocationProperties(properties);
+    // 난이도 표시
+    String difficultyText = calculateLocationDifficulty(location);
+    System.out.println("   예상 난이도: " + difficultyText);
+    System.out.println();
+  }
+
+  /**
+   * 🎯 대폭 개선된 탐험 결과 처리
+   * - ExploreResultData 기반
+   * - 결과별 맞춤 처리
+   * - 향상된 피드백
+   */
+  private void processExplorationResult(ExploreResultData resultData) {
+    ExploreResult result = resultData.getResult();
+    String message = resultData.getMessage();
+
+    // 결과 타입별 아이콘과 색상 적용
+    String resultIcon = getResultIcon(result);
+    //String coloredMessage = applyResultColor(message, result);
+
+    System.out.println("\n" + "=".repeat(40));
+    System.out.println(resultIcon + " 탐험 결과");
+    System.out.println("=".repeat(40));
+    System.out.println(message);
+
+    // 세부 결과 처리
+    handleSpecificResult(result, resultData);
+
+    // 공통 후처리
+    handleCommonPostProcessing(resultData);
+
+    System.out.println("=".repeat(40));
+  }
+
+  /**
+   * 🎨 결과별 아이콘 반환
+   */
+  private String getResultIcon(ExploreResult result) {
+    return switch (result) {
+      case BATTLE_VICTORY -> "🏆";
+      case BATTLE_DEFEAT -> "💀";
+      case BATTLE_ESCAPED -> "🏃‍♂️";
+      case TREASURE -> "💎";
+      case KNOWLEDGE -> "📚";
+      case REST -> "😴";
+      case HEALING_SPRING -> "💧";
+      case MAGIC_CRYSTAL -> "🔮";
+      case SHRINE_BLESSING -> "⛩️";
+      case ERROR -> "❌";
+    };
+  }
+
+  /**
+   * 🌈 결과별 색상 적용
+   */
+  private String applyResultColor(String message, ExploreResult result) {
+    return switch (result) {
+      case BATTLE_VICTORY, TREASURE, KNOWLEDGE, HEALING_SPRING, MAGIC_CRYSTAL, SHRINE_BLESSING -> ConsoleColors.GREEN + message + ConsoleColors.RESET;
+      case BATTLE_DEFEAT, ERROR -> ConsoleColors.RED + message + ConsoleColors.RESET;
+      case BATTLE_ESCAPED -> ConsoleColors.YELLOW + message + ConsoleColors.RESET;
+      case REST -> ConsoleColors.CYAN + message + ConsoleColors.RESET;
+    };
+  }
+
+  /**
+   * 🎯 결과별 세부 처리
+   */
+  private void handleSpecificResult(ExploreResult result, ExploreResultData resultData) {
+    switch (result) {
+      case BATTLE_VICTORY -> handleBattleVictory();
+      case BATTLE_DEFEAT -> handleBattleDefeat();
+      case BATTLE_ESCAPED -> handleBattleEscape();
+      case TREASURE -> handleTreasureFound();
+      case KNOWLEDGE -> handleKnowledgeGained();
+      case REST -> handleRestEvent();
+      case HEALING_SPRING -> handleHealingSpring();
+      case MAGIC_CRYSTAL -> handleMagicCrystal();
+      case SHRINE_BLESSING -> handleShrineBlessing();
+      case ERROR -> handleError(resultData.getMessage());
     }
+  }
+
+  /**
+   * ⚔️ 전투 승리 처리
+   */
+  private void handleBattleVictory() {
+    System.out.println("🎉 전투에서 승리했습니다!");
+
+    // 레벨업 체크
+    if (checkAndHandleLevelUp()) {
+      return; // 레벨업 시 추가 처리 스킵
+    }
+
+    // 현재 상태 표시
+    showPlayerStatusBrief();
+
+    // 퀘스트 진행도 체크
+    checkQuestProgress();
+  }
+
+  /**
+   * 💀 전투 패배 처리
+   */
+  private void handleBattleDefeat() {
+    System.out.println("💔 전투에서 패배했습니다...");
+
+    if (!player.isAlive()) {
+      handlePlayerDeath();
+    } else {
+      handleDefeatPenalty();
+    }
+  }
+
+  /**
+   * 🏃‍♂️ 전투 도망 처리
+   */
+  private void handleBattleEscape() {
+    System.out.println("💨 위험을 피해 안전하게 도망쳤습니다.");
+    // 도망에 대한 특별한 처리는 없음
+  }
+
+  /**
+   * 💎 보물 발견 처리
+   */
+  private void handleTreasureFound() {
+    System.out.println("✨ 귀중한 보물을 발견했습니다!");
+    playTreasureEffect();
+    updateTreasureStatistics();
+  }
+
+  /**
+   * 📚 지식 습득 처리
+   */
+  private void handleKnowledgeGained() {
+    System.out.println("🧠 고대의 지혜를 터득했습니다!");
+
+    if (checkAndHandleLevelUp()) {
+      System.out.println("💡 지식의 힘으로 한층 더 성장했습니다!");
+    }
+  }
+
+  /**
+   * 😴 휴식 처리
+   */
+  private void handleRestEvent() {
+    System.out.println("💤 편안한 휴식을 취했습니다.");
+    showRecoveryStatus();
+  }
+
+  /**
+   * 💧 치유의 샘 처리
+   */
+  private void handleHealingSpring() {
+    System.out.println("🌟 신비한 치유의 힘을 받았습니다!");
+    System.out.println("💝 체력이 완전히 회복되었습니다!");
+    showRecoveryStatus();
+  }
+
+  /**
+   * 🔮 마법 크리스탈 처리
+   */
+  private void handleMagicCrystal() {
+    System.out.println("✨ 마법의 힘이 온몸에 흘러들어옵니다!");
+    System.out.println("🌙 마나가 완전히 회복되었습니다!");
+    showRecoveryStatus();
+  }
+
+  /**
+   * ⛩️ 제단 축복 처리
+   */
+  private void handleShrineBlessing() {
+    System.out.println("🙏 신성한 축복을 받았습니다!");
+    System.out.println("🌟 신비한 힘이 당신을 보호할 것입니다.");
+    showBlessingEffect();
+  }
+
+  /**
+   * ❌ 오류 처리
+   */
+  private void handleError(String errorMessage) {
+    System.out.println("⚠️ 예상치 못한 일이 발생했습니다: " + errorMessage);
+    logger.warn("탐험 중 오류 발생: {}", errorMessage);
+  }
+
+  /**
+   * 🎯 공통 후처리
+   */
+  private void handleCommonPostProcessing(ExploreResultData resultData) {
+    // 긍정적 결과에 대한 추가 보상
+    if (resultData.isPositive()) {
+      // 통계 업데이트
+      updateGameStatistics(resultData.getResult());
+
+      // 행운의 보너스 체크 (낮은 확률)
+      checkLuckyBonus();
+    }
+
+    // 퀘스트 상태 확인
+    questController.checkQuestCompletion();
+
+  }
+
+  /**
+   * 🎯 탐험 후 액션 처리
+   */
+  private void handlePostExplorationActions(ExploreResultData resultData) {
+    // 인벤토리 가득참 경고
+    checkInventoryWarning();
+
+    // 체력/마나 부족 경고
+    checkHealthWarning();
+
+    // 장비 내구도 경고 (향후 구현)
+    // checkEquipmentDurability();
+
+    // 추천 액션 제안
+    suggestNextActions(resultData);
+  }
+
+  // === 유틸리티 메서드들 ===
+
+  /**
+   * 레벨업 체크 및 처리
+   */
+  private boolean checkAndHandleLevelUp() {
+    // 이미 gainExperience()에서 레벨업이 처리되었고 결과를 받았다면
+    // 여기서는 GameEngine 차원의 추가 처리만 수행
+    
+    // 예: 새로운 지역 해금 알림, 특별 이벤트 등
+    // System.out.println("🗺️ 새로운 지역이 해금될 수 있습니다!");
+    
+    return true; // gainExperience()의 반환값을 그대로 전달받아 사용
+  }
+
+  /**
+   * 패배 페널티 처리
+   */
+  private void handleDefeatPenalty() {
+    // 체력을 1로 설정 (완전 사망 방지)
+    player.setHp(1);
+
+    // 경험치 약간 감소
+    int expLoss = Math.max(1, player.getLevel() * 3);
+    player.gainExp(expLoss);
+
+    System.out.println("💔 패배로 인해 경험치 " + expLoss + "를 잃었습니다.");
+    System.out.println("🏥 안전한 곳으로 이동되었습니다.");
+
+    // 시작 지역으로 이동
+    gameState.setCurrentLocation("마을");
+  }
+
+  /**
+   * 플레이어 사망 처리
+   */
+  private void handlePlayerDeath() {
+    System.out.println("\n💀 " + player.getName() + "이(가) 쓰러졌습니다...");
+    System.out.println("게임 오버! 메인 메뉴로 돌아갑니다.");
+
+    // 게임 종료
+    gameRunning = false;
+    inGameLoop = false;
+  }
+
+  /**
+   * 지역 난이도 계산
+   */
+  private String calculateLocationDifficulty(LocationData location) {
+    int playerLevel = player.getLevel();
+    int avgLocationLevel = (location.getMinLevel() + location.getMaxLevel()) / 2;
+    int levelDiff = avgLocationLevel - playerLevel;
+
+    if (levelDiff <= -3) {
+      return "🟢 쉬움";
+    } else if (levelDiff <= 0) {
+      return "🟡 적정";
+    } else if (levelDiff <= 3) {
+      return "🔴 어려움";
+    } else {
+      return "💀 매우 어려움";
+    }
+  }
+
+  /**
+   * 플레이어 상태 간단 표시
+   */
+  private void showPlayerStatusBrief() {
+    System.out.printf("📊 상태: Lv.%d | HP: %d/%d | MP: %d/%d | EXP: %d%n", player.getLevel(), player.getHp(), player.getMaxHp(), player.getMana(),
+        player.getMaxMana(), player.getExp());
+  }
+
+  /**
+   * 회복 상태 표시
+   */
+  private void showRecoveryStatus() {
+    System.out.printf("💝 회복 완료 - HP: %d/%d, MP: %d/%d%n", player.getHp(), player.getMaxHp(), player.getMana(), player.getMaxMana());
+  }
+
+  /**
+   * 보물 효과 연출
+   */
+  private void playTreasureEffect() {
+    System.out.println("♪♫♪ 짜잔~ ♪♫♪");
+  }
+
+  /**
+   * 축복 효과 표시
+   */
+  private void showBlessingEffect() {
+    System.out.println("🌟 ✨ 🌟 ✨ 🌟");
+    System.out.println("신성한 기운이 당신을 감쌉니다...");
+  }
+
+  /**
+   * 인벤토리 경고 체크
+   */
+  private void checkInventoryWarning() {
+    double usage = inventoryController.getInventoryUsageRate(player);
+    if (usage > 0.9) {
+      System.out.println("⚠️ 인벤토리가 거의 가득 찼습니다! (" + String.format("%.0f%%", usage * 100) + ")");
+    }
+  }
+
+  /**
+   * 체력 경고 체크
+   */
+  private void checkHealthWarning() {
+    double hpRate = (double) player.getHp() / player.getMaxHp();
+    double mpRate = (double) player.getMana() / player.getMaxMana();
+
+    if (hpRate < 0.3) {
+      System.out.println("⚠️ 체력이 부족합니다! 휴식을 권장합니다.");
+    }
+    if (mpRate < 0.3) {
+      System.out.println("⚠️ 마나가 부족합니다! 회복을 권장합니다.");
+    }
+  }
+
+  /**
+   * 행운의 보너스 체크
+   */
+  private void checkLuckyBonus() {
+    if (random.nextInt(100) < 5) { // 5% 확률
+      int bonusGold = player.getLevel() * 10;
+      player.setGold(bonusGold);
+      System.out.println("🍀 행운의 보너스! 골드 +" + bonusGold);
+    }
+  }
+
+  /**
+   * 다음 액션 추천
+   */
+  private void suggestNextActions(ExploreResultData resultData) {
+    System.out.println("\n💡 추천 액션:");
+
+    if (player.getHp() < player.getMaxHp() * 0.5) {
+      System.out.println("   🏥 체력 회복 (휴식 또는 아이템 사용)");
+    }
+
+    if (inventoryController.getInventoryUsageRate(player) > 0.8) {
+      System.out.println("   🛒 상점에서 아이템 판매");
+    }
+
+    if (questController.hasCompletableQuests()) {
+      System.out.println("   🎯 퀘스트 완료 및 보상 수령");
+    }
+
+    if (player.getLevel() >= getRecommendedLevelForNextArea()) {
+      System.out.println("   🗺️ 더 높은 레벨 지역 탐험");
+    }
+  }
+
+  // 기타 필요한 메서드들...
+  private void updateTreasureStatistics() { /* 구현 */ }
+
+  private void updateGameStatistics(ExploreResult result) { /* 구현 */ }
+
+  private void checkQuestProgress() { /* 구현 */ }
+
+    private int getRecommendedLevelForNextArea() {
+    return player.getLevel() + 5;
   }
 
   /**
@@ -713,22 +989,6 @@ public class GameEngine {
     if (!traits.isEmpty()) {
       System.out.println("특성: " + String.join(", ", traits));
     }
-  }
-
-  /**
-   * 난이도에 따른 색상을 반환합니다. (DangerLevel 기반)
-   */
-  private String getDifficultyColor(DangerLevel dangerLevel) {
-    return switch (dangerLevel) {
-      case EASY -> ConsoleColors.GREEN;
-      case NORMAL -> ConsoleColors.YELLOW;
-      case HARD -> ConsoleColors.BRIGHT_RED;
-      case VERY_HARD -> ConsoleColors.RED;
-      case EXTREME -> ConsoleColors.PURPLE;
-      case NIGHTMARE -> ConsoleColors.BLACK;
-      case DIVINE -> ConsoleColors.WHITE;
-      case IMPOSSIBLE -> ConsoleColors.RED + ConsoleColors.BOLD;
-    };
   }
 
   /**
@@ -925,32 +1185,6 @@ public class GameEngine {
     }
 
     return recommendation.toString();
-  }
-
-  /**
-   * 지역 통계 표시
-   */
-  private void showLocationStatistics(LocationData location, String locationId) {
-    System.out.println("\n📊 === 지역 통계 ===");
-
-    List<MonsterData> allMonsters = MonsterDataLoader.getMonstersByLocation(locationId);
-    List<MonsterData> suitableMonsters = MonsterDataLoader.getMonstersByLocationAndLevel(locationId, player.getLevel());
-
-    System.out.println("총 몬스터 종류: " + allMonsters.size() + "종");
-    System.out.println("현재 레벨 적합 몬스터: " + suitableMonsters.size() + "종");
-
-    if (!allMonsters.isEmpty()) {
-      // 레벨 범위
-      int minMonsterLevel = allMonsters.stream().mapToInt(MonsterData::getMinLevel).min().orElse(0);
-      int maxMonsterLevel = allMonsters.stream().mapToInt(MonsterData::getMaxLevel).max().orElse(0);
-      System.out.println("몬스터 레벨 범위: " + minMonsterLevel + " ~ " + maxMonsterLevel);
-
-      // 희귀도 분포
-      Map<String, Long> rarityDistribution = allMonsters.stream().collect(Collectors.groupingBy(MonsterData::getRarity, Collectors.counting()));
-
-      System.out.println("희귀도 분포:");
-      rarityDistribution.forEach((rarity, count) -> System.out.println("  " + rarity + ": " + count + "종"));
-    }
   }
 
   /**

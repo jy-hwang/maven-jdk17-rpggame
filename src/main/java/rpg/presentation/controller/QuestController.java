@@ -1,5 +1,6 @@
 package rpg.presentation.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -392,7 +393,26 @@ public class QuestController {
   public boolean hasClaimableRewards() {
     return !questManager.getClaimableQuests().isEmpty();
   }
-
+  
+  /**
+   * 🔧 완료 가능한 퀘스트가 있는지 확인 (기존 hasClaimableRewards와 다름)
+   * - hasClaimableRewards(): 보상 수령 대기 중인 퀘스트 (COMPLETED 상태)
+   * - hasCompletableQuests(): 완료 조건 달성했지만 아직 ACTIVE 상태인 퀘스트
+   */
+  public boolean hasCompletableQuests() {
+      if (currentPlayer == null || currentPlayer.getQuestManager() == null) {
+          return false;
+      }
+      
+      List<Quest> activeQuests = currentPlayer.getQuestManager().getActiveQuests();
+      
+      return activeQuests.stream().anyMatch(quest -> 
+          quest != null && 
+          quest.getStatus() == Quest.QuestStatus.ACTIVE && 
+          quest.isCompleted()
+      );
+  }
+  
   /**
    * 퀘스트 매니저를 반환합니다. (다른 컨트롤러에서 필요한 경우)
    * 
@@ -418,7 +438,49 @@ public class QuestController {
 
     System.out.println("★".repeat(GameConstants.NUMBER_TWENTY));
   }
+  /**
+   * 🔧 퀘스트 완료 상태를 확인하고 자동으로 COMPLETED 상태로 변경
+   * (기존 showQuestCompletionNotification과 연계하여 사용)
+   */
+  public void checkQuestCompletion() {
+      if (currentPlayer == null || currentPlayer.getQuestManager() == null) {
+          logger.warn("플레이어 또는 QuestManager가 null입니다.");
+          return;
+      }
 
+      QuestManager playerQuestManager = currentPlayer.getQuestManager();
+      List<Quest> activeQuests = new ArrayList<>(playerQuestManager.getActiveQuests());
+      boolean anyQuestCompleted = false;
+
+      for (Quest quest : activeQuests) {
+          if (quest != null && 
+              quest.getStatus() == Quest.QuestStatus.ACTIVE && 
+              quest.isCompleted()) {
+              
+              // 퀘스트를 COMPLETED 상태로 변경
+              quest.setStatus(Quest.QuestStatus.COMPLETED);
+              playerQuestManager.completeQuest(quest);
+              
+              // 기존 메서드 활용
+              showQuestCompletionNotification(quest);
+              
+              anyQuestCompleted = true;
+              logger.info("퀘스트 자동 완료: {} ({})", quest.getTitle(), quest.getId());
+          }
+      }
+
+      if (anyQuestCompleted) {
+          // 게임 통계 업데이트
+          if (gameState != null) {
+              gameState.incrementQuestsCompleted();
+          }
+          
+          // 기존 메서드 활용
+          if (hasClaimableRewards()) {
+              System.out.println("💡 퀘스트 메뉴에서 완료된 퀘스트의 보상을 수령하세요!");
+          }
+      }
+  }
   /**
    * 퀘스트 힌트를 표시합니다.
    */

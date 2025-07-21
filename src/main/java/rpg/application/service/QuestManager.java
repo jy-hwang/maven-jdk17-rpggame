@@ -447,7 +447,7 @@ public class QuestManager {
   /**
    * 퀘스트 완료 처리
    */
-  private void completeQuest(Quest quest) {
+  public void completeQuest(Quest quest) {
     activeQuests.remove(quest);
     completedQuests.add(quest);
     quest.setStatus(QuestStatus.COMPLETED);

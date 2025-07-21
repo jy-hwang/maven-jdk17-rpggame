@@ -130,7 +130,7 @@ public class SaveGameController {
 
       System.out.println("✅ 슬롯 " + slotNumber + "에 게임이 저장되었습니다!");
       System.out.printf("   캐릭터: %s (레벨 %d)\n", player.getName(), player.getLevel());
-      System.out.printf("   위치: %s\n", gameState.getCurrentLocation());
+      System.out.printf("   마지막 탐험 위치: %s\n", gameState.getCurrentLocation());
 
       logger.info("슬롯 {} 게임 저장 완료: {}", slotNumber, player.getName());
 
